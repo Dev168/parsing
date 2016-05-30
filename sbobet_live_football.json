@@ -1,0 +1,240 @@
+{
+    "football": [
+        {
+            "INTERNATIONAL FRIENDLY": [
+                {
+                    "Teams": [
+                        "Italy (n)",
+                        "Scotland"
+                    ],
+                    "Coffs": [
+                        "1.73",
+                        "2.68",
+                        "7.60"
+                    ],
+                    "OddsClosed": false
+                },
+                {
+                    "Teams": [
+                        "Portugal",
+                        "Norway"
+                    ],
+                    "Coffs": [
+                        "1.61",
+                        "3.45",
+                        "6.00"
+                    ],
+                    "OddsClosed": false
+                }
+            ]
+        },
+        {
+            "Iceland Pepsi Premier League": [
+                {
+                    "Teams": [
+                        "Vikingur Reykjavik",
+                        "IA Akranes"
+                    ],
+                    "Coffs": [
+                        "3.25",
+                        "3.00",
+                        "2.26"
+                    ],
+                    "OddsClosed": false
+                }
+            ]
+        },
+        {
+            "Italy Lega Pro Playoff": [
+                {
+                    "Teams": [
+                        "Foggia",
+                        "Lecce"
+                    ],
+                    "Coffs": [
+                        "2.33",
+                        "2.40",
+                        "3.65"
+                    ],
+                    "OddsClosed": false
+                }
+            ]
+        },
+        {
+            "Spain Tercera Division Playoff": [
+                {
+                    "Teams": [
+                        "Atletico Sanluqueno",
+                        "Naxara CD"
+                    ],
+                    "Coffs": [
+                        "1.57",
+                        "3.40",
+                        "5.20"
+                    ],
+                    "OddsClosed": false
+                }
+            ]
+        },
+        {
+            "Saudi Arabia King Cup of Champions": [
+                {
+                    "Teams": [
+                        "Al Ahli Jeddah",
+                        "Al Nassr Riyadh"
+                    ],
+                    "Coffs": [
+                        "4.60",
+                        "1.33",
+                        "6.60"
+                    ],
+                    "OddsClosed": false
+                },
+                {
+                    "Teams": [
+                        "Al Ahli Jeddah (ET)",
+                        "Al Nassr Riyadh (ET)"
+                    ],
+                    "Coffs": [
+                        "3.25",
+                        "1.73",
+                        "4.30"
+                    ],
+                    "OddsClosed": false
+                }
+            ]
+        },
+        {
+            "Brazil Serie A": [
+                {
+                    "Teams": [
+                        "Sao Paulo",
+                        "Palmeiras"
+                    ],
+                    "Coffs": [
+                        "1.39",
+                        "3.60",
+                        "12.00"
+                    ],
+                    "OddsClosed": false
+                },
+                {
+                    "Teams": [
+                        "Fluminense (n)",
+                        "Botafogo RJ"
+                    ],
+                    "Coffs": [
+                        "2.45",
+                        "2.23",
+                        "4.50"
+                    ],
+                    "OddsClosed": false
+                },
+                {
+                    "Teams": [
+                        "Vitoria BA",
+                        "Atletico Mineiro"
+                    ],
+                    "Coffs": [
+                        "7.80",
+                        "3.90",
+                        "1.43"
+                    ],
+                    "OddsClosed": false
+                }
+            ]
+        },
+        {
+            "Argentina Primera Division Playoff": [
+                {
+                    "Teams": [
+                        "San Lorenzo (n)",
+                        "Lanus"
+                    ],
+                    "Coffs": [
+                        "8.50",
+                        "3.90",
+                        "1.42"
+                    ],
+                    "OddsClosed": false
+                }
+            ]
+        },
+        {
+            "Argentina Primera B Nacional": [
+                {
+                    "Teams": [
+                        "Crucero del Norte",
+                        "Ferrocarril Oeste"
+                    ],
+                    "Coffs": [
+                        "1.88",
+                        "2.81",
+                        "4.30"
+                    ],
+                    "OddsClosed": false
+                }
+            ]
+        },
+        {
+            "Peru Torneo Descentralizado": [
+                {
+                    "Teams": [
+                        "Ayacucho FC",
+                        "Centro Deportivo Municipal"
+                    ],
+                    "Coffs": [
+                        "12.50",
+                        "3.30",
+                        "1.36"
+                    ],
+                    "OddsClosed": false
+                }
+            ]
+        },
+        {
+            "Uruguay Primera Division": [
+                {
+                    "Teams": [
+                        "Penarol Montevideo",
+                        "Plaza Colonia"
+                    ],
+                    "Coffs": [
+                        "2.09",
+                        "3.05",
+                        "3.20"
+                    ],
+                    "OddsClosed": false
+                },
+                {
+                    "Teams": [
+                        "Sud America",
+                        "Cerro Montevideo"
+                    ],
+                    "Coffs": [
+                        "1.19",
+                        "5.00",
+                        "12.00"
+                    ],
+                    "OddsClosed": false
+                }
+            ]
+        },
+        {
+            "Argentina Primera B Metropolitana": [
+                {
+                    "Teams": [
+                        "CA Atlanta",
+                        "Talleres de Escalada"
+                    ],
+                    "Coffs": [
+                        "1.10",
+                        "5.40",
+                        "38.00"
+                    ],
+                    "OddsClosed": false
+                }
+            ]
+        }
+    ]
+}
