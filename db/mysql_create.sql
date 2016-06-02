@@ -10,10 +10,11 @@ CREATE TABLE `Participants` (
 );
 
 CREATE TABLE `ParticipantNames` (
-	`Name` char(250) NOT NULL AUTO_INCREMENT,
-	`Bookmaker` bigint NOT NULL AUTO_INCREMENT,
+	`id` bigint NOT NULL,
+	`Name` char(250) NOT NULL,
+	`Bookmaker` bigint NOT NULL,
 	`Participant` bigint NOT NULL,
-	PRIMARY KEY (`Name`,`Bookmaker`)
+	PRIMARY KEY (`id`)
 );
 
 CREATE TABLE `FootballEvents` (
@@ -26,14 +27,15 @@ CREATE TABLE `FootballEvents` (
 );
 
 CREATE TABLE `FootballBets` (
-	`FootballEvent` bigint NOT NULL AUTO_INCREMENT,
-	`Bookmaker` bigint NOT NULL AUTO_INCREMENT,
+	`id` bigint NOT NULL,
+	`FootballEvent` bigint NOT NULL,
+	`Bookmaker` bigint NOT NULL,
 	`FirstWin` double NOT NULL,
 	`SecondWin` double NOT NULL,
 	`Draw` double NOT NULL,
 	`Handicap` bigint NOT NULL,
 	`Total` bigint NOT NULL,
-	PRIMARY KEY (`FootballEvent`,`Bookmaker`)
+	PRIMARY KEY (`id`)
 );
 
 CREATE TABLE `Handicap` (
@@ -66,3 +68,7 @@ ALTER TABLE `FootballBets` ADD CONSTRAINT `FootballBets_fk1` FOREIGN KEY (`Bookm
 ALTER TABLE `FootballBets` ADD CONSTRAINT `FootballBets_fk2` FOREIGN KEY (`Handicap`) REFERENCES `Handicap`(`id`);
 
 ALTER TABLE `FootballBets` ADD CONSTRAINT `FootballBets_fk3` FOREIGN KEY (`Total`) REFERENCES `Total`(`id`);
+
+ALTER TABLE `ParticipantNames` ADD UNIQUE `unique_index`(`Name`, `Bookmaker`);
+
+ALTER TABLE `FootballBets` ADD UNIQUE `unique_index`(`FootballEvent`, `Bookmaker`);
