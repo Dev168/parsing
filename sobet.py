@@ -2,6 +2,7 @@ import bs4
 from selenium import webdriver
 
 
+
 def parse_ligue(ligue):
     
     table = ligue.next_sibling()[0]
