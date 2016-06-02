@@ -20,3 +20,24 @@ def init():
         cursor.execute(sql_init_code)
 
         print("База данных успешно инициализирована")
+
+        conn.close()
+
+
+def create_bookmaker(bookmaker_name):
+    """Создает нового букмекера"""
+    conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME)
+
+    cursor = conn.cursor()
+
+    sql_code = 'INSERT INTO bookmakers (Name) VALUES ("{0}")'.format(bookmaker_name)
+
+    try:
+        cursor.execute(sql_code)
+        conn.commit()
+        print("{0} контора успешно создана".format(bookmaker_name))
+    except mysql.IntegrityError as err:
+        print(err)
+
+    conn.close()
+

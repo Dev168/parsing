@@ -1,16 +1,17 @@
 CREATE TABLE `Bookmakers` (
-	`id` bigint NOT NULL,
+	`id` bigint NOT NULL AUTO_INCREMENT,
 	`Name` char(50),
-	PRIMARY KEY (`id`)
+	PRIMARY KEY (`id`),
+	UNIQUE KEY(`Name`)
 );
 
 CREATE TABLE `Participants` (
-	`id` bigint NOT NULL,
+	`id` bigint NOT NULL AUTO_INCREMENT,
 	PRIMARY KEY (`id`)
 );
 
 CREATE TABLE `ParticipantNames` (
-	`id` bigint NOT NULL,
+	`id` bigint NOT NULL AUTO_INCREMENT,
 	`Name` char(250) NOT NULL,
 	`Bookmaker` bigint NOT NULL,
 	`Participant` bigint NOT NULL,
@@ -18,7 +19,7 @@ CREATE TABLE `ParticipantNames` (
 );
 
 CREATE TABLE `FootballEvents` (
-	`id` bigint NOT NULL,
+	`id` bigint NOT NULL AUTO_INCREMENT,
 	`FirstParticipant` bigint NOT NULL,
 	`SecondParticipant` bigint NOT NULL,
 	`EventDate` DATETIME NOT NULL,
@@ -27,7 +28,7 @@ CREATE TABLE `FootballEvents` (
 );
 
 CREATE TABLE `FootballBets` (
-	`id` bigint NOT NULL,
+	`id` bigint NOT NULL AUTO_INCREMENT,
 	`FootballEvent` bigint NOT NULL,
 	`Bookmaker` bigint NOT NULL,
 	`FirstWin` double NOT NULL,
@@ -39,14 +40,14 @@ CREATE TABLE `FootballBets` (
 );
 
 CREATE TABLE `Handicap` (
-	`id` bigint NOT NULL,
+	`id` bigint NOT NULL AUTO_INCREMENT,
 	`ForwardValue` double NOT NULL,
 	`Coff` double NOT NULL,
 	PRIMARY KEY (`id`)
 );
 
 CREATE TABLE `Total` (
-	`id` bigint NOT NULL,
+	`id` bigint NOT NULL AUTO_INCREMENT,
 	`Total_under` bool NOT NULL,
 	`TotalValue` double NOT NULL,
 	`Coff` double NOT NULL,
