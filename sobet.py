@@ -1,5 +1,7 @@
 import bs4
 from selenium import webdriver
+from settings import PROXY
+
 
 def parse_ligue(ligue):
 
@@ -71,9 +73,9 @@ def parse_sport_page(page):
 def get_live_football_events():
 
     service_args = [
-        '--proxy=192.99.251.170:54481',
+        '--proxy={0}'.format(PROXY[0]),
         '--proxy-type=http',
-        '--proxy-auth=GlR6N7WSMu:like.tokarev@gmail.com'
+        '--proxy-auth={0}:{1}'.format(PROXY[1], PROXY[2])
     ]
 
     driver = webdriver.PhantomJS(service_args=service_args)
