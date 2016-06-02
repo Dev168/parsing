@@ -1,9 +1,9 @@
 import bs4
 from selenium import webdriver
 
-
-
 def parse_ligue(ligue):
+
+    i = 1
     
     table = ligue.next_sibling()[0]
 
