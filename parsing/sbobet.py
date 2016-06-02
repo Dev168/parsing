@@ -1,12 +1,13 @@
 import bs4
 from selenium import webdriver
 from settings import PROXY
+import sys
+import os
+from datetime import datetime
 
 
 def parse_ligue(ligue):
 
-    i = 1
-    
     table = ligue.next_sibling()[0]
 
     children = table.children
@@ -35,10 +36,6 @@ def parse_ligue(ligue):
             coffs = game.find_all("span", class_="OddsR")
             coffs_data = [0, 0, 0]
 
-            print(game_data)
-            print(game)
-            print(coffs)
-
             coffs_data[0] = coffs[0].contents[0].strip()
             coffs_data[1] = coffs[1].contents[0].strip()
             coffs_data[2] = coffs[2].contents[0].strip()
@@ -51,6 +48,7 @@ def parse_ligue(ligue):
 
 
 def parse_sport_page(page):
+
 
     bs = bs4.BeautifulSoup(page, "html.parser")
 
@@ -67,7 +65,7 @@ def parse_sport_page(page):
 
         ligues_data.append(ligue_data)
 
-    return {"football": ligues_data}
+    return {"football": ligues_data, "BookmakerName": "sbobet"}
 
 
 def get_live_football_events():
@@ -86,7 +84,16 @@ def get_live_football_events():
 
     driver.close()
 
-    data = parse_sport_page(page)
+    try:
+        data = parse_sport_page(page)
+    except:
+        debug_log(page, sys.exc_info())
 
     return data
+
+
+def debug_log(page, info):
+    dname = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    os.makedirs("parsing/sbobet_logs/{0}".format())
+
 
