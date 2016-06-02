@@ -1,4 +1,4 @@
-CREATE TABLE `Bookmakers` (
+CREATE TABLE `DbNameTemplate` (
 	`id` bigint NOT NULL,
 	`Name` char(50),
 	PRIMARY KEY (`id`)
