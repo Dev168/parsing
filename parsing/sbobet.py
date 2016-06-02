@@ -82,9 +82,9 @@ def get_live_football_events():
 
     driver.get("https://www.sbobet.com/euro/football")
 
-    driver.close()
-
     page = driver.page_source
+
+    driver.close()
 
     data = parse_sport_page(page)
 
