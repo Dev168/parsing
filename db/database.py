@@ -48,11 +48,28 @@ def create_bookmaker(bookmaker_name):
     except mysql.IntegrityError as err:
         print(err)
 
+    cursor.close()
+
     conn.close()
 
 
 def get_bookmakers():
-    return None
+
+    conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME)
+
+    cursor = conn.cursor()
+
+    sql_code = "SELECT * FROM bookmakers"
+
+    cursor.execute(sql_code)
+
+    res = cursor.fetchall()
+
+    cursor.close()
+
+    conn.close()
+
+    return res
 
 
 def create_sports(sports):
