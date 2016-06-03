@@ -73,3 +73,25 @@ ALTER TABLE `FootballBets` ADD CONSTRAINT `FootballBets_fk3` FOREIGN KEY (`Total
 ALTER TABLE `ParticipantNames` ADD UNIQUE `unique_index`(`Name`, `Bookmaker`);
 
 ALTER TABLE `FootballBets` ADD UNIQUE `unique_index`(`FootballEvent`, `Bookmaker`);
+
+
+CREATE TABLE `sports` (
+	`id` bigint NOT NULL AUTO_INCREMENT,
+	`Name` char(200),
+	PRIMARY KEY (`id`),
+    UNIQUE KEY(`Name`)
+);
+
+CREATE TABLE `sportnames` (
+	`id` bigint NOT NULL,
+	`Name` char(250) NOT NULL,
+	`Bookmaker` bigint NOT NULL,
+   	`Sport` bigint,
+	PRIMARY KEY (`id`)
+);
+
+ALTER TABLE `sportnames` ADD CONSTRAINT `sportnames_fk0` FOREIGN KEY (`Bookmaker`) REFERENCES `Bookmakers`(`id`);
+
+ALTER TABLE `sportnames` ADD CONSTRAINT `sportnames_fk1` FOREIGN KEY (`Sport`) REFERENCES `sports`(`id`);
+
+ALTER TABLE `sportnames` ADD UNIQUE `unique_index`(`Name`, `Bookmaker`);
