@@ -18,62 +18,53 @@ CREATE TABLE `ParticipantNames` (
 	PRIMARY KEY (`id`)
 );
 
-CREATE TABLE `FootballEvents` (
-	`id` bigint NOT NULL AUTO_INCREMENT,
-	`FirstParticipant` bigint NOT NULL,
-	`SecondParticipant` bigint NOT NULL,
-	`EventDate` DATETIME NOT NULL,
-	`Current` BINARY NOT NULL,
+CREATE TABLE `href` (
+	`id` bigint NOT NULL,
+	`Bookmaker` bigint NOT NULL,
+	`href` char(200) NOT NULL,
 	PRIMARY KEY (`id`)
 );
 
-CREATE TABLE `FootballBets` (
-	`id` bigint NOT NULL AUTO_INCREMENT,
-	`FootballEvent` bigint NOT NULL,
-	`Bookmaker` bigint NOT NULL,
+CREATE TABLE `vs` (
+	`id` bigint NOT NULL,
+	`FirstParticipant` bigint NOT NULL,
+	`SecondParticipant` bigint NOT NULL,
 	`FirstWin` double NOT NULL,
 	`SecondWin` double NOT NULL,
 	`Draw` double NOT NULL,
-	`Handicap` bigint NOT NULL,
-	`Total` bigint NOT NULL,
+	`OddsDate` DATETIME NOT NULL,
+	`GameDate` DATETIME NOT NULL,
+	`Live` BINARY NOT NULL,
+	`LiveDate` DATETIME,
 	PRIMARY KEY (`id`)
 );
 
 CREATE TABLE `Handicap` (
-	`id` bigint NOT NULL AUTO_INCREMENT,
-	`ForwardValue` double NOT NULL,
-	`Coff` double NOT NULL,
+	`id` bigint NOT NULL,
+	`FristParticipant` bigint NOT NULL,
+	`SecondParticipant` bigint NOT NULL,
+	`Forward` bigint NOT NULL,
+	`Win` double NOT NULL,
+	`OddsDate` DATETIME NOT NULL,
+	`GameDate` DATETIME NOT NULL,
+	`Live` BINARY NOT NULL,
+	`LiveDate` DATETIME NOT NULL,
 	PRIMARY KEY (`id`)
 );
 
-CREATE TABLE `Total` (
-	`id` bigint NOT NULL AUTO_INCREMENT,
-	`Total_under` bool NOT NULL,
-	`TotalValue` double NOT NULL,
-	`Coff` double NOT NULL,
+CREATE TABLE `Forwards` (
+	`id` bigint NOT NULL,
+	`Value` double(3,2) NOT NULL UNIQUE,
 	PRIMARY KEY (`id`)
 );
+
+
 
 ALTER TABLE `ParticipantNames` ADD CONSTRAINT `ParticipantNames_fk0` FOREIGN KEY (`Bookmaker`) REFERENCES `Bookmakers`(`id`);
 
 ALTER TABLE `ParticipantNames` ADD CONSTRAINT `ParticipantNames_fk1` FOREIGN KEY (`Participant`) REFERENCES `Participants`(`id`);
 
-ALTER TABLE `FootballEvents` ADD CONSTRAINT `FootballEvents_fk0` FOREIGN KEY (`FirstParticipant`) REFERENCES `Participants`(`id`);
-
-ALTER TABLE `FootballEvents` ADD CONSTRAINT `FootballEvents_fk1` FOREIGN KEY (`SecondParticipant`) REFERENCES `Participants`(`id`);
-
-ALTER TABLE `FootballBets` ADD CONSTRAINT `FootballBets_fk0` FOREIGN KEY (`FootballEvent`) REFERENCES `FootballEvents`(`id`);
-
-ALTER TABLE `FootballBets` ADD CONSTRAINT `FootballBets_fk1` FOREIGN KEY (`Bookmaker`) REFERENCES `Bookmakers`(`id`);
-
-ALTER TABLE `FootballBets` ADD CONSTRAINT `FootballBets_fk2` FOREIGN KEY (`Handicap`) REFERENCES `Handicap`(`id`);
-
-ALTER TABLE `FootballBets` ADD CONSTRAINT `FootballBets_fk3` FOREIGN KEY (`Total`) REFERENCES `Total`(`id`);
-
 ALTER TABLE `ParticipantNames` ADD UNIQUE `unique_index`(`Name`, `Bookmaker`);
-
-ALTER TABLE `FootballBets` ADD UNIQUE `unique_index`(`FootballEvent`, `Bookmaker`);
-
 
 CREATE TABLE `sports` (
 	`id` bigint NOT NULL AUTO_INCREMENT,
@@ -95,3 +86,15 @@ ALTER TABLE `sportnames` ADD CONSTRAINT `sportnames_fk0` FOREIGN KEY (`Bookmaker
 ALTER TABLE `sportnames` ADD CONSTRAINT `sportnames_fk1` FOREIGN KEY (`Sport`) REFERENCES `sports`(`id`);
 
 ALTER TABLE `sportnames` ADD UNIQUE `unique_index`(`Name`, `Bookmaker`);
+
+ALTER TABLE `href` ADD CONSTRAINT `href_fk0` FOREIGN KEY (`Bookmaker`) REFERENCES `Bookmakers`(`id`);
+
+ALTER TABLE `vs` ADD CONSTRAINT `vs_fk0` FOREIGN KEY (`FirstParticipant`) REFERENCES `Participants`(`id`);
+
+ALTER TABLE `vs` ADD CONSTRAINT `vs_fk1` FOREIGN KEY (`SecondParticipant`) REFERENCES `Participants`(`id`);
+
+ALTER TABLE `Handicap` ADD CONSTRAINT `Handicap_fk0` FOREIGN KEY (`FristParticipant`) REFERENCES `Participants`(`id`);
+
+ALTER TABLE `Handicap` ADD CONSTRAINT `Handicap_fk1` FOREIGN KEY (`SecondParticipant`) REFERENCES `Participants`(`id`);
+
+ALTER TABLE `Handicap` ADD CONSTRAINT `Handicap_fk2` FOREIGN KEY (`Forward`) REFERENCES `Forwards`(`id`);
