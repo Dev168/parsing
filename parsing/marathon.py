@@ -9,7 +9,7 @@ def get_live_football_events():
     jsdata = {}  # Будем использовать словарь словарей, листов и строк, чтобы в дальнейшем с легкостью
     #  серилизовать его в JSON
 
-    html_text = requests.get("https://www.marathonbet2.com/en/live/26418").text
+    html_text = requests.get("https://www.marathonbet6.com/su/live/popular").text
 
     doc = bs4.BeautifulSoup(html_text, "html.parser")  # Создадим Объект для парсинга на основе HTML текста
 
@@ -37,8 +37,6 @@ def parse_event(event):
     event_dict["team1"] = teams[0].contents[0].strip()
 
     event_dict["team2"] = teams[1].contents[0].strip()
-
-    event_dict["id"] = event["data-event-treeid"]
 
     return event_dict
 
