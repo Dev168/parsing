@@ -7,16 +7,128 @@ from datetime import datetime
 import re
 
 
-def football_events():
+def events(url="https://www.sbobet.com/euro/football"):
 
-    page = get_page("https://www.sbobet.com/euro/football")
+    def scrap_vs(game_tag, game):
+
+        spans = game_tag.find("div", class_="DateTimeTxt").find_all("span")
+        if game["live"]:
+            game["score"] = spans[0].contents[0].strip()
+            game["livedate"] = spans[1].font.contents[0].strip()
+            game["oddsdate"] = None
+            game["gamedate"] = None
+        else:
+            game["score"] = None
+            game["livedate"] = None
+            game["oddsdate"] = None
+            game["gamedate"] = spans[0].contents[0].strip() + " " + spans[1].contents[0].strip()
+
+        columns = list(game_tag.children)
+
+        game["firstparticipant"] = columns[2].find("span", class_="OddsL").contents[0].strip()
+
+        game["firstwin"] = columns[2].find("span", class_="OddsR").contents[0].strip()
+
+        game["secondparticipant"] = columns[4].find("span", class_="OddsL").contents[0].strip()
+
+        game["secondwin"] = columns[4].find("span", class_="OddsR").contents[0].strip()
+
+        game["draw"] = columns[3].find("span", class_="OddsR").contents[0].strip()
+
+        game["href"] = columns[5].a["href"]
+
+    def scrap_handicap(game_tag, game):
+        spans = game_tag.find("div", class_="DateTimeTxt").find_all("span")
+        if game["live"]:
+            game["score"] = spans[0].contents[0].strip()
+            game["livedate"] = spans[1].font.contents[0].strip()
+            game["oddsdate"] = None
+            game["gamedate"] = None
+        else:
+            game["score"] = None
+            game["livedate"] = None
+            game["oddsdate"] = None
+            game["gamedate"] = spans[0].contents[0].strip() + " " + spans[1].contents[0].strip()
+
+        columns = list(game_tag.children)
+
+        game["firstparticipant"] = columns[2].find("span", class_="OddsL").contents[0].strip()
+
+        game["firstwin"] = columns[2].find("span", class_="OddsR").contents[0].strip()
+
+        game["firstforward"] = columns[2].find("span", class_="OddsM").contents[0].strip()
+
+        game["secondparticipant"] = columns[3].find("span", class_="OddsL").contents[0].strip()
+
+        game["secondwin"] = columns[3].find("span", class_="OddsR").contents[0].strip()
+
+        game["secondforward"] = columns[3].find("span", class_="OddsM").contents[0].strip()
+
+        game["href"] = columns[4].a["href"]
+
+    page = get_page(url)
 
     try:
-        data = _parse_sport_page(page)
-    except:
-        _debug_log(page, sys.exc_info())
 
-    return data
+        vs = []
+
+        handicap = []
+
+        doc = bs4.BeautifulSoup(page, "html.parser")
+
+        panel_odds_display = doc.find(id="panel-odds-display")
+
+        panels = panel_odds_display.find_all(class_="Panel")
+
+        for panel in panels:
+
+            sport = panel.find("div", class_="HdTitle").contents[0].strip()
+
+            markets = panel.find_all("div", class_=lambda x: x in ["LiveMarket", "NonLiveMarket"])
+
+            for market in markets:
+
+                live = "LiveMarket" in market["class"]
+
+                for odds_type_tag in market.childGenerator():
+
+                    odds_type = odds_type_tag.span.contents[0].strip()
+
+                    scrap_func = scrap_handicap  # Функция которая будет парсить строчку с матчем
+                    data = handicap
+
+                    if odds_type == "1X2":  # Если тип ставки - 1х2, то меняем функцию обработки
+                                            # строчки с матчем (т.к. различается)
+                        scrap_func = scrap_vs
+                        data = vs
+
+                    leagues = odds_type_tag.find_all("div", class_="MarketLea")
+
+                    for league in leagues:
+
+                        league_name = league.find("div", class_="SubHeadT").contents[0].strip()
+
+                        table = league.nextSibling
+
+                        game_tags = table.find_all("tr")
+
+                        for game_tag in game_tags:
+
+                            if "class" in game_tag.attrs and game_tag["class"] == "OddsClosed":
+                                continue
+
+                            game = {"sport": sport, "league": league_name, "live": live}
+
+                            scrap_func(game_tag, game)
+
+                            data.append(game)
+
+        return {"vs": vs, "handicap": handicap}
+
+
+    except IndexError:
+        _debug_log(page, sys.exc_info())
+        return {}
 
 
 def sports():
@@ -25,93 +137,12 @@ def sports():
 
     try:
         data = _parse_sports(page)
+        return data
     except:
         _debug_log(page, sys.exc_info())
-
-    return data
-
-
-def _parse_ligue(ligue):
-
-    table = ligue.next_sibling()[0]
-
-    children = table.children
-
-    games = [node for node in children]
-
-    games_data = []
-
-    for game in games:
-
-        game_data = {"OddsClosed": False,
-                     "Teams": ["team1", "team2"],
-                     "Coffs": None,
-                     "href": None}
-
-        if "class" in game:
-            if "OddsClosed" in game["class"]:
-                game_data["OddsClosed"] = True
-
-        teams = game.find_all("span", class_="OddsL")
-
-        game_data["Teams"][0] = teams[0].contents[0].strip()
-        game_data["Teams"][1] = teams[2].contents[0].strip()
-
-        if not game_data["OddsClosed"]:
-
-            game.find_all("a", class_="IconMarkets")[0]["href"]
-
-            coffs = game.find_all("span", class_="OddsR")
-            coffs_data = [0, 0, 0]
-
-            coffs_data[0] = coffs[0].contents[0].strip()
-            coffs_data[1] = coffs[1].contents[0].strip()
-            coffs_data[2] = coffs[2].contents[0].strip()
-
-            game_data["Coffs"] = coffs_data
-
-        games_data.append(game_data)
-
-    return games_data
+        return {}
 
 
-def _parse_sport_page(page):
-
-    bs = bs4.BeautifulSoup(page, "html.parser")
-
-    market = bs.find_all("div", class_="MarketBd")[0]
-
-    ligues = market.find_all("div", class_="MarketLea")
-
-    ligues_data = []
-
-    for ligue in ligues:
-        ligue_name = ligue.find_all("div", class_="SubHeadT")[0].contents[0].strip()
-
-        ligue_data = {ligue_name: _parse_ligue(ligue)}
-
-        ligues_data.append(ligue_data)
-
-    return {"football": ligues_data, "BookmakerName": "sbobet"}
-
-
-def _parse_sports(page):
-
-    data = []
-
-    doc = bs4.BeautifulSoup(page, "html.parser")
-
-    sports = doc.find_all(id=re.compile("bu:ms:all-sp:[0-9]*"))
-
-    for sport in sports:
-
-        sport_dict = {"name": sport.contents[1].strip(), "href": sport["href"]}
-
-        data.append(sport_dict)
-
-    res = list(map(lambda el: {'name': el['name'], 'href': "https://www.sbobet.com/euro" + el['href']}, data))
-
-    return res
 
 
 def get_page(url):
@@ -133,16 +164,32 @@ def get_page(url):
     return page
 
 
+def _parse_sports(page):
+
+    data = []
+
+    doc = bs4.BeautifulSoup(page, "html.parser")
+
+    sports = doc.find_all(id=re.compile("bu:ms:all-sp:[0-9]*"))
+
+    for sport in sports:
+
+        sport_dict = {"name": sport.contents[1].strip(), "href": sport["href"]}
+
+        data.append(sport_dict)
+
+    res = list(map(lambda el: {'name': el['name'], 'href': "https://www.sbobet.com/euro" + el['href']}, data))
+
+    return res
+
+
 def _debug_log(page, info):
     dname = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     dpath = "parsing/sbobet_logs/{0}".format(dname)
     os.makedirs(dpath)
 
-    with open(dpath+"/page.html", "w+", "utf8") as f:
+    with open(dpath+"/page.html", "w+", encoding="utf8") as f:
         f.write(page)
 
-    with open(dpath+"/log.txt", "w+", "utf8") as f:
+    with open(dpath+"/log.txt", "w+", encoding="utf8") as f:
         f.write(info)
-
-
-
