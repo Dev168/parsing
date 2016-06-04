@@ -4,13 +4,13 @@
             "firstforward": "-0.25",
             "firstparticipant": "SC Hauenstein",
             "firstwin": "2.04",
-            "gamedate": null,
+            "gamedate": null,   // Время начала матча (для лайва можно не указывать)
             "href": "/euro/football/germany-oberliga-playoff/1909129/sc-hauenstein-vs-nottingen-1957",
-            "league": "Germany Oberliga Playoff",
+            "league": "Germany Oberliga Playoff",  //не обязательно пока что
             "live": true,
-            "livedate": "HT",
-            "oddsdate": null,
-            "score": "1-3",
+            "livedate": "HT",     // Здесь время с начала матча  (только для лайва)
+            "oddsdate": null,     // Это время когда спарсена ставка
+            "score": "1-3",     //Счет (Только для лайва)
             "secondforward": "+0.25",
             "secondparticipant": "Nottingen 1957",
             "secondwin": "1.80",
@@ -2337,6 +2337,7 @@
             "sport": "Football"
         }
     ],
+
     "vs": [
         {
             "draw": "5.40",
