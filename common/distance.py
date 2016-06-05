@@ -25,4 +25,6 @@ def dis(list1, list2):
     return list3
 
 
+def levenshtein_distance_computing(not_founded_names):
+    raise NotImplementedError
 
