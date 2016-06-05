@@ -1,5 +1,6 @@
 import MySQLdb as mysql
 from settings import DB_HOST, DB_NAME, DB_USER, DB_PASSWD
+from common.distance import levenshtein_distance_computing
 import json
 import os
 
@@ -9,6 +10,11 @@ DIRNAME = os.path.dirname(os.path.abspath(__file__))
 def init():
     """Инициализирует базу данных со всеми необходимыми таблицами
     Если база данных с именем DB_NAME уже существует то будет ошибка"""
+
+    def __load_init_sports():
+        with open(os.path.join(DIRNAME, "sports_create.json")) as f:
+            text = f.read()
+            return json.loads(text)
 
     conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD)
 
@@ -53,6 +59,27 @@ def create_bookmaker(bookmaker_name):
     conn.close()
 
 
+def create_sports(sports):
+
+    conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME)
+
+    cursor = conn.cursor()
+
+    sql_code = "INSERT INTO sports (`Name`) VALUES (%s)"
+
+    cursor.executemany(sql_code, [(sport,) for sport in sports])
+
+    conn.commit()
+
+    conn.close()
+
+    print("Добавлены новые виды спорта")
+
+
+def create_participants(names, bookmaker_id):
+    raise NotImplementedError
+
+
 def get_bookmakers():
 
     conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME)
@@ -72,29 +99,37 @@ def get_bookmakers():
     return res
 
 
-def create_sports(sports):
+def resolve_participant_names(events, bookmaker_id, keys=("fistparticipant", "secondparticipant")):
+    """Процедура для разрешения ссылок на спортивных участников
+    получает список имен учатников, возвращает их id в базе данных
+    Отсутствующих участников создает"""
 
-    conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME)
+    def separate_not_founded_names(events, keys):
 
-    cursor = conn.cursor()
+        founded_ids = []
 
-    sql_code = "INSERT INTO sports (`Name`) VALUES (%s)"
+        not_founded_names = []
 
-    cursor.executemany(sql_code, [(sport,) for sport in sports])
+        for el in ids:
+            if el["id"] is None:
+                not_founded_names.append(el["name"])
+            else:
+                founded_ids.append(el)
 
-    conn.commit()
+        return founded_ids, not_founded_names
 
-    conn.close()
+    def get_participant_ids(names, bookmaker_id):
+        raise NotImplementedError
 
-    print("Добавлены новые виды спорта")
+    ids = get_participant_ids(events, bookmaker_id) # [{name: "Barselona FC", id: 4}, {name: "Real Mdrd", id: None}, ...]
 
+    founded_ids, not_founded_names = separate_not_founded_names(ids, keys)
 
-def create_sport_names(sport_names, bookmaker_id):
-    return None
+    result = levenshtein_distance_computing(not_founded_names)  # [{"id":3, name:"Real Mdrd"}, ...]
 
+    possible_ids, not_founded_names = separate_not_founded_names(result)
 
-def __load_init_sports():
-    with open(os.path.join(DIRNAME, "sports_create.json")) as f:
-        text = f.read()
-        return json.loads(text)
+    created_ids = create_participants(not_founded_names, bookmaker_id)
+
+    return founded_ids + possible_ids + created_ids
 

@@ -125,7 +125,6 @@ def events(url="https://www.sbobet.com/euro/football"):
 
         return {"vs": vs, "handicap": handicap}
 
-
     except IndexError:
         _debug_log(page, sys.exc_info())
         return {}
@@ -141,8 +140,6 @@ def sports():
     except:
         _debug_log(page, sys.exc_info())
         return {}
-
-
 
 
 def get_page(url):
