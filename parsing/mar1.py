@@ -1,7 +1,10 @@
 import requests
 import bs4
 import re
-def events(url="https://www.marathonbet6.com/ru/live/popular"):
+import sys
+import os
+from datetime import datetime
+def events(url="https://www.marathonbet7.com/ru/live/popular"):
 
     html_text = requests.get(url).text
 
@@ -141,7 +144,7 @@ def events(url="https://www.marathonbet6.com/ru/live/popular"):
         for j in range(len(events)):
             for i in range(len(Convert(cell)['name'])):
                 if((str(odd[i])=='HANDICAP')and(str(odd[i+1])=='HANDICAP')):
-                    if((str(events[j]).find(str(Convert(cell)['name'][i])[str(Convert(cell)['name'][i]).index("(")+1:str(Convert(cell)['name'][i]).index(")")].strip())!=1)and(str(events[j]).find(str(Convert(cell)['name'][i+1])[str(Convert(cell)['name'][i+1]).index("(")+1:str(Convert(cell)['name'][i+1]).index(")")].strip())!=1)):
+                    if (str(events[j]).find(str(Convert(cell)['name'][i])[str(Convert(cell)['name'][i]).index("(")+1:str(Convert(cell)['name'][i]).index(")")].strip())!=1)and(str(events[j]).find(str(Convert(cell)['name'][i+1])[str(Convert(cell)['name'][i+1]).index("(")+1:str(Convert(cell)['name'][i+1]).index(")")].strip())!=1):
                         pairs.append(i)
                         pairs.append(i + 1)
                     else:
@@ -212,11 +215,63 @@ def events(url="https://www.marathonbet6.com/ru/live/popular"):
         d["vs"] = list
         return  d
 
-    def unite_dict(dict1,dict2):
+
+
+
+
+    def get_result2way(index_of_hand, index_of_hand1):
+        moneyline = {}
+
+        moneyline["firstparticipant"] = remove_brackets(str(Convert(cell)['name'][index_of_hand]))
+        moneyline["firstwin"] = Convert(cell)['coeffs'][index_of_hand]
+        moneyline["href"] = None
+
+        moneyline["secondparticipant"] = remove_brackets(str(Convert(cell)['name'][index_of_hand1]))
+        moneyline["secondwin"] = Convert(cell)['coeffs'][index_of_hand1]
+        return moneyline
+    def get_result2way_index():
+        pairs = []
+        uniq_pairs = []
+        for j in range(len(events)):
+            for i in range(len(Convert(cell)['name'])):
+                if ((str(odd[i]) == "RESULT_2WAY") and (str(odd[i + 1]) == "RESULT_2WAY")):
+                    if (
+                                (str(events[j]).find(remove_brackets(str(Convert(cell)['name'][i]) != 1)))
+
+                            and (str(events[j]).find(remove_brackets(str(Convert(cell)['name'][i + 1] != 1))))
+                    ):
+                        pairs.append(i)
+                        pairs.append(i + 1)
+
+                    else:
+                        pass
+        for o in pairs:
+            if (uniq_pairs.__contains__(o) == 0):
+                uniq_pairs.append(o)
+        return uniq_pairs
+    def get_list_of_result2way():
+        d = {}
+        list = []
+        pairs = []
+        pairs = get_result2way_index()
+        for i in range(int(len(pairs) / 2)):
+            list.append(get_result2way(pairs[2 * i], pairs[2 * i + 1]))
+
+        d["result_2way"] = list
+        return d
+    def remove_brackets(a):
+        if (str(a).find('(') == -1):
+            return str(a)
+        else:
+            return str(str(a)[:str(a).index("(")]).strip()
+
+
+    def unite_dict(dict1,dict2,dict3):
         dict1.update(dict2)
+        dict1.update(dict3)
         return dict1
 
 
-    return unite_dict(get_list_of_hand(),get_list_of_money())
+    return unite_dict(get_list_of_hand(),get_list_of_money(),get_list_of_result2way())
 
 
