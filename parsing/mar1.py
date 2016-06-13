@@ -18,7 +18,7 @@ def events(url="https://www.marathonbet7.com/ru/live/popular"):
     events = []
     odd  =  [] # тип события
     cell = []
-
+    hrefs = []
     team =[]
 
 
@@ -265,13 +265,61 @@ def events(url="https://www.marathonbet7.com/ru/live/popular"):
         else:
             return str(str(a)[:str(a).index("(")]).strip()
 
+    def get_chance(index_of_hand, index_of_hand2, index_of_hand1):
+        moneyline = {}
 
-    def unite_dict(dict1,dict2,dict3):
+        moneyline["firstparticipant"] = remove_brackets(str(Convert(cell)['name'][index_of_hand]))
+        moneyline["firstwin"] = Convert(cell)['coeffs'][index_of_hand]
+        moneyline["href"] = None
+
+        moneyline["secondparticipant"] = remove_brackets(str(Convert(cell)['name'][index_of_hand1]))
+        moneyline["secondwin"] = Convert(cell)['coeffs'][index_of_hand1]
+
+        moneyline["1or2"] = Convert(cell)['coeffs'][index_of_hand2]
+
+        return moneyline
+
+    def get_chance_index():
+        pairs = []
+        uniq_pairs = []
+        for j in range(len(events)):
+            for i in range(len(Convert(cell)['name'])):
+                if ((str(odd[i]) == "DOUBLE_CHANCE") and (str(odd[i + 1]) == "DOUBLE_CHANCE") and (
+                    str(odd[i + 2]) == "DOUBLE_CHANCE")):
+                    if (
+                                (str(events[j]).find(remove_brackets(str(Convert(cell)['name'][i]) != 1)))
+
+                            and (str(events[j]).find(remove_brackets(str(Convert(cell)['name'][i + 2] != 1))))
+                    ):
+                        pairs.append(i)
+                        pairs.append(i + 1)
+                        pairs.append(i + 2)
+                    else:
+                        pass
+        for o in pairs:
+            if (uniq_pairs.__contains__(o) == 0):
+                uniq_pairs.append(o)
+        return uniq_pairs
+
+    def get_list_of_chance():
+        d = {}
+        list = []
+        pairs = []
+        pairs = get_chance_index()
+        for i in range(int(len(pairs) / 3)):
+            list.append(get_chance(pairs[3 * i], pairs[3 * i + 1], pairs[3 * i + 2]))
+
+        d["double_chance"] = list
+        return d
+
+
+    def unite_dict(dict1,dict2,dict3,dict4):
         dict1.update(dict2)
         dict1.update(dict3)
+        dict1.update(dict4)
         return dict1
 
 
-    return unite_dict(get_list_of_hand(),get_list_of_money(),get_list_of_result2way())
+    return unite_dict(get_list_of_hand(),get_list_of_money(),get_list_of_result2way(),get_list_of_chance())
 
 
