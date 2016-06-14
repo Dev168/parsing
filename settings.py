@@ -9,3 +9,5 @@ DB_NAME = "betsdb"
 DB_USER = "root"
 
 DB_PASSWD = "1234"
+
+LIVENSHTAIN_MIN = 0.33
