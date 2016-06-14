@@ -12,3 +12,8 @@ DB_USER = "root"
 
 DB_PASSWD = "1234"
 
+<<<<<<< HEAD
+=======
+
+LIVENSHTAIN_MIN = 0.33
+>>>>>>> eaf0042e4c63ab13eadc39aaebf781432884b828
