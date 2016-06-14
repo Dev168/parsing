@@ -159,6 +159,7 @@ def semantic_name_resolving(df):
     df = ser.apply(cluster_analysis_resolving, axis=1, args=(all_names,))
 
 
+
 def cluster_analysis_resolving(name, cluster_df):
 
 
