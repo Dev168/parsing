@@ -1,0 +1,27 @@
+<html>
+ <head>
+
+  <title>Forks</title>
+ </head>
+ <body>
+
+  <table border="1" cellpadding="7" cellspacing="0">
+   {% for post in posts %}
+   <tr>
+
+
+     <td colspan="2"> {{post.event}}<br>{{post.name}}<br>{{post.coeff}}</td>
+
+
+
+     <td colspan="2"> {{post.percent}}</td>
+    <td colspan="2">  {{post.href}}</td>
+   </tr>
+   {% endfor %}
+  </table>
+
+ </body>
+</html>
+
+
+

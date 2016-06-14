@@ -20,6 +20,17 @@ odd  =  [] # тип события
 cell = []
 hrefs = []
 team =[]
+hrefs = []
+href = []
+h=[]
+#tr class="broadcasts-menu-container-tr all-regions">
+
+hrefs = doc.find_all("tr",class_="broadcasts-menu-container-tr all-regions")
+
+for i in range(len(hrefs)):
+    href = hrefs[i].find_all("a",href = True)
+
+
 
 
 teams = doc.find_all("div", class_="live-today-member-name")
@@ -309,6 +320,12 @@ def get_list_of_result2way():
     d["result_2way"] = list
     return d
 
+
+def remove_brackets(a):
+    if (str(a).find('(') == -1):
+        return str(a)
+    else:
+        return str(str(a)[:str(a).index("(")]).strip()
 
 
 
