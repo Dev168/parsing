@@ -101,92 +101,87 @@ def get_bookmakers():
     return res
 
 
-def get_participant_ids(names, bookmaker_id=None):
+def get_participants_from_db(_filter={"1": 1}):
+
+    filter_sql = create_filter_sql(_filter)
+
     conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME)
 
-    cursor = conn.cursor()
-
-    if bookmaker_id is not None:
-        cursor.execute("SELECT participant, name FROM participantnames WHERE bookmaker = %s AND name in %s",
-                       (bookmaker_id, names))
-    else:
-        cursor.execute("SELECT Participant, name, Bookmaker  FROM participantnames WHERE name in %s",
-                       (bookmaker_id, names))
-
-    result = cursor.fetchall()
-
-    cursor.close()
+    all_names = pd.read_sql("SELECT participant, bookmaker name  as `name_from_db`, bookmaker FROM "
+                            "participantnames WHERE %s",
+                            con=conn, params=(filter_sql,))
 
     conn.close()
 
-    return result
+    return all_names
 
 
-def resolve_participant_names(events, bookmaker_id):
+def create_filter_sql(dic={"1": 1}):
+
+    filter_sql = ""
+    if len(dic) > 0:
+        first = True
+        for key, value in dic.items():
+            if not first:
+                filter_sql += " AND "
+            else:
+                first = False
+            filter_sql += key + "=" +str(value)
+    return filter_sql
+
+
+def resolve_participant_names(events_df, bookmaker_id):
     """Процедура для разрешения ссылок на спортивных участников
     получает список имен учатников, возвращает их id в базе данных
     Отсутствующих участников создает"""
 
-    conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME)
+    events_df = replace_names_by_id(events_df, bookmaker_id)
 
-    bookmaker_participants_df = pd.read_sql("SELECT name, participant FROM participantnames WHERE bookmaker = 1",
-                                            con=conn)
+    events_df = replace_names_by_similarities(events_df)
 
-    conn.close()
+
+def replace_names_by_id(events_df, bookmaker_id):
+
+    bookmaker_participants_df = get_participants_from_db({"bookmaker": bookmaker_id})
 
     bookmaker_participants_df.set_index("name")
 
-    events_df = pd.DataFrame(events["handicap"])
-
-    events_df = events_df.join(bookmaker_participants_df, "firstparticipant", rsuffix="1")\
+    participants_df = events_df.join(bookmaker_participants_df, "firstparticipant", rsuffix="1") \
         .join(bookmaker_participants_df, "secondparticipant", rsuffix="2")
 
-    semantic_name_resolving(events_df)
+    return participants_df.drop(
+        ["name", "name2, bookmaker"])  # TODO: Лишняя строка, сделать левое соединение без необходимости удалять лишние столбики
 
 
-def semantic_name_resolving(df):
+def replace_names_by_similarities(df):
 
-    conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME)
+    def participants_without_id(df):
+        ser1 = df["firstparticipant"][df["participant"].isnull()]
 
-    all_names = pd.read_sql("SELECT participant, name, bookmaker FROM participantnames", con=conn)
+        ser2 = df["secondparticipant"][df["participant2"].isnull()]
 
-    conn.close()
+        return pd.DataFrame({"missing_name": pd.Series(pd.concat([ser1, ser2]).unique)})
 
-    ser = df["firstparticipant"][df["participant"].isnull()]
+    def cartesian_product(df1, df2):
+        df1["formerge"] = 1
+        df2["formerge"] = 2
+        result_df = df1.merge(df2, on="formerge")
+        return result_df.drop(["formerge"])
 
-    ser2 = df["secondparticipant"][df["participant2"].isnull()]
+    def calculate_distance(row, key1, key2):
+        return distance(row[key1], row[key2])
 
-    df = ser.apply(cluster_analysis_resolving, axis=1, args=(all_names,))
+    db_names = get_participants_from_db()
+
+    missing_names = participants_without_id(df)
+
+    missing_data = cartesian_product(db_names, missing_names)
+
+    missing_data["distance"] = missing_data.apply(calculate_distance, axis=1, args=(('name_from_db', 'missing_name'),))
+
+    return missing_data
+
+    missing_data.groupby(["bookmaker, missing_name"])["distance"].min()
 
 
 
-def cluster_analysis_resolving(name, cluster_df):
-
-
-
-
-
-
-def detect_possible_participant(names):
-    conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME)
-
-    df = pd.read_sql("SELECT participant, name, bookmaker FROM participantnames", con=conn)
-
-    conn.close()
-
-    founded_names = []
-
-    for name in names:
-
-        df["probability"] = df["name"].apply(distance, args=(name,))
-
-        idx = df.groupby("participant")["probability"].transform(min) == df["probability"]
-
-        filtered_df = df[idx][df["probability"] < LIVENSHTAIN_MIN]
-
-        if len(filtered_df) > 0:
-            id_participant = filtered_df['participant'].value_counts().idmax()
-
-            founded_names.append({"name": name, "participant": id_participant})
-
-    return founded_names

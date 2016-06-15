@@ -1,5 +1,6 @@
 import os
 import json
+import pandas as pd
 
 DIRNAME = os.path.dirname(os.path.abspath(__file__))
 
@@ -7,8 +8,9 @@ DIRNAME = os.path.dirname(os.path.abspath(__file__))
 def load_test_data():
     with open(os.path.join(DIRNAME, "data.json"), "r", encoding="utf8") as f:
         data = json.loads(f.read())
-    return data
+        data = pd.DataFrame(data["handicap"])
 
+    return data
 
 
 def save_test_data(data):
