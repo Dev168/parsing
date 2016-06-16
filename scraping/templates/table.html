@@ -4,18 +4,19 @@
   <title>Forks</title>
  </head>
  <body>
-
-  <table border="1" cellpadding="7" cellspacing="0">
-   {% for post in posts %}
+  {% for post in posts %}
+  <table  border="5" cellpadding="10" cellspacing="0">
+   <caption>{{post.event}}</caption>
    <tr>
 
-
-     <td colspan="2"> {{post.event}}<br>{{post.name}}<br>{{post.coeff}}</td>
-
+      <td colspan="2">Марафон <br> СБО</td>
 
 
-     <td colspan="2"> {{post.percent}}</td>
-    <td colspan="2">  {{post.href}}</td>
+
+     <td>{{post.Sbo_event}} <br>{{post.mar_event}}</td>
+    <td>{{post.sbo_coeff}}<br>{{post.mar_coeff}}</td>
+     <td> {{post.marge_percent}}</td>
+    <td> {{post.href_sbo}}<br>{{post.href_mar}}</td>
    </tr>
    {% endfor %}
   </table>

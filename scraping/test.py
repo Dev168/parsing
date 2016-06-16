@@ -1,40 +1,17 @@
-
-
 from flask import Flask
 from flask import render_template
+
+def get_forks():
+    posts = []
+    return posts
+
+
 app = Flask(__name__)
 @app.route("/")
 
-
-
 def index():
 
-
-    posts = [
-        {   'event' : 'Rus-Eng',
-            'percent': "10%",
-            'name': "England win",
-             'coeff': "2.05",
-                      "href": "vk1.com"
-
-        },
-        {
-            'event' : 'Rus-Por',
-            'percent': "11%",
-            'name': "Rus win",
-             'coeff' :"3.05",
-            "href": "vk.com"
-        }
-
-
-
-
-
-
-
-
-    ]
-
+    posts = get_forks()
 
     return render_template("table.html",
 
