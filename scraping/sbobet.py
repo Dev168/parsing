@@ -182,7 +182,7 @@ def _parse_sports(page):
 
 def _debug_log(page, info):
     dname = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    dpath = "parsing/sbobet_logs/{0}".format(dname)
+    dpath = "scraping/sbobet_logs/{0}".format(dname)
     os.makedirs(dpath)
 
     with open(dpath+"/page.html", "w+", encoding="utf8") as f:

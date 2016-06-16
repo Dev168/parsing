@@ -1,12 +1,13 @@
 CREATE TABLE `Bookmakers` (
 	`id` bigint NOT NULL AUTO_INCREMENT,
-	`Name` char(50),
+	`Name` char(150),
 	PRIMARY KEY (`id`),
 	UNIQUE KEY(`Name`)
 );
 
 CREATE TABLE `Participants` (
 	`id` bigint NOT NULL AUTO_INCREMENT,
+	`Name` char(150),
 	PRIMARY KEY (`id`)
 );
 
@@ -43,12 +44,15 @@ CREATE TABLE `Handicap` (
 	`id` bigint NOT NULL,
 	`FristParticipant` bigint NOT NULL,
 	`SecondParticipant` bigint NOT NULL,
-	`Forward` bigint NOT NULL,
-	`Win` double NOT NULL,
-	`OddsDate` DATETIME NOT NULL,
-	`GameDate` DATETIME NOT NULL,
+	`FirstForward` bigint NOT NULL,
+	`FirstWin` double NOT NULL,
+	`SecondForward` bigint NOT NULL,
+	`SecondWin` double NOT NULL,
+	`OddsDate` DATETIME,
+	`GameDate` DATETIME,
 	`Live` BINARY NOT NULL,
-	`LiveDate` DATETIME NOT NULL,
+	`LiveDate` DATETIME,
+	`href` char(200)
 	PRIMARY KEY (`id`)
 );
 
@@ -65,6 +69,8 @@ ALTER TABLE `ParticipantNames` ADD CONSTRAINT `ParticipantNames_fk0` FOREIGN KEY
 ALTER TABLE `ParticipantNames` ADD CONSTRAINT `ParticipantNames_fk1` FOREIGN KEY (`Participant`) REFERENCES `Participants`(`id`);
 
 ALTER TABLE `ParticipantNames` ADD UNIQUE `unique_index`(`Name`, `Bookmaker`);
+
+ALTER TABLE `Participants` ADD UNIQUE `unique_index` (`Name`);
 
 CREATE TABLE `sports` (
 	`id` bigint NOT NULL AUTO_INCREMENT,

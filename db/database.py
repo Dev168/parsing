@@ -1,12 +1,12 @@
 import MySQLdb as mysql
-from settings import DB_HOST, DB_NAME, DB_USER, DB_PASSWD, LIVENSHTAIN_MIN
+from settings import DB_HOST, DB_NAME, DB_USER, DB_PASSWD
 import json
 import os
 import pandas as pd
 from common.distance import distance
 
-DIRNAME = os.path.dirname(os.path.abspath(__file__))
-
+#DIRNAME = os.path.dirname(os.path.abspath(__file__))
+DIRNAME = "/"
 
 def init():
     """Инициализирует базу данных со всеми необходимыми таблицами
@@ -75,12 +75,47 @@ def create_sports(sports):
     print("Добавлены новые виды спорта")
 
 
-def create_participants(names, bookmaker_id):
+def create_participants(names_df):
+
+    names_df.columns = ["name"]
+    names_list = names_df["name"].tolist()
+    par = [(el,) for el in names_list]
+
     conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME)
 
     cursor = conn.cursor()
 
-    cursor.executemany("INSERT INTO participants (name) VALUES (%s)", )
+    sql_code = "INSERT INTO participants (`Name`) VALUES (%s)"
+
+    cursor.executemany(sql_code, par)
+
+    conn.commit()
+
+    df = pd.read_sql("SELECT * FROM participants WHERE name in %(names)s", con=conn, params={"names": names_list})
+
+    conn.close()
+
+    return df
+
+
+def create_participant_names(names_df, bookmaker_id):
+
+    conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME)
+
+    names_df.columns = ["participant", "name"]
+    names_df["bookmaker"] = bookmaker_id
+
+    names_df.to_sql("participantnames", con=conn)
+
+    names_df = names_df.columns.drop("bookmaker")
+
+    names_df.columns = ["id", "name"]
+
+    conn.close()
+
+
+def create_events(events_df):
+    raise NotImplementedError
 
 
 def get_bookmakers():
@@ -101,33 +136,11 @@ def get_bookmakers():
     return res
 
 
-def get_participants_from_db(_filter={"1": 1}):
+def store_events(events_df, bookmaker_id):
 
-    filter_sql = create_filter_sql(_filter)
+    events_df = resolve_participant_names(events_df, bookmaker_id)
 
-    conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME)
-
-    all_names = pd.read_sql("SELECT participant, bookmaker name  as `name_from_db`, bookmaker FROM "
-                            "participantnames WHERE %s",
-                            con=conn, params=(filter_sql,))
-
-    conn.close()
-
-    return all_names
-
-
-def create_filter_sql(dic={"1": 1}):
-
-    filter_sql = ""
-    if len(dic) > 0:
-        first = True
-        for key, value in dic.items():
-            if not first:
-                filter_sql += " AND "
-            else:
-                first = False
-            filter_sql += key + "=" +str(value)
-    return filter_sql
+    create_events(events_df)
 
 
 def resolve_participant_names(events_df, bookmaker_id):
@@ -139,49 +152,98 @@ def resolve_participant_names(events_df, bookmaker_id):
 
     events_df = replace_names_by_similarities(events_df)
 
+    events_df = replace_names_by_created_id(events_df, bookmaker_id)
+
+    return events_df
+
 
 def replace_names_by_id(events_df, bookmaker_id):
 
-    bookmaker_participants_df = get_participants_from_db({"bookmaker": bookmaker_id})
+    conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME)
+
+    bookmaker_participants_df = pd.read_sql("SELECT participant, name  FROM "
+                            "participantnames WHERE %s",
+                            con=conn, params=(bookmaker_id,))
+
+    conn.close()
 
     bookmaker_participants_df.set_index("name")
 
-    participants_df = events_df.join(bookmaker_participants_df, "firstparticipant", rsuffix="1") \
-        .join(bookmaker_participants_df, "secondparticipant", rsuffix="2")
+    participants_df = events_df.\
+        merge(bookmaker_participants_df, how="left", left_on="firstparticipant", right_on="name").\
+        merge(bookmaker_participants_df, how="left", left_on="secondparticipant", right_on="name")
 
     return participants_df.drop(
-        ["name", "name2, bookmaker"])  # TODO: Лишняя строка, сделать левое соединение без необходимости удалять лишние столбики
+        ["name_x", "name_y"], axis=1)  # TODO: Лишняя строка, сделать левое соединение без необходимости удалять лишние столбики
 
 
 def replace_names_by_similarities(df):
 
-    def participants_without_id(df):
-        ser1 = df["firstparticipant"][df["participant"].isnull()]
+    conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME)
 
-        ser2 = df["secondparticipant"][df["participant2"].isnull()]
+    db_names = pd.read_sql("SELECT participant, bookmaker, name  as `name_from_db`, bookmaker FROM "
+                            "participantnames",
+                            con=conn)
 
-        return pd.DataFrame({"missing_name": pd.Series(pd.concat([ser1, ser2]).unique)})
-
-    def cartesian_product(df1, df2):
-        df1["formerge"] = 1
-        df2["formerge"] = 2
-        result_df = df1.merge(df2, on="formerge")
-        return result_df.drop(["formerge"])
-
-    def calculate_distance(row, key1, key2):
-        return distance(row[key1], row[key2])
-
-    db_names = get_participants_from_db()
+    conn.close()
 
     missing_names = participants_without_id(df)
 
     missing_data = cartesian_product(db_names, missing_names)
 
-    missing_data["distance"] = missing_data.apply(calculate_distance, axis=1, args=(('name_from_db', 'missing_name'),))
+    if missing_data.empty:
+        return df
 
-    return missing_data
+    missing_data["distance"] = missing_data.apply(calculate_distance, axis=1, args=('name_from_db', 'missing_name'))
 
-    missing_data.groupby(["bookmaker, missing_name"])["distance"].min()
+    #  TODO доработать логику распознавания
 
+
+def replace_names_by_created_id(df, bookmaker_id):
+
+    creating_participants = participants_without_id(df)
+
+    if creating_participants.empty:
+        return df
+
+    created_participants = create_participants(creating_participants)
+
+    create_participant_names(created_participants, bookmaker_id)
+
+    merged_participants = df.merge(created_participants, how='left', left_on="firstparticipant", right_on="Name").merge(created_participants, how="left",
+                                                                                 left_on="secondparticipant",
+                                                                                 right_on="Name")
+
+    merged_participants.loc[merged_participants["participant"].isnull(), "participant"] = \
+        merged_participants.loc[merged_participants["participant"].isnull()]["id_x"]
+
+    merged_participants.loc[merged_participants["participant2"].isnull(), "participant2"] = \
+        merged_participants.loc[merged_participants["participant2"].isnull()]["id_y"]
+
+    merged_participants = merged_participants.columns.drop(["id_x", "id_y", "Name_x", "Name_y"])
+
+    return merged_participants
+
+
+def participants_without_id(df):
+
+    ser1 = df["firstparticipant"][df["participant_x"].isnull()]
+
+    ser2 = df["secondparticipant"][df["participant_y"].isnull()]
+
+    conc_ser = pd.concat([ser1, ser2], ignore_index=True)
+
+    return pd.DataFrame({"missing_name": conc_ser.unique()})
+
+
+def cartesian_product(df1, df2):
+    df1["formerge"] = 1
+    df2["formerge"] = 1
+    result_df = df1.merge(df2, on="formerge")
+    return result_df.drop(["formerge"], axis=1)
+
+
+def calculate_distance(row, key1, key2):
+    return distance(row[key1], row[key2])
 
 
