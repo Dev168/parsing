@@ -4,7 +4,7 @@ import re
 import sys
 import os
 from datetime import datetime
-def events(url="https://www.marathonbet7.com/ru/live/popular"):
+def events(url="https://www.mthbet.com/su/live/popular"):
 
     html_text = requests.get(url).text
 
@@ -19,8 +19,12 @@ def events(url="https://www.marathonbet7.com/ru/live/popular"):
     odd  =  [] # тип события
     cell = []
     hrefs = []
+    href = []
     team =[]
+    hrefs = doc.find_all("tr", class_="broadcasts-menu-container-tr all-regions")
 
+    for i in range(len(hrefs)):
+        href.append(hrefs[i].a['href'])
 
     teams = doc.find_all("div", class_="live-today-member-name")
     odds =doc.find_all("td",
@@ -114,7 +118,10 @@ def events(url="https://www.marathonbet7.com/ru/live/popular"):
         d["name"] = n
         return d
 
-
+    def get_url(team1, team2):
+        for i in range(len(events)):
+            if ((str(events[i]).find(team1) != -1) and (str(events[i]).find(team2) != -1)):
+                return href[i]
 
     uniq_odds = []
 
@@ -132,10 +139,10 @@ def events(url="https://www.marathonbet7.com/ru/live/popular"):
         handicap["firstforward"] = str(Convert(cell)['name'][index_of_hand])[str(Convert(cell)['name'][index_of_hand]).index("(")+1:str(Convert(cell)['name'][index_of_hand]).index(")")].strip()
         handicap["firstparticipant"] = str(Convert(cell)['name'][index_of_hand])[:str(Convert(cell)['name'][index_of_hand]).index("(")].strip()
         handicap["firstwin"] = Convert(cell)['coeffs'][index_of_hand]
-        handicap["href"] = None
         handicap["secondforward"] = str(Convert(cell)['name'][index_of_hand1])[str(Convert(cell)['name'][index_of_hand1]).index("(")+1:str(Convert(cell)['name'][index_of_hand1]).index(")")].strip()
         handicap["secondparticipant"] = str(Convert(cell)['name'][index_of_hand1])[:str(Convert(cell)['name'][index_of_hand1]).index("(")].strip()
         handicap["secondwin"] = Convert(cell)['coeffs'][index_of_hand1]
+        handicap["href"] = get_url(str(Convert(cell)['name'][index_of_hand])[:str(Convert(cell)['name'][index_of_hand]).index("(")].strip(),str(Convert(cell)['name'][index_of_hand1])[:str(Convert(cell)['name'][index_of_hand1]).index("(")].strip())
         return handicap
     def get_pairs_of_participants_handicap():
         pairs = []
@@ -324,5 +331,7 @@ def events(url="https://www.marathonbet7.com/ru/live/popular"):
 
 
     return unite_dict(get_list_of_hand(),get_list_of_money(),get_list_of_result2way(),get_list_of_chance())
+
+
 
 
