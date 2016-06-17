@@ -44,33 +44,17 @@ CREATE TABLE `Handicap` (
 	`id` bigint NOT NULL,
 	`FristParticipant` bigint NOT NULL,
 	`SecondParticipant` bigint NOT NULL,
-	`FirstForward` bigint NOT NULL,
+	`FirstForward` double NOT NULL,
 	`FirstWin` double NOT NULL,
-	`SecondForward` bigint NOT NULL,
+	`SecondForward` double NOT NULL,
 	`SecondWin` double NOT NULL,
 	`OddsDate` DATETIME,
 	`GameDate` DATETIME,
 	`Live` BINARY NOT NULL,
 	`LiveDate` DATETIME,
-	`href` char(200)
+	`href` char(200),
 	PRIMARY KEY (`id`)
 );
-
-CREATE TABLE `Forwards` (
-	`id` bigint NOT NULL,
-	`Value` double(3,2) NOT NULL UNIQUE,
-	PRIMARY KEY (`id`)
-);
-
-
-
-ALTER TABLE `ParticipantNames` ADD CONSTRAINT `ParticipantNames_fk0` FOREIGN KEY (`Bookmaker`) REFERENCES `Bookmakers`(`id`);
-
-ALTER TABLE `ParticipantNames` ADD CONSTRAINT `ParticipantNames_fk1` FOREIGN KEY (`Participant`) REFERENCES `Participants`(`id`);
-
-ALTER TABLE `ParticipantNames` ADD UNIQUE `unique_index`(`Name`, `Bookmaker`);
-
-ALTER TABLE `Participants` ADD UNIQUE `unique_index` (`Name`);
 
 CREATE TABLE `sports` (
 	`id` bigint NOT NULL AUTO_INCREMENT,
@@ -87,6 +71,14 @@ CREATE TABLE `sportnames` (
 	PRIMARY KEY (`id`)
 );
 
+ALTER TABLE `ParticipantNames` ADD CONSTRAINT `ParticipantNames_fk0` FOREIGN KEY (`Bookmaker`) REFERENCES `Bookmakers`(`id`);
+
+ALTER TABLE `ParticipantNames` ADD CONSTRAINT `ParticipantNames_fk1` FOREIGN KEY (`Participant`) REFERENCES `Participants`(`id`);
+
+ALTER TABLE `ParticipantNames` ADD UNIQUE `unique_index`(`Name`, `Bookmaker`);
+
+ALTER TABLE `Participants` ADD UNIQUE `unique_index` (`Name`);
+
 ALTER TABLE `sportnames` ADD CONSTRAINT `sportnames_fk0` FOREIGN KEY (`Bookmaker`) REFERENCES `Bookmakers`(`id`);
 
 ALTER TABLE `sportnames` ADD CONSTRAINT `sportnames_fk1` FOREIGN KEY (`Sport`) REFERENCES `sports`(`id`);
@@ -102,5 +94,3 @@ ALTER TABLE `vs` ADD CONSTRAINT `vs_fk1` FOREIGN KEY (`SecondParticipant`) REFER
 ALTER TABLE `Handicap` ADD CONSTRAINT `Handicap_fk0` FOREIGN KEY (`FristParticipant`) REFERENCES `Participants`(`id`);
 
 ALTER TABLE `Handicap` ADD CONSTRAINT `Handicap_fk1` FOREIGN KEY (`SecondParticipant`) REFERENCES `Participants`(`id`);
-
-ALTER TABLE `Handicap` ADD CONSTRAINT `Handicap_fk2` FOREIGN KEY (`Forward`) REFERENCES `Forwards`(`id`);

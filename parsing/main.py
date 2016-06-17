@@ -25,7 +25,7 @@ def replace_names_by_id(events_df, bookmaker_id):
     conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME)
 
     bookmaker_participants_df = pd.read_sql("SELECT participant, name  FROM "
-                            "participantnames WHERE %s",
+                            "participantnames WHERE bookmaker = %s",
                             con=conn, params=(bookmaker_id,))
 
     conn.close()
@@ -40,13 +40,13 @@ def replace_names_by_id(events_df, bookmaker_id):
         ["name_x", "name_y"], axis=1)  # TODO: Лишняя строка, сделать левое соединение без необходимости удалять лишние столбики
 
 
-def replace_names_by_similarities(df):
+def replace_names_by_similarities(df, bookmaker_id):
 
     conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME)
 
     db_names = pd.read_sql("SELECT participant, bookmaker, name  as `name_from_db`, bookmaker FROM "
-                            "participantnames",
-                            con=conn)
+                            "participantnames WHERE bookmaker != %s",
+                            con=conn, params=(bookmaker_id,))
 
     conn.close()
 
@@ -71,19 +71,19 @@ def replace_names_by_created_id(df, bookmaker_id):
 
     created_participants = create_participants(creating_participants)
 
-    create_participant_names(created_participants, bookmaker_id)
+    created_participants = create_participant_names(created_participants, bookmaker_id)
 
-    merged_participants = df.merge(created_participants, how='left', left_on="firstparticipant", right_on="Name").merge(created_participants, how="left",
+    merged_participants = df.merge(created_participants, how='left', left_on="firstparticipant", right_on="name").merge(created_participants, how="left",
                                                                                  left_on="secondparticipant",
-                                                                                 right_on="Name")
+                                                                                 right_on="name")
 
-    merged_participants.loc[merged_participants["participant"].isnull(), "participant"] = \
-        merged_participants.loc[merged_participants["participant"].isnull()]["id_x"]
+    merged_participants.loc[merged_participants["participant_x"].isnull(), "participant_x"] = \
+        merged_participants.loc[merged_participants["participant_x"].isnull()]["id_x"]
 
-    merged_participants.loc[merged_participants["participant2"].isnull(), "participant2"] = \
-        merged_participants.loc[merged_participants["participant2"].isnull()]["id_y"]
+    merged_participants.loc[merged_participants["participant_y"].isnull(), "participant_y"] = \
+        merged_participants.loc[merged_participants["participant_y"].isnull()]["id_y"]
 
-    merged_participants = merged_participants.columns.drop(["id_x", "id_y", "Name_x", "Name_y"])
+    merged_participants = merged_participants.columns.drop(["id_x", "id_y", "name_x", "name_y"])
 
     return merged_participants
 

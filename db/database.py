@@ -4,11 +4,11 @@ import os
 import MySQLdb as mysql
 import pandas as pd
 
-from parsing.main import resolve_participant_names
+#from parsing.main import resolve_participant_names
 from settings import DB_HOST, DB_NAME, DB_USER, DB_PASSWD
 
-#DIRNAME = os.path.dirname(os.path.abspath(__file__))
-DIRNAME = "/"
+DIRNAME = os.path.dirname(os.path.abspath(__file__))
+
 
 def init():
     """Инициализирует базу данных со всеми необходимыми таблицами
@@ -23,12 +23,22 @@ def init():
 
     cursor = conn.cursor()
 
-    sql_code = "CREATE DATABASE IF NOT EXISTS {0}; USE {0}".format(DB_NAME)
+    sql_code = "CREATE DATABASE IF NOT EXISTS {0}".format(DB_NAME)
 
     cursor.execute(sql_code)
 
+    cursor.close()
+
+    conn.close()
+
+    print("База данных успешно создана")
+
     with open(os.path.join(DIRNAME, "mysql_create.sql"), "r") as f:
         sql_init_code = f.read()
+
+        conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME)
+
+        cursor = conn.cursor()
 
         cursor.execute(sql_init_code)
 
@@ -36,7 +46,7 @@ def init():
 
         conn.close()
 
-        print("База данных успешно инициализирована")
+        print("Таблицы успешно созданы")
 
     create_sports(__load_init_sports())
 
@@ -107,11 +117,13 @@ def create_participant_names(names_df, bookmaker_id):
     names_df.columns = ["participant", "name"]
     names_df["bookmaker"] = bookmaker_id
 
-    names_df.to_sql("participantnames", con=conn)
+    names_df.to_sql("participantnames", con=conn, if_exists="append", flavor="mysql", index=False)
 
-    names_df = names_df.columns.drop("bookmaker")
+    names_df = names_df.drop("bookmaker", 1)
 
     names_df.columns = ["id", "name"]
+
+    return names_df
 
     conn.close()
 
@@ -138,11 +150,11 @@ def get_bookmakers():
     return res
 
 
-def store_events(events_json, bookmaker_id):
+def store_handicaps(handicaps_json, bookmaker_id):
 
-    events_df = pd.DataFrame(events_json)
+    handicaps_df = pd.DataFrame(handicaps_json)
 
-    events_df = resolve_participant_names(events_df, bookmaker_id)
+    handicaps_df = resolve_participant_names(handicaps_df, bookmaker_id)
 
     create_events(events_df)
 
