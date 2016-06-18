@@ -5,6 +5,12 @@ import sys
 import os
 from datetime import datetime
 import re
+import json
+import linecache
+
+
+def live_handicaps(url="https://www.sbobet.com/euro/football"):
+    return events(url)["handicap"]
 
 
 def events(url="https://www.sbobet.com/euro/football"):
@@ -41,7 +47,10 @@ def events(url="https://www.sbobet.com/euro/football"):
         spans = game_tag.find("div", class_="DateTimeTxt").find_all("span")
         if game["live"]:
             game["score"] = spans[0].contents[0].strip()
-            game["livedate"] = spans[1].font.contents[0].strip()
+            if type(spans[0].contents[0]) == str:
+                game["livedate"] = spans[1].font.contents[0].strip()
+            else:
+                game["livedate"] = ""
             game["oddsdate"] = None
             game["gamedate"] = None
         else:
@@ -121,7 +130,8 @@ def events(url="https://www.sbobet.com/euro/football"):
 
                             scrap_func(game_tag, game)
 
-                            data.append(game)
+                            if live:
+                                data.append(game)
 
         print("Данные успешно загружены")
 
@@ -195,7 +205,19 @@ def _debug_log(page, info):
     with open(dpath+"/page.html", "w+", encoding="utf8") as f:
         f.write(page)
 
-    with open(dpath+"/log.txt", "w+", encoding="utf8") as f:
-        f.write(str(info)+"\n"+info[2])
+    game = json.dumps(info[2].tb_frame.f_locals["game"], indent=4)
+
+    with open(dpath + "/f_locals.json", "w+", encoding="utf8") as f:
+        f.write(game)
+
+    with open(dpath + "/line_error.txt", "w+", encoding="utf8") as fl:
+        exc_type, exc_obj, tb = info
+        f = tb.tb_frame
+        lineno = tb.tb_lineno
+        filename = f.f_code.co_filename
+        linecache.checkcache(filename)
+        line = linecache.getline(filename, lineno, f.f_globals)
+        text = 'EXCEPTION IN ({0}, LINE {1} "{2}"): {3}'.format(filename, lineno, line.strip(), exc_obj)
+        fl.write(text)
 
     raise Exception

@@ -35,7 +35,7 @@ CREATE TABLE `vs` (
 
 CREATE TABLE `handicaps` (
 	`id` bigint NOT NULL AUTO_INCREMENT,
-	`fristparticipant` bigint NOT NULL,
+	`firstparticipant` bigint NOT NULL,
 	`secondparticipant` bigint NOT NULL,
 	`firstforward` double NOT NULL,
 	`firstwin` double NOT NULL,
@@ -43,8 +43,10 @@ CREATE TABLE `handicaps` (
 	`secondwin` double NOT NULL,
 	`oddsdate` DATETIME NOT NULL,
 	`gamedate` DATETIME,
-	`live` BINARY NOT NULL,
+	`live` BIT NOT NULL,
 	`href` char(200),
+	`actual` BIT NOT NULL,
+	`bookmaker` bigint NOT NULL,
 	PRIMARY KEY (`id`)
 );
 
@@ -83,6 +85,8 @@ ALTER TABLE `vs` ADD CONSTRAINT `vs_fk0` FOREIGN KEY (`FirstParticipant`) REFERE
 
 ALTER TABLE `vs` ADD CONSTRAINT `vs_fk1` FOREIGN KEY (`SecondParticipant`) REFERENCES `Participants`(`id`);
 
-ALTER TABLE `Handicap` ADD CONSTRAINT `Handicap_fk0` FOREIGN KEY (`FristParticipant`) REFERENCES `Participants`(`id`);
+ALTER TABLE `handicaps` ADD CONSTRAINT `Handicap_fk0` FOREIGN KEY (`firstparticipant`) REFERENCES `Participants`(`id`);
 
-ALTER TABLE `Handicap` ADD CONSTRAINT `Handicap_fk1` FOREIGN KEY (`SecondParticipant`) REFERENCES `Participants`(`id`);
+ALTER TABLE `handicaps` ADD CONSTRAINT `Handicap_fk1` FOREIGN KEY (`SecondParticipant`) REFERENCES `Participants`(`id`);
+
+ALTER TABLE `handicaps` ADD CONSTRAINT `handicaps_fk2` FOREIGN KEY (`bookmaker`) REFERENCES `bookmakers`(`id`);

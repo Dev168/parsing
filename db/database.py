@@ -150,9 +150,18 @@ def create_participant_names(names_df, bookmaker_id):
     return names_df
 
 
-def create_handicaps(handicaps_df):
+def create_handicaps(handicaps_df, bookmaker_id):
 
     # TODO: Избавится от кода по удалению столбцов. Лишних данных не должно поступать из JSON файлов!
+
+    conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME)
+
+    last_handicaps = pd.read_sql("SELECT * FROM handicaps WHERE actual = true AND bookmaker = %(id)s", con=conn, params={"id": bookmaker_id})
+
+    last_handicaps["actual"] = False
+    last_handicaps = last_handicaps.drop(["id"], 1)
+
+    last_handicaps.to_sql("handicaps", con=conn, if_exists="append", flavor="mysql", index=False)
 
     handicaps_df["oddsdate"] = datetime.now()
 
@@ -171,8 +180,11 @@ def create_handicaps(handicaps_df):
     if "gamedate" in handicaps_df:
         handicaps_df = handicaps_df.drop(["gamedate"], 1)
 
-    conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME)
-    handicaps_df.to_sql("handicap", con=conn, if_exists="append", flavor="mysql", index=False)
+    handicaps_df["actual"] = True
+    handicaps_df["bookmaker"] = bookmaker_id
+
+    handicaps_df.to_sql("handicaps", con=conn, if_exists="append", flavor="mysql", index=False)
+
     conn.close()
 
     print("Были добавлены новые события")

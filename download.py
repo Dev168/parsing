@@ -5,8 +5,10 @@ from db.database import create_handicaps
 
 def download_handicaps(scraping_module):
 
-    handicaps_df = pd.DataFrame(scraping_module.events()["handicap"])
+    bookmaker_id = scraping_module.bookmaker_id()
 
-    handicaps_df = resolve_participant_names(handicaps_df, scraping_module.bookmaker_id())
+    handicaps_df = pd.DataFrame(scraping_module.live_handicaps())
 
-    create_handicaps(handicaps_df)
+    handicaps_df = resolve_participant_names(handicaps_df, bookmaker_id)
+
+    create_handicaps(handicaps_df, bookmaker_id)
