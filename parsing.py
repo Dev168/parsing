@@ -74,6 +74,9 @@ def _replace_names_by_created_id(df, bookmaker_id):
     if creating_participants.empty:
         return df
 
+    print("Следующие участники будут созданы в базе")
+    print(creating_participants)
+
     created_participants = db.create_participants(creating_participants)
 
     created_participants = db.create_participant_names(created_participants, bookmaker_id)

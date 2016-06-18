@@ -125,6 +125,8 @@ def create_participants(names_df):
 
     conn.close()
 
+    print("Были созданы новые участники")
+
     return df
 
 
@@ -141,9 +143,11 @@ def create_participant_names(names_df, bookmaker_id):
 
     names_df.columns = ["id", "name"]
 
-    return names_df
-
     conn.close()
+
+    print("Для конторы были добавлены новые участники")
+
+    return names_df
 
 
 def create_handicaps(handicaps_df):
@@ -170,6 +174,8 @@ def create_handicaps(handicaps_df):
     conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME)
     handicaps_df.to_sql("handicap", con=conn, if_exists="append", flavor="mysql", index=False)
     conn.close()
+
+    print("Были добавлены новые события")
 
 
 

@@ -123,11 +123,18 @@ def events(url="https://www.sbobet.com/euro/football"):
 
                             data.append(game)
 
+        print("Данные успешно загружены")
+
         return {"vs": vs, "handicap": handicap}
 
-    except (IndexError, AttributeError):
+    except (IndexError, AttributeError, Exception):
+        print("При загрузке данных с сайта произошли ошибки")
         _debug_log(page, sys.exc_info())
         return {}
+
+
+def bookmaker_id():
+    return 1
 
 
 def sports():
@@ -189,4 +196,6 @@ def _debug_log(page, info):
         f.write(page)
 
     with open(dpath+"/log.txt", "w+", encoding="utf8") as f:
-        f.write(info)
+        f.write(str(info)+"\n"+info[2])
+
+    raise Exception
