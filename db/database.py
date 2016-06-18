@@ -3,8 +3,8 @@ import os
 
 import MySQLdb as mysql
 import pandas as pd
+from datetime import datetime as datetime
 
-#from parsing.main import resolve_participant_names
 from settings import DB_HOST, DB_NAME, DB_USER, DB_PASSWD
 
 DIRNAME = os.path.dirname(os.path.abspath(__file__))
@@ -128,8 +128,28 @@ def create_participant_names(names_df, bookmaker_id):
     conn.close()
 
 
-def create_events(events_df):
-    raise NotImplementedError
+def create_handicaps(handicaps_df):
+
+    handicaps_df["oddsdate"] = datetime.now()
+
+    if "score" in handicaps_df:
+        handicaps_df = handicaps_df.drop(["score"], 1)
+
+    if "league" in handicaps_df:
+        handicaps_df = handicaps_df.drop(["league"], 1)
+
+    if "sport" in handicaps_df:
+        handicaps_df = handicaps_df.drop(["sport"], 1)
+
+    if "livedate" in handicaps_df:
+        handicaps_df = handicaps_df.drop(["livedate"], 1)
+
+    if "gamedate" in handicaps_df:
+        handicaps_df = handicaps_df.drop(["gamedate"], 1)
+
+    conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME)
+    handicaps_df.to_sql("handicap", con=conn, if_exists="append", flavor="mysql", index=False)
+    conn.close()
 
 
 def get_bookmakers():
@@ -150,12 +170,6 @@ def get_bookmakers():
     return res
 
 
-def store_handicaps(handicaps_json, bookmaker_id):
 
-    handicaps_df = pd.DataFrame(handicaps_json)
-
-    handicaps_df = resolve_participant_names(handicaps_df, bookmaker_id)
-
-    create_events(events_df)
 
 

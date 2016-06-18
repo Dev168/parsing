@@ -19,15 +19,8 @@ CREATE TABLE `ParticipantNames` (
 	PRIMARY KEY (`id`)
 );
 
-CREATE TABLE `href` (
-	`id` bigint NOT NULL,
-	`Bookmaker` bigint NOT NULL,
-	`href` char(200) NOT NULL,
-	PRIMARY KEY (`id`)
-);
-
 CREATE TABLE `vs` (
-	`id` bigint NOT NULL,
+	`id` bigint NOT NULL AUTO_INCREMENT,
 	`FirstParticipant` bigint NOT NULL,
 	`SecondParticipant` bigint NOT NULL,
 	`FirstWin` double NOT NULL,
@@ -40,18 +33,17 @@ CREATE TABLE `vs` (
 	PRIMARY KEY (`id`)
 );
 
-CREATE TABLE `Handicap` (
-	`id` bigint NOT NULL,
-	`FristParticipant` bigint NOT NULL,
-	`SecondParticipant` bigint NOT NULL,
-	`FirstForward` double NOT NULL,
-	`FirstWin` double NOT NULL,
-	`SecondForward` double NOT NULL,
-	`SecondWin` double NOT NULL,
-	`OddsDate` DATETIME,
-	`GameDate` DATETIME,
-	`Live` BINARY NOT NULL,
-	`LiveDate` DATETIME,
+CREATE TABLE `handicaps` (
+	`id` bigint NOT NULL AUTO_INCREMENT,
+	`fristparticipant` bigint NOT NULL,
+	`secondparticipant` bigint NOT NULL,
+	`firstforward` double NOT NULL,
+	`firstwin` double NOT NULL,
+	`secondforward` double NOT NULL,
+	`secondwin` double NOT NULL,
+	`oddsdate` DATETIME NOT NULL,
+	`gamedate` DATETIME,
+	`live` BINARY NOT NULL,
 	`href` char(200),
 	PRIMARY KEY (`id`)
 );

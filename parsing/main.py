@@ -2,7 +2,7 @@ import MySQLdb as mysql
 import pandas as pd
 
 from common.distance import distance
-from db.database import create_participants, create_participant_names
+import db.database as db
 from settings import DB_HOST, DB_USER, DB_PASSWD, DB_NAME
 
 
@@ -13,9 +13,14 @@ def resolve_participant_names(events_df, bookmaker_id):
 
     events_df = replace_names_by_id(events_df, bookmaker_id)
 
-    events_df = replace_names_by_similarities(events_df)
+    events_df = replace_names_by_similarities(events_df, bookmaker_id)
 
     events_df = replace_names_by_created_id(events_df, bookmaker_id)
+
+    events_df = events_df.drop(["firstparticipant", "secondparticipant"], 1)
+
+    events_df = events_df.rename(
+        columns={"participant_x": "firstparticipant", "participant_y": "secondparticipant"})
 
     return events_df
 
@@ -69,9 +74,9 @@ def replace_names_by_created_id(df, bookmaker_id):
     if creating_participants.empty:
         return df
 
-    created_participants = create_participants(creating_participants)
+    created_participants = db.create_participants(creating_participants)
 
-    created_participants = create_participant_names(created_participants, bookmaker_id)
+    created_participants = db.create_participant_names(created_participants, bookmaker_id)
 
     merged_participants = df.merge(created_participants, how='left', left_on="firstparticipant", right_on="name").merge(created_participants, how="left",
                                                                                  left_on="secondparticipant",
@@ -83,7 +88,7 @@ def replace_names_by_created_id(df, bookmaker_id):
     merged_participants.loc[merged_participants["participant_y"].isnull(), "participant_y"] = \
         merged_participants.loc[merged_participants["participant_y"].isnull()]["id_y"]
 
-    merged_participants = merged_participants.columns.drop(["id_x", "id_y", "name_x", "name_y"])
+    merged_participants = merged_participants.drop(["id_x", "id_y", "name_x", "name_y"], 1)
 
     return merged_participants
 
@@ -108,3 +113,12 @@ def cartesian_product(df1, df2):
 
 def calculate_distance(row, key1, key2):
     return distance(row[key1], row[key2])
+
+
+def store_handicaps(handicaps_json, bookmaker_id):
+
+    handicaps_df = pd.DataFrame(handicaps_json)
+
+    handicaps_df = resolve_participant_names(handicaps_df, bookmaker_id)
+
+    db.create_handicaps(handicaps_df)

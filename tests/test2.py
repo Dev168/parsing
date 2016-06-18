@@ -1,12 +1,7 @@
-from parsing.main import replace_names_by_id, replace_names_by_created_id, replace_names_by_similarities
+import parsing.main as m
 from tests.t1.test import load_test_data
 
-events_df = load_test_data()
+handicaps_df = load_test_data()
 
-bookmaker_id = 1
+handicaps_df = m.resolve_participant_names(handicaps_df, 1)
 
-events_df = replace_names_by_id(events_df, bookmaker_id)
-
-events_df = replace_names_by_similarities(events_df, bookmaker_id)
-
-events_df = replace_names_by_created_id(events_df, bookmaker_id)
