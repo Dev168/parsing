@@ -51,6 +51,24 @@ def init():
     create_sports(__load_init_sports())
 
 
+def get_bookmakers():
+    conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME)
+
+    cursor = conn.cursor()
+
+    sql_code = "SELECT * FROM bookmakers"
+
+    cursor.execute(sql_code)
+
+    res = cursor.fetchall()
+
+    cursor.close()
+
+    conn.close()
+
+    return res
+
+
 def create_bookmaker(bookmaker_name):
     """Создает нового букмекера"""
     conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME)
@@ -130,6 +148,8 @@ def create_participant_names(names_df, bookmaker_id):
 
 def create_handicaps(handicaps_df):
 
+    # TODO: Избавится от кода по удалению столбцов. Лишних данных не должно поступать из JSON файлов!
+
     handicaps_df["oddsdate"] = datetime.now()
 
     if "score" in handicaps_df:
@@ -151,23 +171,6 @@ def create_handicaps(handicaps_df):
     handicaps_df.to_sql("handicap", con=conn, if_exists="append", flavor="mysql", index=False)
     conn.close()
 
-
-def get_bookmakers():
-    conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME)
-
-    cursor = conn.cursor()
-
-    sql_code = "SELECT * FROM bookmakers"
-
-    cursor.execute(sql_code)
-
-    res = cursor.fetchall()
-
-    cursor.close()
-
-    conn.close()
-
-    return res
 
 
 

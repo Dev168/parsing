@@ -1,4 +1,4 @@
-import parsing.main as m
+import parsing as m
 from tests.t1.test import load_test_data
 
 handicaps_df = load_test_data()

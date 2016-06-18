@@ -11,11 +11,11 @@ def resolve_participant_names(events_df, bookmaker_id):
     получает список имен учатников, возвращает их id в базе данных
     Отсутствующих участников создает"""
 
-    events_df = replace_names_by_id(events_df, bookmaker_id)
+    events_df = _replace_names_by_id(events_df, bookmaker_id)
 
-    events_df = replace_names_by_similarities(events_df, bookmaker_id)
+    events_df = _replace_names_by_similarities(events_df, bookmaker_id)
 
-    events_df = replace_names_by_created_id(events_df, bookmaker_id)
+    events_df = _replace_names_by_created_id(events_df, bookmaker_id)
 
     events_df = events_df.drop(["firstparticipant", "secondparticipant"], 1)
 
@@ -25,7 +25,7 @@ def resolve_participant_names(events_df, bookmaker_id):
     return events_df
 
 
-def replace_names_by_id(events_df, bookmaker_id):
+def _replace_names_by_id(events_df, bookmaker_id):
 
     conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME)
 
@@ -45,7 +45,7 @@ def replace_names_by_id(events_df, bookmaker_id):
         ["name_x", "name_y"], axis=1)  # TODO: Лишняя строка, сделать левое соединение без необходимости удалять лишние столбики
 
 
-def replace_names_by_similarities(df, bookmaker_id):
+def _replace_names_by_similarities(df, bookmaker_id):
 
     conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME)
 
@@ -55,21 +55,21 @@ def replace_names_by_similarities(df, bookmaker_id):
 
     conn.close()
 
-    missing_names = participants_without_id(df)
+    missing_names = _participants_without_id(df)
 
-    missing_data = cartesian_product(db_names, missing_names)
+    missing_data = _cartesian_product(db_names, missing_names)
 
     if missing_data.empty:
         return df
 
-    missing_data["distance"] = missing_data.apply(calculate_distance, axis=1, args=('name_from_db', 'missing_name'))
+    missing_data["distance"] = missing_data.apply(_calculate_distance, axis=1, args=('name_from_db', 'missing_name'))
 
     #  TODO доработать логику распознавания
 
 
-def replace_names_by_created_id(df, bookmaker_id):
+def _replace_names_by_created_id(df, bookmaker_id):
 
-    creating_participants = participants_without_id(df)
+    creating_participants = _participants_without_id(df)
 
     if creating_participants.empty:
         return df
@@ -93,7 +93,7 @@ def replace_names_by_created_id(df, bookmaker_id):
     return merged_participants
 
 
-def participants_without_id(df):
+def _participants_without_id(df):
 
     ser1 = df["firstparticipant"][df["participant_x"].isnull()]
 
@@ -104,14 +104,14 @@ def participants_without_id(df):
     return pd.DataFrame({"missing_name": conc_ser.unique()})
 
 
-def cartesian_product(df1, df2):
+def _cartesian_product(df1, df2):
     df1["formerge"] = 1
     df2["formerge"] = 1
     result_df = df1.merge(df2, on="formerge")
     return result_df.drop(["formerge"], axis=1)
 
 
-def calculate_distance(row, key1, key2):
+def _calculate_distance(row, key1, key2):
     return distance(row[key1], row[key2])
 
 
