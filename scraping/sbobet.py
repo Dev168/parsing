@@ -20,7 +20,10 @@ def events(url="https://www.sbobet.com/euro/football", debug_page=None):
         spans = game_tag.find("div", class_="DateTimeTxt").find_all("span")
         if game["live"]:
             game["score"] = spans[0].contents[0].strip()
-            game["livedate"] = spans[1].font.contents[0].strip()
+            if type(spans[1].contents[0]) == str:
+                game["livedate"] = spans[1].font.contents[0].strip()
+            else:
+                game["livedate"] = ""
             game["oddsdate"] = None
             game["gamedate"] = None
         else:

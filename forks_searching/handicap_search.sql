@@ -9,7 +9,7 @@
         h1.href,
         h2.href,
         ( h1.firstwin * h2.secondwin - h1.firstwin - h2.secondwin ) / (
-        h1.firstwin + h2.secondwin ) AS merge_percent
+        h1.firstwin + h2.secondwin ) * 100 AS merge_percent
  FROM   handicaps AS h1,
         handicaps AS h2
  WHERE  h1.firstparticipant = h2.firstparticipant
@@ -30,7 +30,7 @@ UNION
         h1.href,
         h2.href,
         ( h1.firstwin * h2.secondwin - h1.firstwin - h2.secondwin ) / (
-        h1.firstwin + h2.secondwin ) AS merge_percent
+        h1.firstwin + h2.secondwin ) * 100 AS merge_percent
  FROM   handicaps AS h1,
         handicaps AS h2
  WHERE  h1.firstparticipant = h2.firstparticipant

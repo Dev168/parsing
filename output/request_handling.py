@@ -10,9 +10,7 @@ def index():
 
     posts = get_forks()
 
-    return render_template("table.html",
-
-        posts = posts)
+    return render_template("table.html", posts = posts)
 
 if __name__ == "__main__":
     app.run()
