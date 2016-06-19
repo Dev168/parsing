@@ -479,7 +479,7 @@ def live_handicaps(url="https://www.marathonbet9.com/en/live/26418#cc=3255521,32
         handicap["firstwin"] = Convert(cell)['coeffs'][index_of_hand]
 
         handicap["secondwin"] = Convert(cell)['coeffs'][index_of_hand1]
-        handicap["live"] = "True"
+        handicap["live"] = True
         handicap["href"] = "None"
         return handicap
 
