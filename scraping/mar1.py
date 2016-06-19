@@ -534,9 +534,8 @@ def live_handicaps(url="https://www.marathonbet9.com/en/live/26418#cc=3255521,32
         else:
             return str(a[:int(str(a.index("(")))].strip())
 
-    dicton = get_list_of_hand()
-    return dicton["handicap"]
 
+    return get_list_of_hand()["handicap"]
 
 def bookmaker_id():
     return 2
