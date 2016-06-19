@@ -4,6 +4,8 @@ import re
 import sys
 import os
 from datetime import datetime
+
+
 def events(url="https://www.mthbet.com/su/live/popular"):
 
     html_text = requests.get(url).text
