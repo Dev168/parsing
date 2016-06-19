@@ -5,11 +5,11 @@ import os
 
 
 def get_forks():
-    with open(os.path.join(PROJECT_PATH, "forks_searching\handicap_search.sql"), "r") as f:
-        sql_code = f.read()
-        conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME)
-        df = pd.read_sql(sql_code, con=conn)
-        conn.close()
+    with open(os.path.join(PROJECT_PATH, "forks_searching","handicap_search.sql"), "r") as f:
+        # sql_code = f.read()
+        # conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME)
+        # df = pd.read_sql(sql_code, con=conn)
+        # conn.close()
         return [
             {"participant_names": "Rus-England",
              "event_1": "handicap Rus +2",
@@ -17,8 +17,8 @@ def get_forks():
              "coeff_1": "2",
              "coeff_2": "3",
              "marge_percent": "10%",
-             "href_1": "раз",
-             "href_2": "два",
+             "href_1": "https://new.vk.com",
+             "href_2": "https://new.vk.com",
              "bookmaker1": "sbobet",
              "bookmaker2": "marathon"
             }
