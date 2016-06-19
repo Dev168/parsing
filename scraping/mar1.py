@@ -4,6 +4,8 @@ import re
 import sys
 import os
 from datetime import datetime
+
+
 def events(url="https://www.marathonbet9.com/ru/live/popular"):
 
     html_text = requests.get(url).text
@@ -342,7 +344,6 @@ def events(url="https://www.marathonbet9.com/ru/live/popular"):
     return unite_dict(get_list_of_hand(),get_list_of_money(),get_list_of_result2way(),get_list_of_chance())
 
 
-
 def live_handicaps(url="https://www.marathonbet9.com/en/live/26418#cc=3255521,3255508,3262951,3255473"):
 
     cookie = {'panbet.sitestyle': 'MULTIMARKETS'}
@@ -533,5 +534,13 @@ def live_handicaps(url="https://www.marathonbet9.com/en/live/26418#cc=3255521,32
         else:
             return str(a[:int(str(a.index("(")))].strip())
 
-    return get_list_of_hand()
+    dicton = get_list_of_hand()
+    return dicton["handicap"]
 
+
+def bookmaker_id():
+    return 2
+
+
+def bookmaker_name():
+    return "marathonbet"
