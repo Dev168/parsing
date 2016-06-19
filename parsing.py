@@ -3,7 +3,7 @@ import pandas as pd
 
 from common.distance import distance
 import db.database as db
-from settings import DB_HOST, DB_USER, DB_PASSWD, DB_NAME
+from settings import DB_HOST, DB_USER, DB_PASSWD, DB_NAME, LIVENSHTAIN_MIN
 
 
 def resolve_participant_names(events_df, bookmaker_id):
@@ -63,6 +63,25 @@ def _replace_names_by_similarities(df, bookmaker_id):
         return df
 
     missing_data["distance"] = missing_data.apply(_calculate_distance, axis=1, args=('name_from_db', 'missing_name'))
+
+    similar_participants = missing_data[missing_data["distance"] <= LIVENSHTAIN_MIN][["participant", "missing_name"]]
+    similar_participants.columns = ["participant", "name"]
+    created_participants = db.create_participant_names(similar_participants, bookmaker_id)
+
+    merged_participants = df.merge(created_participants, how='left', left_on="firstparticipant", right_on="name").merge(
+        created_participants, how="left",
+        left_on="secondparticipant",
+        right_on="name")
+
+    merged_participants.loc[merged_participants["participant_x"].isnull(), "participant_x"] = \
+        merged_participants.loc[merged_participants["participant_x"].isnull()]["id_x"]
+
+    merged_participants.loc[merged_participants["participant_y"].isnull(), "participant_y"] = \
+        merged_participants.loc[merged_participants["participant_y"].isnull()]["id_y"]
+
+    merged_participants = merged_participants.drop(["id_x", "id_y", "name_x", "name_y"], 1)
+
+    return merged_participants
 
     #  TODO доработать логику распознавания
 
