@@ -79,8 +79,6 @@ ALTER TABLE `sportnames` ADD CONSTRAINT `sportnames_fk1` FOREIGN KEY (`Sport`) R
 
 ALTER TABLE `sportnames` ADD UNIQUE `unique_index`(`Name`, `Bookmaker`);
 
-ALTER TABLE `href` ADD CONSTRAINT `href_fk0` FOREIGN KEY (`Bookmaker`) REFERENCES `Bookmakers`(`id`);
-
 ALTER TABLE `vs` ADD CONSTRAINT `vs_fk0` FOREIGN KEY (`FirstParticipant`) REFERENCES `Participants`(`id`);
 
 ALTER TABLE `vs` ADD CONSTRAINT `vs_fk1` FOREIGN KEY (`SecondParticipant`) REFERENCES `Participants`(`id`);

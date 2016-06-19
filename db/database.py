@@ -19,6 +19,11 @@ def init():
             text = f.read()
             return json.loads(text)
 
+    def __load_init_bookmakers():
+        with open(os.path.join(DIRNAME, "bookmakers_create.json")) as f:
+            text = f.read()
+            return json.loads(text)
+
     conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD)
 
     cursor = conn.cursor()
@@ -50,6 +55,8 @@ def init():
 
     create_sports(__load_init_sports())
 
+    create_bookmakers(__load_init_bookmakers())
+
 
 def get_bookmakers():
     conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME)
@@ -69,24 +76,21 @@ def get_bookmakers():
     return res
 
 
-def create_bookmaker(bookmaker_name):
-    """Создает нового букмекера"""
+def create_bookmakers(bookmakers):
+
     conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME)
 
     cursor = conn.cursor()
 
-    sql_code = 'INSERT INTO bookmakers (Name) VALUES ("{0}")'.format(bookmaker_name)
+    sql_code = "INSERT INTO bookmakers (`id`, `Name`) VALUES (%s, %s)"
 
-    try:
-        cursor.execute(sql_code)
-        conn.commit()
-        print("{0} контора успешно создана".format(bookmaker_name))
-    except mysql.IntegrityError as err:
-        print(err)
+    cursor.executemany(sql_code, [(bookmaker[0], bookmaker[1]) for bookmaker in bookmakers])
 
-    cursor.close()
+    conn.commit()
 
     conn.close()
+
+    print("Добавлены букмекеры")
 
 
 def create_sports(sports):

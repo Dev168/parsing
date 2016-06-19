@@ -13,7 +13,7 @@ def live_handicaps(url="https://www.sbobet.com/euro/football"):
     return events(url)["handicap"]
 
 
-def events(url="https://www.sbobet.com/euro/football"):
+def events(url="https://www.sbobet.com/euro/football", debug_page=None):
 
     def scrap_vs(game_tag, game):
 
@@ -47,7 +47,7 @@ def events(url="https://www.sbobet.com/euro/football"):
         spans = game_tag.find("div", class_="DateTimeTxt").find_all("span")
         if game["live"]:
             game["score"] = spans[0].contents[0].strip()
-            if type(spans[0].contents[0]) == str:
+            if type(spans[1].contents[0]) == str:
                 game["livedate"] = spans[1].font.contents[0].strip()
             else:
                 game["livedate"] = ""
@@ -75,7 +75,10 @@ def events(url="https://www.sbobet.com/euro/football"):
 
         game["href"] = columns[4].a["href"]
 
-    page = get_page(url)
+    if debug_page is None:
+        page = get_page(url)
+    else:
+        page = debug_page
 
     try:
 
@@ -123,7 +126,7 @@ def events(url="https://www.sbobet.com/euro/football"):
 
                         for game_tag in game_tags:
 
-                            if "class" in game_tag.attrs and game_tag["class"] == "OddsClosed":
+                            if "class" in game_tag.attrs and "OddsClosed" in game_tag["class"]:
                                 continue
 
                             game = {"sport": sport, "league": league_name, "live": live}
@@ -145,6 +148,10 @@ def events(url="https://www.sbobet.com/euro/football"):
 
 def bookmaker_id():
     return 1
+
+
+def bookmaker_name():
+    return "sbobet"
 
 
 def sports():
