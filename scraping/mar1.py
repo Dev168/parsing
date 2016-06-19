@@ -457,10 +457,7 @@ def live_handicaps(url="https://www.marathonbet9.com/en/live/26418#cc=3255521,32
         d["name"] = n
         return d
 
-    def get_url(team1, team2):
-        for i in range(len(events)):
-            if ((str(events[i]).find(team1) != -1) and (str(events[i]).find(team2) != -1)):
-                return href[i]
+
 
     uniq_odds = []
 
@@ -483,9 +480,7 @@ def live_handicaps(url="https://www.marathonbet9.com/en/live/26418#cc=3255521,32
 
         handicap["secondwin"] = Convert(cell)['coeffs'][index_of_hand1]
         handicap["live"] = "True"
-        handicap["href"] = get_url(
-            get_part_string(str(Convert(cell)['name'][index_of_hand])),
-            get_part_string(str(Convert(cell)['name'][index_of_hand1])))
+        handicap["href"] = "None"
         return handicap
 
     def get_pairs_of_participants_handicap():
