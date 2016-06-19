@@ -1,14 +1,11 @@
 from flask import Flask
 from flask import render_template
-
-def get_forks():
-    posts = []
-    return posts
+from forks_searching.search import get_forks
 
 
 app = Flask(__name__)
-@app.route("/")
 
+@app.route("/")
 def index():
 
     posts = get_forks()
