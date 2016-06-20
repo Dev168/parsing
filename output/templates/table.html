@@ -1,18 +1,14 @@
 <html>
  <head>
-
   <title>Forks</title>
+   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
  </head>
  <body>
+   <table  border="5" cellpadding="10" cellspacing="0">
   {% for post in posts %}
-  <table  border="5" cellpadding="10" cellspacing="0">
-   <caption>{{post.participant_names}}</caption>
    <tr>
-
       <td colspan="2">{{post.bookmaker1}} <br> {{post.bookmaker2}}</td>
-
-
-
+      <td colspan="2">{{post.participant_names}}</td>
      <td>{{post.event_1}} <br>{{post.event_2}}</td>
     <td>{{post.coeff_1}}<br>{{post.coeff_1}}</td>
      <td> {{post.marge_percent}}</td>
