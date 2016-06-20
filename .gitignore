@@ -2,4 +2,5 @@
 .idea/
 ghostdriver.log
 settings
+__pycache__/
 garbage/

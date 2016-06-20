@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
+  <title>Starter Template - Materialize</title>
+
+  <!-- CSS  -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link href="static/css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+  <link href="static/css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+</head>
+<body>
+
+  <nav class="light-blue lighten-1" role="navigation">
+    <div class="nav-wrapper container"><a id="logo-container" href="#" class="brand-logo">Вилки на спорт</a>
+      <ul class="right hide-on-med-and-down">
+          <li><a href="#">Вилки</a></li>
+          <li><a href="#">Команды</a></li>
+          <li><a href="#">Актуальные события</a></li>
+      </ul>
+      <ul id="nav-mobile" class="side-nav">
+        <li><a href="#"></a></li>
+      </ul>
+      <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
+    </div>
+  </nav>
+
+    <table class="responsive-table striped">
+        <thead>
+          <tr>
+              <th data-field="bookmakers">Букмекер 1 <br> Букмекер 2</th>
+              <th data-field="event">Событие</th>
+              <th data-field="bets">Ставка 1 <br> Ставка 2</th>
+              <th data-field="coeffs">Коэфф 1 <br> Коэфф 2</th>
+              <th data-field="marga">Маржа</th>
+              <th data-field="hrefs">Ссылка 1 <br> Ссылка 2</th>
+          </tr>
+        </thead>
+        <tbody>
+              {% for post in posts %}
+               <tr>
+                  <td>{{post.bookmaker1}} <br> {{post.bookmaker2}}</td>
+                  <td>{{post.participant_names}}</td>
+                  <td>{{post.event_1}} <br>{{post.event_2}}</td>
+                  <td>{{post.coeff_1}}<br>{{post.coeff_1}}</td>
+                  <td> {{post.marge_percent}}</td>
+                  <td> <a href="{{ post.href_1 }}">Ссылка 1</a><br><a href="{{ post.href_2 }}">Ссылка 2</a></td>
+               </tr>
+               {% endfor %}
+        </tbody>
+      </table>
+
+
+
+
+  <!--  Scripts-->
+  <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="static/js/materialize.js"></script>
+  <script src="static/js/init.js"></script>
+
+  </body>
+</html>
