@@ -11,6 +11,9 @@ def resolve_participant_names(events_df, bookmaker_id):
     получает список имен учатников, возвращает их id в базе данных
     Отсутствующих участников создает"""
 
+    if events_df.empty:
+        return events_df
+
     events_df = _replace_names_by_id(events_df, bookmaker_id)
 
     events_df = _replace_names_by_similarities(events_df, bookmaker_id)

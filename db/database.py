@@ -162,9 +162,15 @@ def create_handicaps(handicaps_df, bookmaker_id):
 
     last_handicaps = pd.read_sql("SELECT * FROM handicaps WHERE actual = true AND bookmaker = %(id)s", con=conn, params={"id": bookmaker_id})
 
+    cursor = conn.cursor()
+    sql_to_del = "DELETE FROM handicaps WHERE `id` in (%s)"
+    lis = last_handicaps["id"].values.tolist()
+    params = [(el,) for el in lis]
+    cursor.executemany(sql_to_del, params)
+    conn.commit()
+
     last_handicaps["actual"] = False
     last_handicaps = last_handicaps.drop(["id"], 1)
-
     last_handicaps.to_sql("handicaps", con=conn, if_exists="append", flavor="mysql", index=False)
 
     handicaps_df["oddsdate"] = datetime.now()
