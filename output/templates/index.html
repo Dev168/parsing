@@ -3,7 +3,7 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
-  <title>Starter Template - Materialize</title>
+  <title>Вилки на спортивные мероприятия</title>
 
   <!-- CSS  -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -34,7 +34,6 @@
               <th data-field="bets">Ставка 1 <br> Ставка 2</th>
               <th data-field="coeffs">Коэфф 1 <br> Коэфф 2</th>
               <th data-field="marga">Маржа</th>
-              <th data-field="hrefs">Ссылка 1 <br> Ссылка 2</th>
           </tr>
         </thead>
         <tbody>
@@ -42,10 +41,9 @@
                <tr>
                   <td>{{post.bookmaker1}} <br> {{post.bookmaker2}}</td>
                   <td>{{post.participant_names}}</td>
-                  <td>{{post.event_1}} <br>{{post.event_2}}</td>
-                  <td>{{post.coeff_1}}<br>{{post.coeff_1}}</td>
+                   <td> <a href="{{ post.href_1 }}">{{post.event_1}}</a><br><a href="{{ post.href_2 }}">{{post.event_2}}</a></td>
+                  <td>{{post.coeff_1}}<br>{{post.coeff_2}}</td>
                   <td> {{post.marge_percent}}</td>
-                  <td> <a href="{{ post.href_1 }}">Ссылка 1</a><br><a href="{{ post.href_2 }}">Ссылка 2</a></td>
                </tr>
                {% endfor %}
         </tbody>

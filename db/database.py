@@ -82,9 +82,9 @@ def create_bookmakers(bookmakers):
 
     cursor = conn.cursor()
 
-    sql_code = "INSERT INTO bookmakers (`id`, `Name`) VALUES (%s, %s)"
+    sql_code = "INSERT INTO bookmakers (`id`, `Name`, `hostname`) VALUES (%s, %s, %s)"
 
-    cursor.executemany(sql_code, [(bookmaker[0], bookmaker[1]) for bookmaker in bookmakers])
+    cursor.executemany(sql_code, [(bookmaker[0], bookmaker[1], bookmaker[2]) for bookmaker in bookmakers])
 
     conn.commit()
 

@@ -4,7 +4,7 @@ import os
 
 
 def get_forks():
-    with open(os.path.join(PROJECT_PATH, "forks_searching", "handicap_search.sql"), "r") as f:
+    with open(os.path.join(PROJECT_PATH, "forks_searching", "rc.sql"), "r") as f:
         with open(os.path.join(PROJECT_PATH, "forks_searching", "handicap_search2.sql"), "r") as f2:
             sql_code1 = f.read()
             sql_code2 = f2.read()

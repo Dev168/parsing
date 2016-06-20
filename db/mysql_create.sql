@@ -2,7 +2,8 @@ CREATE TABLE `Bookmakers` (
 	`id` bigint NOT NULL AUTO_INCREMENT,
 	`Name` char(150),
 	PRIMARY KEY (`id`),
-	UNIQUE KEY(`Name`)
+	UNIQUE KEY(`Name`),
+	`hostname` char(250)
 );
 
 CREATE TABLE `Participants` (
