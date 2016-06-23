@@ -12,3 +12,7 @@
 .icon-block .material-icons {
 	font-size: inherit;
 }
+
+.navbar-material .nav-wrapper .brand-logo img {
+    height: 64px;
+}

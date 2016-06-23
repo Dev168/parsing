@@ -44,9 +44,9 @@ CREATE TABLE `handicaps` (
 	`secondwin` double NOT NULL,
 	`oddsdate` DATETIME NOT NULL,
 	`gamedate` DATETIME,
-	`live` BIT NOT NULL,
+	`live` BOOLEAN NOT NULL,
 	`href` char(200),
-	`actual` BIT NOT NULL,
+	`actual` BOOLEAN NOT NULL,
 	`bookmaker` bigint NOT NULL,
 	PRIMARY KEY (`id`)
 );

@@ -14,6 +14,7 @@
 
   <nav class="light-blue lighten-1" role="navigation">
     <div class="nav-wrapper container"><a id="logo-container" href="#" class="brand-logo">Вилки на спорт</a>
+
       <ul class="right hide-on-med-and-down">
           <li><a href="#">Вилки</a></li>
           <li><a href="#">Команды</a></li>
@@ -29,7 +30,6 @@
     <table class="responsive-table striped">
         <thead>
           <tr>
-              <th data-field="bookmakers">Букмекер 1 <br> Букмекер 2</th>
               <th data-field="event">Событие</th>
               <th data-field="bets">Ставка 1 <br> Ставка 2</th>
               <th data-field="coeffs">Коэфф 1 <br> Коэфф 2</th>
@@ -39,9 +39,8 @@
         <tbody>
               {% for post in posts %}
                <tr>
-                  <td>{{post.bookmaker1}} <br> {{post.bookmaker2}}</td>
                   <td>{{post.participant_names}}</td>
-                   <td> <a href="{{ post.href_1 }}">{{post.event_1}}</a><br><a href="{{ post.href_2 }}">{{post.event_2}}</a></td>
+                   <td> <a href="{{ post.href_1 }}">{{post.event_1}} ({{post.bookmaker1}})</a><br><a href="{{ post.href_2 }}">{{post.event_2}} ({{post.bookmaker2}})</a></td>
                   <td>{{post.coeff_1}}<br>{{post.coeff_2}}</td>
                   <td> {{post.marge_percent}}</td>
                </tr>
