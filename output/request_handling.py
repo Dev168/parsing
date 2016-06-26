@@ -1,6 +1,7 @@
 from flask import Flask
 from flask import render_template
 from forks_searching.search import get_forks
+from gevent import wsgi
 
 
 app = Flask(__name__)
@@ -12,5 +13,6 @@ def index():
 
     return render_template("index.html", posts = posts)
 
-if __name__ == "__main__":
-    app.run()
+
+server = wsgi.WSGIServer(('', 5000), app)
+server.serve_forever()
