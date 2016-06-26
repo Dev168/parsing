@@ -1,7 +1,11 @@
+import sys
+sys.path.append("C:\\Users\\Administrator\\PycharmProjects\\BookmakerPlus")
+
 from flask import Flask
 from flask import render_template
 from forks_searching.search import get_forks
 from gevent import wsgi
+
 
 
 app = Flask(__name__)
