@@ -1,10 +1,13 @@
 import requests
 import bs4
 import re
+import sys
+import os
+from datetime import datetime
+url1 = "https://www.marafonsportsbook.com/su/live/26418"
 
-url="https://www.marathonbet9.com/en/live/26418#cc=3255521,3255508,3262951,3255473"
 cookie = {'panbet.sitestyle': 'MULTIMARKETS'}
-html_text = requests.get(url,cookies=cookie).text
+html_text = requests.get(url1, cookies=cookie).text
 
 doc = bs4.BeautifulSoup(html_text, "html.parser")
 
@@ -114,10 +117,7 @@ def Convert(cell):
     d["name"] = n
     return d
 
-def get_url(team1, team2):
-    for i in range(len(events)):
-        if ((str(events[i]).find(team1) != -1) and (str(events[i]).find(team2) != -1)):
-            return href[i]
+
 
 uniq_odds = []
 
@@ -138,26 +138,32 @@ def get_handicap(index_of_hand, index_of_hand1):
     handicap["secondparticipant"] = get_part_string(str(Convert(cell)['name'][index_of_hand1]))
     handicap["firstwin"] = Convert(cell)['coeffs'][index_of_hand]
 
-
-
     handicap["secondwin"] = Convert(cell)['coeffs'][index_of_hand1]
-    handicap["href"] = get_url(
-        get_part_string(str(Convert(cell)['name'][index_of_hand])), get_part_string(str(Convert(cell)['name'][index_of_hand1])))
+    handicap["live"] = True
+    handicap["href"] =  os.path.join(url1,get_url(get_part_string(str(Convert(cell)['name'][index_of_hand])),get_part_string(str(Convert(cell)['name'][index_of_hand1]))))
     return handicap
+
+def get_url(team1, team2):
+    for i in range(len(events)):
+        if ((str(events[i]).find(team1) != -1) and (str(events[i]).find(team2) != -1)):
+            if(i<len(href)):
+                return href[i]
+            else:
+                return "/"
+
 
 def get_pairs_of_participants_handicap():
     pairs = []
     uniq_pairs = []
+    if(len(odd)>1):
+        for j in range(len(events)):
+            for i in range(len(Convert(cell)['name']) - 1):
+                if ((str(odd[i]) == 'HANDICAP') and (str(odd[i + 1]) == 'HANDICAP')):
 
-    for j in range(len(events)):
-        for i in range(len(Convert(cell)['name']) - 1):
-            if ((str(odd[i]) == 'HANDICAP') and (str(odd[i + 1]) == 'HANDICAP')):
-
-
-                pairs.append(i)
-                pairs.append(i + 1)
-            else:
-                 pass
+                    pairs.append(i)
+                    pairs.append(i + 1)
+                else:
+                    pass
     for o in pairs:
         if (uniq_pairs.__contains__(o) == 0):
             uniq_pairs.append(o)
@@ -175,25 +181,21 @@ def get_list_of_hand():
     return d
 
 def is_forward_zero(a):
-    if(str(a).find("(")==-1):
+    if (str(a).find("(") == -1):
         return 0
     else:
         return 1
 
 def get_forward_string(a):
-    if(is_forward_zero(a)==0):
+    if (is_forward_zero(a) == 0):
         return 0
     else:
         return str(a[int(a.index("(") + 1):int(str(a.index(")")))].strip())
 
 def get_part_string(a):
-    if(is_forward_zero(a)==0):
+    if (is_forward_zero(a) == 0):
         return a
     else:
         return str(a[:int(str(a.index("(")))].strip())
-
-
-
-
 
 

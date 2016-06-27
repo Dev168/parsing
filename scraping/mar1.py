@@ -344,7 +344,9 @@ def events(url="https://www.marathonbet9.com/ru/live/popular"):
     return unite_dict(get_list_of_hand(),get_list_of_money(),get_list_of_result2way(),get_list_of_chance())
 
 
-def live_handicaps(url="https://www.mirrormarafonbet.com/en/live/26418"):
+def live_handicaps(url="https://www.marafonsportsbook.com/en/live/26418"):
+
+    url1 = "https://www.marafonsportsbook.com/en/live/26418"
 
     cookie = {'panbet.sitestyle': 'MULTIMARKETS'}
     html_text = requests.get(url, cookies=cookie).text
@@ -483,18 +485,27 @@ def live_handicaps(url="https://www.mirrormarafonbet.com/en/live/26418"):
         handicap["href"] = "None"
         return handicap
 
+    def get_url(team1, team2):
+        for i in range(len(events)):
+            if ((str(events[i]).find(team1) != -1) and (str(events[i]).find(team2) != -1)):
+                if(i<len(href)):
+                    return href[i]
+                else:
+                    return "/"
+
+
     def get_pairs_of_participants_handicap():
         pairs = []
         uniq_pairs = []
+        if(len(odd)>1):
+            for j in range(len(events)):
+                for i in range(len(Convert(cell)['name']) - 1):
+                    if ((str(odd[i]) == 'HANDICAP') and (str(odd[i + 1]) == 'HANDICAP')):
 
-        for j in range(len(events)):
-            for i in range(len(Convert(cell)['name']) - 1):
-                if ((str(odd[i]) == 'HANDICAP') and (str(odd[i + 1]) == 'HANDICAP')):
-
-                    pairs.append(i)
-                    pairs.append(i + 1)
-                else:
-                    pass
+                        pairs.append(i)
+                        pairs.append(i + 1)
+                    else:
+                        pass
         for o in pairs:
             if (uniq_pairs.__contains__(o) == 0):
                 uniq_pairs.append(o)
