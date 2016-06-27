@@ -59,7 +59,7 @@ def events(url="https://www.sbobet.com/euro/football", debug_page=None):
             res = re.findall("[0-9]+", game["score"])
             score1 = float(res[0])
             score2 = float(res[1])
-            diff = abs(score1-score2)
+            diff = score1-score2
 
             if type(spans[1].contents[0]) == str:
                 game["livedate"] = spans[1].font.contents[0].strip()
@@ -83,20 +83,9 @@ def events(url="https://www.sbobet.com/euro/football", debug_page=None):
 
         game["secondforward"] = float(columns[3].find("span", class_="OddsM").contents[0].strip())
 
-        if diff != 0:
-            if game["firstforward"] == 0:
-                if score1 > 0:
-                    game["firstforward"] -= diff
-                    game["secondforward"] += diff
-                else:
-                    game["firstforward"] += diff
-                    game["secondforward"] -= diff
-            elif game["firstforward"] > 0:
-                game["firstforward"] += diff
-                game["secondforward"] -= diff
-            else:
-                game["firstforward"] -= diff
-                game["firstforward"] += diff
+        game["firstforward"] -= diff
+
+        game["secondforward"] += diff
 
         game["secondparticipant"] = columns[3].find("span", class_="OddsL").contents[0].strip()
 
