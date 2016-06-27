@@ -48,8 +48,19 @@ def events(url="https://www.sbobet.com/euro/football", debug_page=None):
 
     def scrap_handicap(game_tag, game):
         spans = game_tag.find("div", class_="DateTimeTxt").find_all("span")
+
+        diff = 0
+        score1 = 0
+        score2 = 0
+
         if game["live"]:
             game["score"] = spans[0].contents[0].strip()
+
+            res = re.findall("[0-9]+", game["score"])
+            score1 = float(res[0])
+            score2 = float(res[1])
+            diff = abs(score1-score2)
+
             if type(spans[1].contents[0]) == str:
                 game["livedate"] = spans[1].font.contents[0].strip()
             else:
@@ -68,13 +79,28 @@ def events(url="https://www.sbobet.com/euro/football", debug_page=None):
 
         game["firstwin"] = columns[2].find("span", class_="OddsR").contents[0].strip()
 
-        game["firstforward"] = columns[2].find("span", class_="OddsM").contents[0].strip()
+        game["firstforward"] = float(columns[2].find("span", class_="OddsM").contents[0].strip())
+
+        game["secondforward"] = float(columns[3].find("span", class_="OddsM").contents[0].strip())
+
+        if diff != 0:
+            if game["firstforward"] == 0:
+                if score1 > 0:
+                    game["firstforward"] -= diff
+                    game["secondforward"] += diff
+                else:
+                    game["firstforward"] += diff
+                    game["secondforward"] -= diff
+            elif game["firstforward"] > 0:
+                game["firstforward"] += diff
+                game["secondforward"] -= diff
+            else:
+                game["firstforward"] -= diff
+                game["firstforward"] += diff
 
         game["secondparticipant"] = columns[3].find("span", class_="OddsL").contents[0].strip()
 
         game["secondwin"] = columns[3].find("span", class_="OddsR").contents[0].strip()
-
-        game["secondforward"] = columns[3].find("span", class_="OddsM").contents[0].strip()
 
         game["href"] = columns[4].a["href"]
 
