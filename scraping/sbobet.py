@@ -165,8 +165,6 @@ def events(url="https://www.sbobet.com/euro/football", debug_page=None):
                             if live:
                                 data.append(game)
 
-        print("Данные успешно загружены")
-
         return {"vs": vs, "handicap": handicap}
 
     except (IndexError, AttributeError, Exception):

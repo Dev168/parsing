@@ -197,7 +197,8 @@ def create_handicaps(handicaps_df, bookmaker_id):
 
     conn.close()
 
-    print("Были добавлены новые события")
+    if not handicaps_df.empty:
+        print("Были добавлены новые события")
 
 
 

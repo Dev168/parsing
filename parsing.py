@@ -86,7 +86,6 @@ def _replace_names_by_similarities(df, bookmaker_id):
 
     return merged_participants
 
-    #  TODO доработать логику распознавания
 
 
 def _replace_names_by_created_id(df, bookmaker_id):
