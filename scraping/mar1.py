@@ -344,7 +344,7 @@ def events(url="https://www.marathonbet9.com/ru/live/popular"):
     return unite_dict(get_list_of_hand(),get_list_of_money(),get_list_of_result2way(),get_list_of_chance())
 
 
-def live_handicaps(url="https://www.marathonbet9.com/en/live/26418#cc=3255521,3255508,3262951,3255473"):
+def live_handicaps(url="https://www.mirrormarafonbet.com/en/live/26418"):
 
     cookie = {'panbet.sitestyle': 'MULTIMARKETS'}
     html_text = requests.get(url, cookies=cookie).text
