@@ -12,3 +12,5 @@ def download_handicaps(scraping_module):
     handicaps_df = resolve_participant_names(handicaps_df, bookmaker_id)
 
     create_handicaps(handicaps_df, bookmaker_id)
+
+    print("Загрузка данных для " + scraping_module.bookmaker_name() + " успешно завершена")
