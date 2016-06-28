@@ -470,7 +470,7 @@ def live_handicaps(url="https://www.marafonsportsbook.com/en/live/26418"):
         handicap["firstforward"] = get_forward_string(str(n[m][index_of_hand]))
 
         handicap["firstparticipant"] = get_part_string(str(n[m][index_of_hand]))
-
+        handicap["sport"] = "football"
         handicap["secondforward"] = get_forward_string(n[m][index_of_hand1])
 
         handicap["secondparticipant"] = get_part_string(str(n[m][index_of_hand1]))
@@ -647,7 +647,7 @@ def live_handicaps_tennis(url="https://www.marafonsportsbook.com/en/live/22723")
     def get_handicap(index_of_hand, index_of_hand1, m):
 
         handicap = {}
-
+        handicap["sport"] = "tennis"
         handicap["firstforward"] = get_forward_string(str(n[m][index_of_hand]))
 
         handicap["firstparticipant"] = get_part_string(str(n[m][index_of_hand]))
@@ -830,7 +830,7 @@ def live_handicaps_basket(url="https://www.marafonsportsbook.com/en/live/45356")
         handicap = {}
 
         handicap["firstforward"] = get_forward_string(str(n[m][index_of_hand]))
-
+        handicap["sport"] = "basketball"
         handicap["firstparticipant"] = get_part_string(str(n[m][index_of_hand]))
 
         handicap["secondforward"] = get_forward_string(n[m][index_of_hand1])
@@ -1011,7 +1011,7 @@ def live_handicaps_baseball(url="https://www.marafonsportsbook.com/en/live/12086
         handicap = {}
 
         handicap["firstforward"] = get_forward_string(str(n[m][index_of_hand]))
-
+        handicap["sport"] = "baseball"
         handicap["firstparticipant"] = get_part_string(str(n[m][index_of_hand]))
 
         handicap["secondforward"] = get_forward_string(n[m][index_of_hand1])
@@ -1197,7 +1197,7 @@ def live_moneyline(url="https://www.marafonsportsbook.com/en/live/26418"):
 
         moneyline["firstparticipant"] = get_part_string(str(n[m][index_of_hand]))
 
-
+        moneyline["sport"] = "football"
 
         moneyline["secondparticipant"] = get_part_string(str(n[m][index_of_hand1]))
         moneyline["firstwin"] = c[m][index_of_hand]
@@ -1377,7 +1377,7 @@ def live_result2way_tennis(url="https://www.marafonsportsbook.com/en/live/22723"
         result2way = {}
 
         result2way["firstparticipant"] = get_part_string(str(n[m][index_of_hand]))
-
+        result2way["sport"] = "tennis"
         result2way["secondparticipant"] = get_part_string(str(n[m][index_of_hand1]))
         result2way["firstwin"] = c[m][index_of_hand]
 
@@ -1554,7 +1554,7 @@ def live_result2way_baseball(url="https://www.marafonsportsbook.com/en/live/1208
         result2way = {}
 
         result2way["firstparticipant"] = get_part_string(str(n[m][index_of_hand]))
-
+        result2way['sport'] = "baseball"
         result2way["secondparticipant"] = get_part_string(str(n[m][index_of_hand1]))
         result2way["firstwin"] = c[m][index_of_hand]
 

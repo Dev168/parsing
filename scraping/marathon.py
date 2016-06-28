@@ -5,7 +5,7 @@ import sys
 import os
 from datetime import datetime
 
-url1 = "https://www.marafonsportsbook.com/en/live/popular"
+url1 = "https://www.marafonsportsbook.com/en/live/45356"
 
 cookie = {'panbet.sitestyle': 'MULTIMARKETS'}
 html_text = requests.get(url1, cookies=cookie).text
@@ -95,24 +95,24 @@ for span in spans:
         odds.append([])
     i += 1
 
-for odd in odds:
-    for od in odd:
-        data_sel[j].append(od['data-sel'].strip())
-        new_odds[k].append(od['data-market-type'].strip())
+if (len(odds[0]) > 0):
+    for odd in odds:
+        for od in odd:
+            data_sel[j].append(od['data-sel'].strip())
+            new_odds[k].append(od['data-market-type'].strip())
 
-        c[j].append(coeff(od['data-sel'].strip()))
-        r[j].append(result(od['data-sel'].strip()))
-        n[j].append(name(od['data-sel'].strip()))
+            c[j].append(coeff(od['data-sel'].strip()))
+            r[j].append(result(od['data-sel'].strip()))
+            n[j].append(name(od['data-sel'].strip()))
 
-    if (j < len(spans) - 1):
-        data_sel.append([])
-        new_odds.append([])
-        c.append([])
-        r.append([])
-        n.append([])
-    j += 1
-    k += 1
-
+        if (j < len(spans) - 1):
+            data_sel.append([])
+            new_odds.append([])
+            c.append([])
+            r.append([])
+            n.append([])
+        j += 1
+        k += 1
 def get_handicap(index_of_hand, index_of_hand1, m):
 
     handicap = {}
