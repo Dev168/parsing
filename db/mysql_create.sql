@@ -1,4 +1,4 @@
-CREATE TABLE `Bookmakers` (
+CREATE TABLE `bookmakers` (
 	`id` bigint NOT NULL AUTO_INCREMENT,
 	`Name` char(150),
 	PRIMARY KEY (`id`),
@@ -6,13 +6,13 @@ CREATE TABLE `Bookmakers` (
 	`hostname` char(250)
 );
 
-CREATE TABLE `Participants` (
+CREATE TABLE `participants` (
 	`id` bigint NOT NULL AUTO_INCREMENT,
 	`Name` char(150),
 	PRIMARY KEY (`id`)
 );
 
-CREATE TABLE `ParticipantNames` (
+CREATE TABLE `participantNames` (
 	`id` bigint NOT NULL AUTO_INCREMENT,
 	`Name` char(250) NOT NULL,
 	`Bookmaker` bigint NOT NULL,
@@ -66,26 +66,26 @@ CREATE TABLE `sportnames` (
 	PRIMARY KEY (`id`)
 );
 
-ALTER TABLE `ParticipantNames` ADD CONSTRAINT `ParticipantNames_fk0` FOREIGN KEY (`Bookmaker`) REFERENCES `Bookmakers`(`id`);
+ALTER TABLE `participantNames` ADD CONSTRAINT `ParticipantNames_fk0` FOREIGN KEY (`bookmaker`) REFERENCES `bookmakers`(`id`);
 
-ALTER TABLE `ParticipantNames` ADD CONSTRAINT `ParticipantNames_fk1` FOREIGN KEY (`Participant`) REFERENCES `Participants`(`id`);
+ALTER TABLE `participantNames` ADD CONSTRAINT `ParticipantNames_fk1` FOREIGN KEY (`participant`) REFERENCES `participants`(`id`);
 
-ALTER TABLE `ParticipantNames` ADD UNIQUE `unique_index`(`Name`, `Bookmaker`);
+ALTER TABLE `participantNames` ADD UNIQUE `unique_index`(`Name`, `Bookmaker`);
 
-ALTER TABLE `Participants` ADD UNIQUE `unique_index` (`Name`);
+ALTER TABLE `participants` ADD UNIQUE `unique_index` (`Name`);
 
-ALTER TABLE `sportnames` ADD CONSTRAINT `sportnames_fk0` FOREIGN KEY (`Bookmaker`) REFERENCES `Bookmakers`(`id`);
+ALTER TABLE `sportnames` ADD CONSTRAINT `sportnames_fk0` FOREIGN KEY (`bookmaker`) REFERENCES `bookmakers`(`id`);
 
-ALTER TABLE `sportnames` ADD CONSTRAINT `sportnames_fk1` FOREIGN KEY (`Sport`) REFERENCES `sports`(`id`);
+ALTER TABLE `sportnames` ADD CONSTRAINT `sportnames_fk1` FOREIGN KEY (`sport`) REFERENCES `sports`(`id`);
 
 ALTER TABLE `sportnames` ADD UNIQUE `unique_index`(`Name`, `Bookmaker`);
 
-ALTER TABLE `vs` ADD CONSTRAINT `vs_fk0` FOREIGN KEY (`FirstParticipant`) REFERENCES `Participants`(`id`);
+ALTER TABLE `vs` ADD CONSTRAINT `vs_fk0` FOREIGN KEY (`firstparticipant`) REFERENCES `participants`(`id`);
 
-ALTER TABLE `vs` ADD CONSTRAINT `vs_fk1` FOREIGN KEY (`SecondParticipant`) REFERENCES `Participants`(`id`);
+ALTER TABLE `vs` ADD CONSTRAINT `vs_fk1` FOREIGN KEY (`secondparticipant`) REFERENCES `participants`(`id`);
 
-ALTER TABLE `handicaps` ADD CONSTRAINT `Handicap_fk0` FOREIGN KEY (`firstparticipant`) REFERENCES `Participants`(`id`);
+ALTER TABLE `handicaps` ADD CONSTRAINT `Handicap_fk0` FOREIGN KEY (`firstparticipant`) REFERENCES `participants`(`id`);
 
-ALTER TABLE `handicaps` ADD CONSTRAINT `Handicap_fk1` FOREIGN KEY (`SecondParticipant`) REFERENCES `Participants`(`id`);
+ALTER TABLE `handicaps` ADD CONSTRAINT `Handicap_fk1` FOREIGN KEY (`SecondParticipant`) REFERENCES `participants`(`id`);
 
 ALTER TABLE `handicaps` ADD CONSTRAINT `handicaps_fk2` FOREIGN KEY (`bookmaker`) REFERENCES `bookmakers`(`id`);
