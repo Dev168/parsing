@@ -1,6 +1,6 @@
 import sys
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from abc import abstractmethod, ABCMeta
 from settings import LOG_DIR, LOAD_WAIT_TIME
 
@@ -72,7 +72,9 @@ class Bookmaker(object):
 
     def _debug_scraping_error(self, page):
 
-        dname = datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + " scrap error"
+        time = datetime.utcnow() + timedelta(hours=3)
+
+        dname = time.strftime("%Y-%m-%d_%H-%M-%S") + " scrap error"
         dpath = os.path.join(self.bookmaker_log_dir, dname)
 
         os.makedirs(dpath)
@@ -85,7 +87,9 @@ class Bookmaker(object):
 
     def _debug_timeout_exception(self):
 
-        dname = datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + " load page error"
+        time = datetime.utcnow() + timedelta(hours=3)
+
+        dname = time.strftime("%Y-%m-%d_%H-%M-%S") + " load page error"
         dpath = os.path.join(self.bookmaker_log_dir, dname)
 
         os.makedirs(dpath)

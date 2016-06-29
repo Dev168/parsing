@@ -5,7 +5,7 @@ from flask import Flask
 from flask import render_template
 from forks_searching.search import get_forks
 from gevent import wsgi
-
+import json
 
 
 app = Flask(__name__)
@@ -16,6 +16,11 @@ def index():
     posts = get_forks()
 
     return render_template("index.html", posts = posts)
+
+@app.route("/forks")
+def forks():
+
+    return json.dumps(get_forks(), indent=4)
 
 
 server = wsgi.WSGIServer(('', 5000), app)
