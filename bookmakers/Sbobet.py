@@ -4,10 +4,14 @@ from selenium import webdriver
 from settings import PROXY, LOAD_WAIT_TIME
 import bs4
 import re
-import sys
 
 
 class Sbobet(Bookmaker):
+
+    def __del__(self):
+        if self._driver is not None:
+            self._driver.quit()
+        self._driver = None
 
     bookmaker_id = 1
 
@@ -19,21 +23,11 @@ class Sbobet(Bookmaker):
 
     def _get_page(self, url):
 
-        service_args = [
-            '--proxy={0}'.format(PROXY[0]),
-            '--proxy-type=http',
-            '--proxy-auth={0}:{1}'.format(PROXY[1], PROXY[2])
-        ]
-
-        driver = webdriver.PhantomJS(service_args=service_args)
-
-        driver.set_page_load_timeout(LOAD_WAIT_TIME)
+        driver = self._get_driver()
 
         driver.get(url)
 
         page = driver.page_source
-
-        driver.close()
 
         return page
 
@@ -172,3 +166,22 @@ class Sbobet(Bookmaker):
                                 data.append(game)
 
         return {"vs": vs, "handicap": handicap}
+
+    _driver = None
+
+    def _get_driver(self):
+
+        if self._driver is not None:
+            return self._driver
+
+        service_args = [
+            '--proxy={0}'.format(PROXY[0]),
+            '--proxy-type=http',
+            '--proxy-auth={0}:{1}'.format(PROXY[1], PROXY[2])
+        ]
+
+        self._driver = webdriver.PhantomJS(service_args=service_args)
+
+        self._driver.set_page_load_timeout(LOAD_WAIT_TIME)
+
+        return self._driver

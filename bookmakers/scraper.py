@@ -15,7 +15,10 @@ if __name__ == "__main__":
         try:
             download_handicaps(sb)
             download_handicaps(mb)
-            print("Перерыв 15 секунд")
+            print("Перерыв 5 секунд")
+        except KeyboardInterrupt:
+            del sb
+            del mb
         except Exception:
             print("Попытка будет возобновлена через 15 секунд")
-        time.sleep(15)
+        time.sleep(5)
