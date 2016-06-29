@@ -535,6 +535,8 @@ def live_handicaps(url="https://www.marafonsportsbook.com/en/live/26418"):
             return str(a[:int(str(a.index("(")))].strip())
 
     return get_list_of_hand()["handicap"]
+
+
 def live_handicaps_tennis(url="https://www.marafonsportsbook.com/en/live/22723"):
     url1 = "https://www.marafonsportsbook.com/en/live/22723"
 
