@@ -67,7 +67,7 @@ class Bookmaker(object):
     def live_handicaps(self, url=None):
         try:
             return self.events(url)["handicap"]
-        except Exception:
+        except self._timeoutexception:
             raise
 
     def _debug_scraping_error(self, page):
