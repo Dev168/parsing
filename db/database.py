@@ -1,9 +1,9 @@
 import json
 import os
-
 import MySQLdb as mysql
 import pandas as pd
 from datetime import datetime as datetime
+from sqlalchemy import create_engine
 
 from settings import DB_HOST, DB_NAME, DB_USER, DB_PASSWD
 
@@ -139,7 +139,8 @@ def create_participant_names(names_df, bookmaker_id):
     names_df.columns = ["participant", "name"]
     names_df["bookmaker"] = bookmaker_id
 
-    names_df.to_sql("participantnames", con=conn, if_exists="append", flavor="mysql", index=False)
+    engine = create_engine('mysql://root:1234@localhost/betsdb')
+    names_df.to_sql("participantnames", con=engine, if_exists="append", index=False)
 
     names_df = names_df.drop("bookmaker", 1)
 
