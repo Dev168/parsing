@@ -69,6 +69,9 @@ def _replace_names_by_similarities(df, bookmaker_id):
 
     similar_participants = missing_data[missing_data["distance"] <= LIVENSHTAIN_MIN][["participant", "missing_name"]]
     similar_participants.columns = ["participant", "name"]
+    similar_participants = similar_participants.groupby("name").max()
+    similar_participants.reset_index(level=0, inplace=True)
+    similar_participants = similar_participants.reindex_axis(["participant", "name"], 1)
     created_participants = db.create_participant_names(similar_participants, bookmaker_id)
 
     merged_participants = df.merge(created_participants, how='left', left_on="firstparticipant", right_on="name").merge(
