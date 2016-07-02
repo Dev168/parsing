@@ -4,7 +4,6 @@ sys.path.append("C:\\Users\\Administrator\\PycharmProjects\\BookmakerPlus")
 from flask import Flask
 from flask import render_template
 from forks_searching.search import get_forks
-from gevent import wsgi
 import json
 
 
@@ -21,7 +20,3 @@ def index():
 def forks():
 
     return json.dumps(get_forks(), indent=4)
-
-
-server = wsgi.WSGIServer(('', 5000), app)
-server.serve_forever()

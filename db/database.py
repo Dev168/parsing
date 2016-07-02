@@ -109,25 +109,23 @@ def create_sports(sports):
     print("Добавлены новые виды спорта")
 
 
-def create_participants(names_df):
+def create_participants(names_df, bookmaker_id=None):
 
     names_df.columns = ["name"]
     names_list = names_df["name"].tolist()
     par = [(el,) for el in names_list]
 
     conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME)
-
     cursor = conn.cursor()
 
-    sql_code = "INSERT INTO participants (`Name`) VALUES (%s)"
-
-    cursor.executemany(sql_code, par)
-
-    conn.commit()
-
-    df = pd.read_sql("SELECT * FROM participants WHERE name in %(names)s", con=conn, params={"names": names_list})
-
-    conn.close()
+    try:
+        sql_code = "INSERT INTO participants (`Name`) VALUES (%s)"
+        cursor.executemany(sql_code, par)
+        conn.commit()
+        df = pd.read_sql("SELECT * FROM participants WHERE name in %(names)s", con=conn, params={"names": names_list})
+        conn.close()
+    except:
+        conn.rollback()
 
     print("Были созданы новые участники")
 

@@ -1,7 +1,5 @@
 Flask == 0.11.1
 beautifulsoup4 == 4.4.1
-gevent == 1.1.1
 pandas == 0.18.1
 Requests == 2.10.0
 selenium == 2.53.5
-bs4
