@@ -142,7 +142,7 @@ class Marathonbet(Bookmaker):
 
             handicap["secondwin"] = c[m][index_of_hand1]
             handicap["live"] = True
-            handicap["href"] = "https://www.marafonsportsbook.com/en/live/animation/" + str(hrefs[m])
+            handicap["href"] = "/en/live/animation/" + str(hrefs[m])
             return handicap
 
         def get_pairs_of_participants_handicap():
