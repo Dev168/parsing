@@ -4,3 +4,4 @@ ghostdriver.log
 settings
 __pycache__/
 garbage/
+app.wsgi
