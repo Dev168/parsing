@@ -167,6 +167,10 @@ class Sbobet(Bookmaker):
 
         return {"vs": vs, "handicap": handicap}
 
+    def get_scraping_urls(self):
+        return ["https://www.sbobet.com/euro/football",
+                ]
+
     _driver = None
 
     def _get_driver(self):

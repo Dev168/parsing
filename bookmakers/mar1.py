@@ -349,7 +349,7 @@ def events(url="https://www.marathonbet9.com/ru/live/popular"):
 def bookmaker_id():
     return 2
 
-
+"""DEPRICATED"""
 def bookmaker_name():
     return "marathonbet"
 

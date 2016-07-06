@@ -3,6 +3,10 @@ import os
 from datetime import datetime, timedelta
 from abc import abstractmethod, ABCMeta
 from settings import LOG_DIR, LOAD_WAIT_TIME
+import pandas as pd
+from parsing import resolve_participant_names
+from db.database import create_handicaps
+from multiprocessing import Pool
 
 
 class Bookmaker(object):
@@ -39,6 +43,34 @@ class Bookmaker(object):
     @abstractmethod
     def _scrape_page(self, page):
         pass
+
+    @abstractmethod
+    def get_scraping_urls(self):
+        pass
+
+    def download_events(self, scraping_url):
+
+        bookmaker_name = self.bookmaker_name
+
+        bookmaker_id = self.bookmaker_id
+
+        print(bookmaker_name + ": Начата загрузка данных с сайта")
+
+        try:
+            handicaps_df = pd.DataFrame(self.live_handicaps(scraping_url))
+        except Exception:
+            print("Произошли ошибки при парсинге данных")
+            raise
+
+        print(bookmaker_name + ": Данные успешно загружены с сайта")
+
+        handicaps_df = resolve_participant_names(handicaps_df, bookmaker_id)
+
+        create_handicaps(handicaps_df, bookmaker_id)
+
+        print(bookmaker_name + ": Работа успешно завершена")
+
+        return scraping_url
 
     def events(self, url=None, debug_page=None):
 

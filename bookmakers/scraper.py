@@ -1,8 +1,8 @@
 import sys
 import time
 sys.path.append("C:\\Users\\Administrator\\PycharmProjects\\BookmakerPlus")
-from bookmakers.Sbobet import Sbobet
-from bookmakers.Marathonbet import Marathonbet
+from bookmakers.sbobet import Sbobet
+from bookmakers.marathonbet import Marathonbet
 from download import download_handicaps
 
 if __name__ == "__main__":
