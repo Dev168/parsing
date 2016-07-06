@@ -74,9 +74,6 @@ class Bookmaker(object):
 
     def events(self, url=None, debug_page=None):
 
-        if url is None:
-            url = self._default_url
-
         try:
 
             if debug_page is None:
@@ -93,7 +90,7 @@ class Bookmaker(object):
             return self._scrape_page(page)
 
         except (IndexError, AttributeError, Exception):
-            self._debug_scraping_error(page, sys.exc_info())
+            self._debug_scraping_error(page)
             raise
 
     def live_handicaps(self, url=None):
