@@ -200,3 +200,6 @@ class Marathonbet(Bookmaker):
 
         return get_list_of_hand()
 
+    def get_scraping_urls(self):
+        return ["https://www.marathonbet.com/en/live/26418",
+                ]

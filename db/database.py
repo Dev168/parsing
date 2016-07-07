@@ -4,6 +4,8 @@ import MySQLdb as mysql
 import pandas as pd
 from datetime import datetime as datetime
 from sqlalchemy import create_engine
+import sys
+import logging
 
 from settings import DB_HOST, DB_NAME, DB_USER, DB_PASSWD
 
@@ -115,17 +117,18 @@ def create_participants(names_df, bookmaker_id=None):
     names_list = names_df["name"].tolist()
     par = [(el,) for el in names_list]
 
-    conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME)
+    conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME, use_unicode=True, charset='utf8')
     cursor = conn.cursor()
 
+    sql_code = "INSERT INTO participants (`Name`) VALUES (%s)"
+
     try:
-        sql_code = "INSERT INTO participants (`Name`) VALUES (%s)"
         cursor.executemany(sql_code, par)
         conn.commit()
         df = pd.read_sql("SELECT * FROM participants WHERE name in %(names)s", con=conn, params={"names": names_list})
-        conn.close()
-    except:
+    except mysql.IntegrityError as ie:
         conn.rollback()
+    conn.close()
 
     print("Были созданы новые участники")
 
@@ -148,7 +151,7 @@ def create_participant_names(names_df, bookmaker_id):
 
     conn.close()
 
-    print("Для конторы были добавлены новые участники")
+    print("Были созданы новые имена участников")
 
     return names_df
 
