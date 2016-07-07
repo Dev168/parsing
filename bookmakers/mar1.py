@@ -481,7 +481,7 @@ def live_handicaps(url="https://www.marafonbet.info/en/live/26418"):
 
         handicap["secondwin"] = c[m][index_of_hand1]
         handicap["live"] = True
-        handicap["href"] = "https://www.sportsbookmarafonbet.com/" + str(hrefs[m])
+        handicap["href"] = "https://www.sportsbookmarafonbet.com/en/live/animation/" + str(hrefs[m])
         return handicap
 
     def get_pairs_of_participants_handicap():
