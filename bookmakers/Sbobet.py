@@ -44,6 +44,7 @@ class Sbobet(Bookmaker):
                     game["livedate"] = ""
                 game["oddsdate"] = None
                 game["gamedate"] = None
+
             else:
                 game["score"] = None
                 game["livedate"] = None
@@ -111,9 +112,40 @@ class Sbobet(Bookmaker):
 
             game["href"] = columns[4].a["href"]
 
+        def scrap_moneyline(game_tag, game):
+            spans = game_tag.find("div", class_="DateTimeTxt").find_all("span")
+
+            if game["live"]:
+
+                if type(spans[1].contents[0]) == str:
+                    game["livedate"] = spans[1].font.contents[0].strip()
+                else:
+                    game["livedate"] = ""
+                game["oddsdate"] = None
+                game["gamedate"] = None
+            else:
+                game["score"] = None
+                game["livedate"] = None
+                game["oddsdate"] = None
+                game["gamedate"] = spans[0].contents[0].strip() + " " + spans[1].contents[0].strip()
+
+            columns = list(game_tag.children)
+
+            game["firstparticipant"] = columns[2].find("span", class_="OddsL").contents[0].strip()
+
+            game["firstwin"] = columns[2].find("span", class_="OddsR").contents[0].strip()
+
+            game["secondparticipant"] = columns[3].find("span", class_="OddsL").contents[0].strip()
+
+            game["secondwin"] = columns[3].find("span", class_="OddsR").contents[0].strip()
+
+            game["href"] = columns[4].a["href"]
+
         vs = []
 
         handicap = []
+
+        moneyline = []
 
         doc = bs4.BeautifulSoup(page, "html.parser")
 
@@ -143,6 +175,10 @@ class Sbobet(Bookmaker):
                         scrap_func = scrap_vs
                         data = vs
 
+                    if odds_type == "Money Line":
+                        scrap_func = scrap_moneyline
+                        data = moneyline
+
                     leagues = odds_type_tag.find_all("div", class_="MarketLea")
 
                     for league in leagues:
@@ -165,7 +201,7 @@ class Sbobet(Bookmaker):
                             if live:
                                 data.append(game)
 
-        return {"vs": vs, "handicap": handicap}
+        return {"vs": vs, "handicap": handicap, "moneyline": moneyline}
 
     def get_scraping_urls(self):
         return ["https://www.sbobet.com/euro/football",
