@@ -14,7 +14,7 @@ class Marathonbet(Bookmaker):
 
     _timeoutexception = ConnectTimeout
 
-    _default_url = "https://www.marafonsportsbook.com/en/live/26418"
+    _default_url = "https://www.sportsbookmarafonbet.com/en/live/26418"
 
     def _get_page(self, url):
         cookie = {'panbet.sitestyle': 'MULTIMARKETS'}
