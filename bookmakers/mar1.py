@@ -653,11 +653,11 @@ def live_moneyline(url="https://www.marafonbet.info/en/live/26418"):
 
 
 
-        moneyline["firstparticipant"] = get_part_string(str(n[m][index_of_hand]))
+        moneyline["firstparticipant"] = remove_to_win(get_part_string(str(n[m][index_of_hand])))
 
         moneyline["sport"] = "football"
 
-        moneyline["secondparticipant"] = get_part_string(str(n[m][index_of_hand1]))
+        moneyline["secondparticipant"] = remove_to_win(get_part_string(str(n[m][index_of_hand1])))
         moneyline["firstwin"] = c[m][index_of_hand]
 
         moneyline["secondwin"] = c[m][index_of_hand1]
@@ -1017,9 +1017,9 @@ def live_result2way_tennis(url="https://www.marafonbet.info/en/live/22723"):
 
         result2way = {}
 
-        result2way["firstparticipant"] = get_part_string(str(n[m][index_of_hand]))
+        result2way["firstparticipant"] = remove_to_win(get_part_string(str(n[m][index_of_hand])))
         result2way["sport"] = "tennis"
-        result2way["secondparticipant"] = get_part_string(str(n[m][index_of_hand1]))
+        result2way["secondparticipant"] = remove_to_win(get_part_string(str(n[m][index_of_hand1])))
         result2way["firstwin"] = c[m][index_of_hand]
 
         result2way["secondwin"] = c[m][index_of_hand1]
@@ -1635,3 +1635,6 @@ def football():
     return unite_dict(live_handicaps(),live_moneyline())
 def tennis():
     return unite_dict(live_handicaps_tennis(), live_result2way_tennis())
+
+def remove_to_win(a):
+    return a[:len(a)-7]
