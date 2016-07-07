@@ -357,7 +357,7 @@ def bookmaker_name():
 
 
 #football
-def live_handicaps(url="https://www.marafonbet.info/en/live/26418"):
+def football(url="https://www.marafonbet.info/en/live/26418"):
     url1 = "https://www.marafonbet.info/en/live/26418"
 
     cookie = {'panbet.sitestyle': 'MULTIMARKETS'}
@@ -518,135 +518,6 @@ def live_handicaps(url="https://www.marafonbet.info/en/live/26418"):
 
         d["handicap"] = list
         return d
-
-    def is_forward_zero(a):
-        if (str(a).find("(") == -1):
-            return 0
-        else:
-            return 1
-
-    def get_forward_string(a):
-        if (is_forward_zero(a) == 0):
-            return 0
-        else:
-            return str(a[int(a.index("(") + 1):int(str(a.index(")")))].strip())
-
-    def get_part_string(a):
-        if (is_forward_zero(a) == 0):
-            return a
-        else:
-            return str(a[:int(str(a.index("(")))].strip())
-
-    return get_list_of_hand()
-def live_moneyline(url="https://www.marafonbet.info/en/live/26418"):
-    url1 = "https://www.marafonbet.info/en/live/26418"
-
-    cookie = {'panbet.sitestyle': 'MULTIMARKETS'}
-    html_text = requests.get(url1, cookies=cookie).text
-    doc = bs4.BeautifulSoup(html_text, "html.parser")
-    spans = doc.find_all("tbody", class_="")
-
-    events = []
-    hrefs = []
-    odds = []
-    data_sel = []
-    odds.append([])
-    data_sel.append([])
-    new_odds = []
-    new_odds.append([])
-    i = 0
-    j = 0
-    k = 0
-    c = []
-    r = []
-    n = []
-    n.append([])
-    r.append([])
-    c.append([])
-
-    def coeff(cell):
-        q = []
-        q = re.split('[,]+', cell)
-
-        for i in range(len(q)):
-            if (q[i].__contains__("epr")):
-                coeff = q[i][7:len(q[i]) - 1]
-
-        return coeff
-
-    def result(cell):
-        q = []
-        q = re.split('[,]+', cell)
-        q[0] = q[0][(q[0].index(':') + 2):(len(q[0]) - 1)]
-        result_string = ''
-
-        index = 0
-        index1 = 0
-
-        for i in range(len(q)):
-            if (q[i].__contains__("ewc")):
-                index = i
-
-        for i in range(len(q)):
-            if (q[i].__contains__("nm")):
-                index1 = i
-
-        for i in range(index1, index):
-            result_string += q[i] + ' '
-
-        result_string = result_string[(result_string.index(':') + 2):(len(result_string) - 1)]
-        result_string = result_string.strip()
-        if (result_string[len(result_string) - 1] == '"'):
-            result_string = result_string[:len(result_string) - 1]
-        return result_string
-
-    def name(cell):
-        q = []
-        q = re.split('[,]+', cell)
-
-        for i in range(len(q)):
-            if (q[i].__contains__("mn")):
-                index = i
-        for i in range(index - 1):
-            q[0] += q[i + 1] + ' '
-
-        q[0] = q[0][(q[0].index(':') + 2):(len(q[0]) - 1)]
-
-        return q[0]
-
-    for span in spans:
-
-        events.append(span['data-event-name'])
-        hrefs.append(span['data-event-treeid'])
-
-        odds[i] = span.find_all("td",
-                                {'class': lambda x: x
-                                                    and 'price' in x.split()
-                                 }
-                                )
-
-        if (i < len(spans) - 1):
-            odds.append([])
-        i += 1
-
-    for odd in odds:
-        for od in odd:
-            data_sel[j].append(od['data-sel'].strip())
-            new_odds[k].append(od['data-market-type'].strip())
-
-            c[j].append(coeff(od['data-sel'].strip()))
-            r[j].append(result(od['data-sel'].strip()))
-            n[j].append(name(od['data-sel'].strip()))
-
-        if (j < len(spans) - 1):
-            data_sel.append([])
-            new_odds.append([])
-            c.append([])
-            r.append([])
-            n.append([])
-        j += 1
-        k += 1
-
     def get_moneyline(index_of_hand, index_of_hand1,index_of_draw, m):
 
         moneyline = {}
@@ -720,10 +591,11 @@ def live_moneyline(url="https://www.marafonbet.info/en/live/26418"):
         else:
             return str(a[:int(str(a.index("(")))].strip())
 
-    return get_list_of_moneyline()
+    return unite_dict(get_list_of_hand(),get_list_of_moneyline())
+
 
 #tennis
-def live_handicaps_tennis(url="https://www.marafonbet.info/en/live/22723"):
+def tennis(url="https://www.marafonbet.info/en/live/22723"):
     url1 = "https://www.marafonbet.info/en/live/22723"
 
     cookie = {'panbet.sitestyle': 'MULTIMARKETS'}
@@ -884,135 +756,6 @@ def live_handicaps_tennis(url="https://www.marafonbet.info/en/live/22723"):
 
         d["handicap"] = list
         return d
-
-    def is_forward_zero(a):
-        if (str(a).find("(") == -1):
-            return 0
-        else:
-            return 1
-
-    def get_forward_string(a):
-        if (is_forward_zero(a) == 0):
-            return 0
-        else:
-            return str(a[int(a.index("(") + 1):int(str(a.index(")")))].strip())
-
-    def get_part_string(a):
-        if (is_forward_zero(a) == 0):
-            return a
-        else:
-            return str(a[:int(str(a.index("(")))].strip())
-
-    return get_list_of_hand()
-def live_result2way_tennis(url="https://www.marafonbet.info/en/live/22723"):
-    url1 = "https://www.marafonbet.info/en/live/22723"
-
-    cookie = {'panbet.sitestyle': 'MULTIMARKETS'}
-    html_text = requests.get(url1, cookies=cookie).text
-    doc = bs4.BeautifulSoup(html_text, "html.parser")
-    spans = doc.find_all("tbody", class_="")
-
-    events = []
-    hrefs = []
-    odds = []
-    data_sel = []
-    odds.append([])
-    data_sel.append([])
-    new_odds = []
-    new_odds.append([])
-    i = 0
-    j = 0
-    k = 0
-    c = []
-    r = []
-    n = []
-    n.append([])
-    r.append([])
-    c.append([])
-
-    def coeff(cell):
-        q = []
-        q = re.split('[,]+', cell)
-
-        for i in range(len(q)):
-            if (q[i].__contains__("epr")):
-                coeff = q[i][7:len(q[i]) - 1]
-
-        return coeff
-
-    def result(cell):
-        q = []
-        q = re.split('[,]+', cell)
-        q[0] = q[0][(q[0].index(':') + 2):(len(q[0]) - 1)]
-        result_string = ''
-
-        index = 0
-        index1 = 0
-
-        for i in range(len(q)):
-            if (q[i].__contains__("ewc")):
-                index = i
-
-        for i in range(len(q)):
-            if (q[i].__contains__("nm")):
-                index1 = i
-
-        for i in range(index1, index):
-            result_string += q[i] + ' '
-
-        result_string = result_string[(result_string.index(':') + 2):(len(result_string) - 1)]
-        result_string = result_string.strip()
-        if (result_string[len(result_string) - 1] == '"'):
-            result_string = result_string[:len(result_string) - 1]
-        return result_string
-
-    def name(cell):
-        q = []
-        q = re.split('[,]+', cell)
-
-        for i in range(len(q)):
-            if (q[i].__contains__("mn")):
-                index = i
-        for i in range(index - 1):
-            q[0] += q[i + 1] + ' '
-
-        q[0] = q[0][(q[0].index(':') + 2):(len(q[0]) - 1)]
-
-        return q[0]
-
-    for span in spans:
-
-        events.append(span['data-event-name'])
-        hrefs.append(span['data-event-treeid'])
-
-        odds[i] = span.find_all("td",
-                                {'class': lambda x: x
-                                                    and 'price' in x.split()
-                                 }
-                                )
-
-        if (i < len(spans) - 1):
-            odds.append([])
-        i += 1
-
-    for odd in odds:
-        for od in odd:
-            data_sel[j].append(od['data-sel'].strip())
-            new_odds[k].append(od['data-market-type'].strip())
-
-            c[j].append(coeff(od['data-sel'].strip()))
-            r[j].append(result(od['data-sel'].strip()))
-            n[j].append(name(od['data-sel'].strip()))
-
-        if (j < len(spans) - 1):
-            data_sel.append([])
-            new_odds.append([])
-            c.append([])
-            r.append([])
-            n.append([])
-        j += 1
-        k += 1
-
     def get_result2way(index_of_hand, index_of_hand1, m):
 
         result2way = {}
@@ -1062,6 +805,7 @@ def live_result2way_tennis(url="https://www.marafonbet.info/en/live/22723"):
         d["result2way"] = list
         return d
 
+
     def is_forward_zero(a):
         if (str(a).find("(") == -1):
             return 0
@@ -1080,10 +824,11 @@ def live_result2way_tennis(url="https://www.marafonbet.info/en/live/22723"):
         else:
             return str(a[:int(str(a.index("(")))].strip())
 
-    return get_list_of_result2way()
+    return unite_dict(get_list_of_hand(),get_list_of_result2way())
+
 
 #baseball
-def live_handicaps_baseball(url="https://www.marafonbet.info/en/live/120866"):
+def baseball(url="https://www.marafonbet.info/en/live/120866"):
     url1 = "https://www.marafonbet.info/en/live/120866"
 
     cookie = {'panbet.sitestyle': 'MULTIMARKETS'}
@@ -1244,135 +989,6 @@ def live_handicaps_baseball(url="https://www.marafonbet.info/en/live/120866"):
 
         d["handicap"] = list
         return d
-
-    def is_forward_zero(a):
-        if (str(a).find("(") == -1):
-            return 0
-        else:
-            return 1
-
-    def get_forward_string(a):
-        if (is_forward_zero(a) == 0):
-            return 0
-        else:
-            return str(a[int(a.index("(") + 1):int(str(a.index(")")))].strip())
-
-    def get_part_string(a):
-        if (is_forward_zero(a) == 0):
-            return a
-        else:
-            return str(a[:int(str(a.index("(")))].strip())
-
-    return get_list_of_hand()
-def live_result2way_baseball(url="https://www.marafonbet.info/en/live/120866"):
-    url1 = "https://www.marafonbet.info/en/live/120866"
-
-    cookie = {'panbet.sitestyle': 'MULTIMARKETS'}
-    html_text = requests.get(url1, cookies=cookie).text
-    doc = bs4.BeautifulSoup(html_text, "html.parser")
-    spans = doc.find_all("tbody", class_="")
-
-    events = []
-    hrefs = []
-    odds = []
-    data_sel = []
-    odds.append([])
-    data_sel.append([])
-    new_odds = []
-    new_odds.append([])
-    i = 0
-    j = 0
-    k = 0
-    c = []
-    r = []
-    n = []
-    n.append([])
-    r.append([])
-    c.append([])
-
-    def coeff(cell):
-        q = []
-        q = re.split('[,]+', cell)
-
-        for i in range(len(q)):
-            if (q[i].__contains__("epr")):
-                coeff = q[i][7:len(q[i]) - 1]
-
-        return coeff
-
-    def result(cell):
-        q = []
-        q = re.split('[,]+', cell)
-        q[0] = q[0][(q[0].index(':') + 2):(len(q[0]) - 1)]
-        result_string = ''
-
-        index = 0
-        index1 = 0
-
-        for i in range(len(q)):
-            if (q[i].__contains__("ewc")):
-                index = i
-
-        for i in range(len(q)):
-            if (q[i].__contains__("nm")):
-                index1 = i
-
-        for i in range(index1, index):
-            result_string += q[i] + ' '
-
-        result_string = result_string[(result_string.index(':') + 2):(len(result_string) - 1)]
-        result_string = result_string.strip()
-        if (result_string[len(result_string) - 1] == '"'):
-            result_string = result_string[:len(result_string) - 1]
-        return result_string
-
-    def name(cell):
-        q = []
-        q = re.split('[,]+', cell)
-
-        for i in range(len(q)):
-            if (q[i].__contains__("mn")):
-                index = i
-        for i in range(index - 1):
-            q[0] += q[i + 1] + ' '
-
-        q[0] = q[0][(q[0].index(':') + 2):(len(q[0]) - 1)]
-
-        return q[0]
-
-    for span in spans:
-
-        events.append(span['data-event-name'])
-        hrefs.append(span['data-event-treeid'])
-
-        odds[i] = span.find_all("td",
-                                {'class': lambda x: x
-                                                    and 'price' in x.split()
-                                 }
-                                )
-
-        if (i < len(spans) - 1):
-            odds.append([])
-        i += 1
-
-    for odd in odds:
-        for od in odd:
-            data_sel[j].append(od['data-sel'].strip())
-            new_odds[k].append(od['data-market-type'].strip())
-
-            c[j].append(coeff(od['data-sel'].strip()))
-            r[j].append(result(od['data-sel'].strip()))
-            n[j].append(name(od['data-sel'].strip()))
-
-        if (j < len(spans) - 1):
-            data_sel.append([])
-            new_odds.append([])
-            c.append([])
-            r.append([])
-            n.append([])
-        j += 1
-        k += 1
-
     def get_result2way(index_of_hand, index_of_hand1, m):
 
         result2way = {}
@@ -1440,7 +1056,10 @@ def live_result2way_baseball(url="https://www.marafonbet.info/en/live/120866"):
         else:
             return str(a[:int(str(a.index("(")))].strip())
 
-    return get_list_of_result2way()
+    return unite_dict(get_list_of_hand(),get_list_of_result2way())
+
+
+
 
 
 def live_handicaps_basket(url="https://www.marafonsportsbook.com/en/live/45356"):
@@ -1629,19 +1248,8 @@ def live_handicaps_basket(url="https://www.marafonsportsbook.com/en/live/45356")
 def unite_dict(dict1, dict2):
     dict1.update(dict2)
     return dict1
-
-
-def football():
-    return unite_dict(live_handicaps(),live_moneyline())
-def tennis():
-    return unite_dict(live_handicaps_tennis(), live_result2way_tennis())
-
-def baseball():
-    return unite_dict(live_handicaps_baseball(), live_result2way_baseball())
-
 def remove_to_win(a):
     return a[:len(a)-7]
-
 def get_scraping_urls(self):
  return ["https://www.marafonbet.info/en/live/26418",
  "https://www.marafonsportsbook.com/en/live/45356",
