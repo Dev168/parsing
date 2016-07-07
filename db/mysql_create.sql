@@ -9,6 +9,7 @@ CREATE TABLE `bookmakers` (
 CREATE TABLE `participants` (
 	`id` bigint NOT NULL AUTO_INCREMENT,
 	`Name` char(150),
+	`League` bigint NOT NULL,
 	PRIMARY KEY (`id`)
 );
 
@@ -17,6 +18,21 @@ CREATE TABLE `participantNames` (
 	`Name` char(250) NOT NULL,
 	`Bookmaker` bigint NOT NULL,
 	`Participant` bigint NOT NULL,
+	PRIMARY KEY (`id`)
+);
+
+CREATE TABLE `leagues` (
+	`id` bigint NOT NULL AUTO_INCREMENT,
+	`Name` char(150),
+	`Sport` bigint NOT NULL,
+	PRIMARY KEY (`id`)
+);
+
+CREATE TABLE `leaguesNames` (
+	`id` bigint NOT NULL AUTO_INCREMENT,
+	`Name` char(250) NOT NULL,
+	`Bookmaker` bigint NOT NULL,
+	`League` bigint,
 	PRIMARY KEY (`id`)
 );
 
@@ -59,7 +75,7 @@ CREATE TABLE `sports` (
 );
 
 CREATE TABLE `sportnames` (
-	`id` bigint NOT NULL,
+	`id` bigint NOT  AUTO_INCREMENT,
 	`Name` char(250) NOT NULL,
 	`Bookmaker` bigint NOT NULL,
    	`Sport` bigint,
@@ -72,7 +88,19 @@ ALTER TABLE `participantNames` ADD CONSTRAINT `ParticipantNames_fk1` FOREIGN KEY
 
 ALTER TABLE `participantNames` ADD UNIQUE `unique_index`(`Name`, `Bookmaker`);
 
+
 ALTER TABLE `participants` ADD UNIQUE `unique_index` (`Name`);
+
+ALTER TABLE `participants` ADD CONSTRAINT `participants_fk1` FOREIGN KEY (`league`) REFERENCES `leagues`(`id`);
+
+
+ALTER TABLE `leagues` ADD CONSTRAINT `leagues_fk1` FOREIGN KEY (`sport`) REFERENCES `sports`(`id`);
+
+
+ALTER TABLE `leaguesNames` ADD UNIQUE `unique_index`(`Name`, `Bookmaker`);
+
+ALTER TABLE `leaguesNames` ADD CONSTRAINT `leaguesnames_fk1` FOREIGN KEY (`league`) REFERENCES `leagues`(`id`);
+
 
 ALTER TABLE `sportnames` ADD CONSTRAINT `sportnames_fk0` FOREIGN KEY (`bookmaker`) REFERENCES `bookmakers`(`id`);
 
@@ -80,9 +108,11 @@ ALTER TABLE `sportnames` ADD CONSTRAINT `sportnames_fk1` FOREIGN KEY (`sport`) R
 
 ALTER TABLE `sportnames` ADD UNIQUE `unique_index`(`Name`, `Bookmaker`);
 
+
 ALTER TABLE `vs` ADD CONSTRAINT `vs_fk0` FOREIGN KEY (`firstparticipant`) REFERENCES `participants`(`id`);
 
 ALTER TABLE `vs` ADD CONSTRAINT `vs_fk1` FOREIGN KEY (`secondparticipant`) REFERENCES `participants`(`id`);
+
 
 ALTER TABLE `handicaps` ADD CONSTRAINT `Handicap_fk0` FOREIGN KEY (`firstparticipant`) REFERENCES `participants`(`id`);
 

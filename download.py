@@ -1,5 +1,5 @@
 import pandas as pd
-from parsing import resolve_participant_names
+from parsing import resolve_participant_names, resolve_sports
 from db.database import create_handicaps
 
 
@@ -18,6 +18,8 @@ def download_handicaps(bookmaker):
         raise
 
     print(bookmaker_name + ": Данные успешно загружены с сайта")
+
+    handicaps_df = resolve_sports(handicaps_df, bookmaker_id)
 
     handicaps_df = resolve_participant_names(handicaps_df, bookmaker_id)
 

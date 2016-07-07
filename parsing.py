@@ -90,7 +90,6 @@ def _replace_names_by_similarities(df, bookmaker_id):
     return merged_participants
 
 
-
 def _replace_names_by_created_id(df, bookmaker_id):
 
     creating_participants = _participants_without_id(df)
@@ -149,3 +148,4 @@ def store_handicaps(handicaps_json, bookmaker_id):
     handicaps_df = resolve_participant_names(handicaps_df, bookmaker_id)
 
     db.create_handicaps(handicaps_df)
+

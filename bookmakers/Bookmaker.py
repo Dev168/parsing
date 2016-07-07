@@ -6,7 +6,6 @@ from settings import LOG_DIR, LOAD_WAIT_TIME
 import pandas as pd
 from parsing import resolve_participant_names
 from db.database import create_handicaps
-from multiprocessing import Pool
 
 
 class Bookmaker(object):
@@ -33,8 +32,6 @@ class Bookmaker(object):
     bookmaker_log_dir = None
 
     _timeoutexception = Exception
-
-    _default_url = "https://www.sbobet.com/euro/football"
 
     @abstractmethod
     def _get_page(self, url):

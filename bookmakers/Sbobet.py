@@ -19,7 +19,6 @@ class Sbobet(Bookmaker):
 
     _timeoutexception = TimeoutException
 
-    _default_url = "https://www.sbobet.com/euro/football"
 
     def _get_page(self, url):
 
@@ -169,6 +168,9 @@ class Sbobet(Bookmaker):
 
     def get_scraping_urls(self):
         return ["https://www.sbobet.com/euro/football",
+                "https://www.sbobet.com/euro/basketball",
+                "https://www.sbobet.com/euro/tennis",
+                "https://www.sbobet.com/euro/baseball"
                 ]
 
     _driver = None
