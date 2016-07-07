@@ -7,7 +7,7 @@ from sqlalchemy import create_engine
 
 from settings import DB_HOST, DB_NAME, DB_USER, DB_PASSWD
 
-DIRNAME = os.path.dirname(os.path.abspath(__file__))
+DIRNAME = os.path.dirname(os.path.abspath("__file__"))
 
 
 def init():
