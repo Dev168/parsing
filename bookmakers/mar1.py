@@ -1082,7 +1082,7 @@ def live_result2way_tennis(url="https://www.marafonbet.info/en/live/22723"):
 
     return get_list_of_result2way()
 
-
+#baseball
 def live_handicaps_baseball(url="https://www.marafonbet.info/en/live/120866"):
     url1 = "https://www.marafonbet.info/en/live/120866"
 
@@ -1263,7 +1263,7 @@ def live_handicaps_baseball(url="https://www.marafonbet.info/en/live/120866"):
         else:
             return str(a[:int(str(a.index("(")))].strip())
 
-    return get_list_of_hand()["handicap"]
+    return get_list_of_hand()
 def live_result2way_baseball(url="https://www.marafonbet.info/en/live/120866"):
     url1 = "https://www.marafonbet.info/en/live/120866"
 
@@ -1377,9 +1377,9 @@ def live_result2way_baseball(url="https://www.marafonbet.info/en/live/120866"):
 
         result2way = {}
 
-        result2way["firstparticipant"] = get_part_string(str(n[m][index_of_hand]))
+        result2way["firstparticipant"] = remove_to_win(get_part_string(str(n[m][index_of_hand])))
         result2way['sport'] = "baseball"
-        result2way["secondparticipant"] = get_part_string(str(n[m][index_of_hand1]))
+        result2way["secondparticipant"] = remove_to_win(get_part_string(str(n[m][index_of_hand1])))
         result2way["firstwin"] = c[m][index_of_hand]
 
         result2way["secondwin"] = c[m][index_of_hand1]
@@ -1440,7 +1440,7 @@ def live_result2way_baseball(url="https://www.marafonbet.info/en/live/120866"):
         else:
             return str(a[:int(str(a.index("(")))].strip())
 
-    return get_list_of_result2way()["result2way"]
+    return get_list_of_result2way()
 
 
 def live_handicaps_basket(url="https://www.marafonsportsbook.com/en/live/45356"):
@@ -1636,5 +1636,15 @@ def football():
 def tennis():
     return unite_dict(live_handicaps_tennis(), live_result2way_tennis())
 
+def baseball():
+    return unite_dict(live_handicaps_baseball(), live_result2way_baseball())
+
 def remove_to_win(a):
     return a[:len(a)-7]
+
+def get_scraping_urls(self):
+ return ["https://www.marafonbet.info/en/live/26418",
+ "https://www.marafonsportsbook.com/en/live/45356",
+ "https://www.marafonbet.info/en/live/22723",
+ "https://www.marafonbet.info/en/live/120866"
+ ]
