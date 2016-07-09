@@ -45,30 +45,6 @@ class Bookmaker(object):
     def get_scraping_urls(self):
         pass
 
-    def download_events(self, scraping_url):
-
-        bookmaker_name = self.bookmaker_name
-
-        bookmaker_id = self.bookmaker_id
-
-        print(bookmaker_name + ": Начата загрузка данных с сайта")
-
-        try:
-            handicaps_df = pd.DataFrame(self.live_handicaps(scraping_url))
-        except Exception:
-            print("Произошли ошибки при парсинге данных")
-            raise
-
-        print(bookmaker_name + ": Данные успешно загружены с сайта")
-
-        handicaps_df = resolve_participant_names(handicaps_df, bookmaker_id)
-
-        create_handicaps(handicaps_df, bookmaker_id)
-
-        print(bookmaker_name + ": Работа успешно завершена")
-
-        return scraping_url
-
     def events(self, url=None, debug_page=None):
 
         try:
@@ -122,3 +98,28 @@ class Bookmaker(object):
 
         with open(dpath + "/info.txt", "w+", encoding="utf8") as f:
             f.write("Превышен таймаут соединения")
+
+    # depricated
+    def download_events(self, scraping_url):
+        bookmaker_name = self.bookmaker_name
+
+        bookmaker_id = self.bookmaker_id
+
+        print(bookmaker_name + ": Начата загрузка данных с сайта")
+
+        try:
+            handicaps_df = pd.DataFrame(self.live_handicaps(scraping_url))
+        except Exception:
+            print("Произошли ошибки при парсинге данных")
+            raise
+
+        print(bookmaker_name + ": Данные успешно загружены с сайта")
+
+        handicaps_df = resolve_participant_names(handicaps_df, bookmaker_id)
+
+        create_handicaps(handicaps_df, bookmaker_id)
+
+        print(bookmaker_name + ": Работа успешно завершена")
+
+        return scraping_url
+

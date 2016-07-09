@@ -16,11 +16,6 @@ def init():
     """Инициализирует базу данных со всеми необходимыми таблицами
     Если база данных с именем DB_NAME уже существует то будет ошибка"""
 
-    def __load_init_sports():
-        with open(os.path.join(DIRNAME, "sports_create.json")) as f:
-            text = f.read()
-            return json.loads(text)
-
     def __load_init_bookmakers():
         with open(os.path.join(DIRNAME, "bookmakers_create.json")) as f:
             text = f.read()
@@ -54,8 +49,6 @@ def init():
         conn.close()
 
         print("Таблицы успешно созданы")
-
-    create_sports(__load_init_sports())
 
     create_bookmakers(__load_init_bookmakers())
 
