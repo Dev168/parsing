@@ -13,30 +13,31 @@ def get_football_test():
         return events
 
 
-def resolve_links(list_of_dicts, aim_field, filter_field, table):
+def resolve_links(list_of_dicts, aim_fields, filter_field, table):
 
-    unique_dicts = get_dicts_with_unique_values_of_keys(list_of_dicts, aim_field, filter_field)
+    unique_dicts = get_dicts_with_unique_values_of_keys(list_of_dicts, aim_fields, filter_field)
 
-    rolled_dict = list_of_dicts_roll_to_dict_of_lists(unique_dicts, filter_field, aim_field)
+    rolled_dict = list_of_dicts_roll_to_dict_of_lists(unique_dicts, filter_field)
 
-    id_list = get_id_from_db(rolled_dict, table, filter_field, aim_field)
+    id_list = get_id_from_db(rolled_dict, table, filter_field)
     
-    return replace_attribute_value(id_list, list_of_dicts, (aim_field, filter_field), "id_", aim_field)
+    return replace_attribute_value(id_list, list_of_dicts, (aim_fields, filter_field), "id_", aim_fields)
 
 
-def get_dicts_with_unique_values_of_keys(list_of_dicts, aim_field, filter_field):
+def get_dicts_with_unique_values_of_keys(list_of_dicts, aim_fields, filter_field):
     unique_values_local = []
     for dict_ in list_of_dicts:
-        new_dict = {
-            aim_field: dict_[aim_field],
-            filter_field: dict_[filter_field]
-        }
-        if new_dict not in unique_values_local:
-            unique_values_local.append(new_dict)
+        for aim_field in aim_fields:
+            new_dict = {
+                "aim_field": dict_[aim_field],
+                filter_field: dict_[filter_field]
+            }
+            if new_dict not in unique_values_local:
+                unique_values_local.append(new_dict)
     return unique_values_local
 
 
-def list_of_dicts_roll_to_dict_of_lists(list_of_dicts, key, outkey):
+def list_of_dicts_roll_to_dict_of_lists(list_of_dicts, key):
 
     rolled_dict = {}
     for dict_ in list_of_dicts:
@@ -44,12 +45,12 @@ def list_of_dicts_roll_to_dict_of_lists(list_of_dicts, key, outkey):
         if dictkey not in rolled_dict.keys():
             rolled_dict[dictkey] = []
 
-        rolled_dict[dictkey].append(dict_[outkey])
+        rolled_dict[dictkey].append(dict_["aim_field"])
 
     return rolled_dict
 
 
-def get_id_from_db(dict_of_lists, table, filter_field, aim_field):
+def get_id_from_db(dict_of_lists, table, filter_field):
 
     result = []
 
@@ -74,13 +75,14 @@ def get_id_from_db(dict_of_lists, table, filter_field, aim_field):
             if id_ is None:
                 absent_names.append(name)
             else:
-                result.append({filter_field: key, aim_field: name, id_: id_})
+                result.append({filter_field: key, "aim_field": name, "id_": id_})
 
-        tuples = insert_to_db(absent_names, table, filter_field, key)
+        if len(absent_names) > 0:
+            tuples = insert_to_db(absent_names, table, filter_field, key)
 
-        for name in absent_names:
-            id_ = find(name, tuples)
-            result.append({filter_field: key, aim_field: name, id_: id_})
+            for name in absent_names:
+                id_ = find(name, tuples)
+                result.append({filter_field: key, "aim_field": name, "id_": id_})
 
     return result
 
@@ -89,7 +91,8 @@ def insert_to_db(absent_names, table, filter_field, filter_value):
     with mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME, use_unicode=True,
                        charset='utf8') as cursor:
         sql_request = "INSERT INTO {0} (`Name`, `{1}`) VALUES (%s, {2})".format(table, filter_field, filter_value)
-        cursor.executemany(sql_request, absent_names)
+        par = [(el,) for el in absent_names]
+        cursor.executemany(sql_request, par)
 
     return get_from_db(table, absent_names, filter_field, filter_value)
 
@@ -116,17 +119,33 @@ def replace_attribute_value(substitutional_objs, subsitutable_objs, match_attrs,
         for subsitutable_obj in subsitutable_objs:
             eq = True
             for attr in match_attrs:
-                if subsitutable_obj[attr] != substitutional_obj[attr]:
-                    eq = False
-                    break
+                if type(attr) is tuple:
+                    absent_equal = False
+                    for el in attr:
+                        if subsitutable_obj[el] == substitutional_obj[el]:
+                            absent_equal = True
+                            break
+                    if absent_equal:
+                        eq = False
+                        break
+                else:
+                    if subsitutable_obj[attr] != substitutional_obj[attr]:
+                        eq = False
+                        break
             if eq:
                 subsitutable_obj[subsitutable_atrr] = substitutional_obj[substitutional_attr]
 
-    return substitutional_objs
+    return subsitutable_objs
 
 
 data = get_football_test()["handicap"]
 
-data = resolve_links(data, "sport", "bookmaker", "sports")
+data = resolve_links(data, ("sport",), "bookmaker", "sports")
+
+data = resolve_links(data, ("league",), "sport", "leagues")
+
+data = resolve_links(data, ("firstparticipant", "secondparticipant"), "league", "participants")
+
+
 
 debug = 1
