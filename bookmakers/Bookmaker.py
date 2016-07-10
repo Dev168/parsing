@@ -97,11 +97,8 @@ class Bookmaker(object):
         with open(dpath + "/info.txt", "w+", encoding="utf8") as f:
             f.write("Превышен таймаут соединения")
 
-    # depricated
-    def download_events(self, scraping_url):
+    def download_events(self, debug_page):
         bookmaker_name = self.bookmaker_name
-
-        bookmaker_id = self.bookmaker_id
 
         print(bookmaker_name + ": Начата загрузка данных с сайта")
 
@@ -111,8 +108,7 @@ class Bookmaker(object):
         #     print("Произошли ошибки при парсинге данных")
         #     raise
 
-        with open(os.path.join(PROJECT_PATH, "test1\\football.html"), encoding="utf8") as f:
-            handicaps = self._scrape_page(f.read())["handicap"]
+        handicaps = self._scrape_page(debug_page)["handicap"]
 
         print(bookmaker_name + ": Данные успешно загружены с сайта")
 
@@ -127,5 +123,4 @@ class Bookmaker(object):
 
         print(bookmaker_name + ": Работа успешно завершена")
 
-        return scraping_url
 
