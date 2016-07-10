@@ -669,9 +669,6 @@ def football(url="https://www.marafonbet.info/en/live/26418"):
     d["handicap"] = handicap_list
     d["moneyline"] = moneyline
     return d
-
-
-#tennis
 def tennis(url="https://www.marafonbet.info/en/live/22723"):
 
     url1 = "https://www.marathonplay.com/en/live/22723"
@@ -932,10 +929,6 @@ def tennis(url="https://www.marafonbet.info/en/live/22723"):
     d["handicap"] = handicap_list
     d["result_2way"] = moneyline
     return d
-
-
-
-#baseball
 def baseball(url="https://www.marafonbet.info/en/live/120866"):
 
     url1 = "https://www.marathonplay.com/en/live/120866"
@@ -1197,13 +1190,6 @@ def baseball(url="https://www.marafonbet.info/en/live/120866"):
     d["handicap"] = handicap_list
     d["result_2way"] = moneyline
     return d
-
-
-
-
-
-
-
 def basket(url="https://www.marathonplay.com/en/live/45356"):
 
     url1 = "https://www.marathonplay.com/en/live/45356"
