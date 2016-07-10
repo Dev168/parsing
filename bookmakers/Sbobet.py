@@ -19,7 +19,6 @@ class Sbobet(Bookmaker):
 
     _timeoutexception = TimeoutException
 
-
     def _get_page(self, url):
 
         driver = self._get_driver()
@@ -227,3 +226,7 @@ class Sbobet(Bookmaker):
         self._driver.set_page_load_timeout(LOAD_WAIT_TIME)
 
         return self._driver
+
+sb = Sbobet()
+
+sb.download_events(1)

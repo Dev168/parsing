@@ -1,5 +1,5 @@
 import pandas as pd
-from parsing import resolve_participant_names, resolve_sports
+from parsing import resolve_participant_names
 from db.database import create_handicaps
 
 

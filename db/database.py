@@ -1,11 +1,6 @@
 import json
 import os
 import MySQLdb as mysql
-import pandas as pd
-from datetime import datetime as datetime
-from sqlalchemy import create_engine
-import sys
-import logging
 
 from settings import DB_HOST, DB_NAME, DB_USER, DB_PASSWD
 
@@ -104,96 +99,52 @@ def create_sports(sports):
     print("Добавлены новые виды спорта")
 
 
-def create_participants(names_df, bookmaker_id=None):
+def create_handicaps(handicaps):
 
-    names_df.columns = ["name"]
-    names_list = names_df["name"].tolist()
-    par = [(el,) for el in names_list]
+    delete_previous("handicaps", handicaps[0]["bookmaker"], handicaps[0]["sport"])
 
     conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME, use_unicode=True, charset='utf8')
-    cursor = conn.cursor()
-
-    sql_code = "INSERT INTO participants (`Name`) VALUES (%s)"
-
-    try:
-        cursor.executemany(sql_code, par)
-        conn.commit()
-        df = pd.read_sql("SELECT * FROM participants WHERE name in %(names)s", con=conn, params={"names": names_list})
-    except mysql.IntegrityError as ie:
-        conn.rollback()
-    conn.close()
-
-    print("Были созданы новые участники")
-
-    return df
-
-
-def create_participant_names(names_df, bookmaker_id):
-
-    conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME)
-
-    names_df.columns = ["participant", "name"]
-    names_df["bookmaker"] = bookmaker_id
-
-    engine = create_engine('mysql://root:1234@localhost/betsdb')
-    names_df.to_sql("participantnames", con=engine, if_exists="append", index=False)
-
-    names_df = names_df.drop("bookmaker", 1)
-
-    names_df.columns = ["id", "name"]
-
-    conn.close()
-
-    print("Были созданы новые имена участников")
-
-    return names_df
-
-
-def create_handicaps(handicaps_df, bookmaker_id):
-
-    # TODO: Избавится от кода по удалению столбцов. Лишних данных не должно поступать из JSON файлов!
-
-    conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME)
-
-    last_handicaps = pd.read_sql("SELECT * FROM handicaps WHERE actual = true AND bookmaker = %(id)s", con=conn, params={"id": bookmaker_id})
 
     cursor = conn.cursor()
-    sql_to_del = "DELETE FROM handicaps WHERE `id` in (%s)"
-    lis = last_handicaps["id"].values.tolist()
-    params = [(el,) for el in lis]
-    cursor.executemany(sql_to_del, params)
+
+    sql_code = 'INSERT INTO handicaps ' \
+               '(`firstforward`, `firstwin`, `secondforward`, `secondwin`,' \
+               ' `oddsdate`, `live`, `href`, `firstparticipant`, `secondparticipant`,' \
+               ' `bookmaker`, `actual`, `sport`, `league`)' \
+               ' VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+
+    params = []
+
+    for h in handicaps:
+        params.append(
+            (h["firstforward"], h["firstwin"], h["secondforward"], h["secondwin"],
+             h["oddsdate"], h["live"], h["href"], h["firstparticipant"], h["secondparticipant"],
+             h["bookmaker"], h["actual"], h["sport"], h["league"])
+        )
+
+    cursor.executemany(sql_code, params)
+
     conn.commit()
 
-    last_handicaps["actual"] = False
-    last_handicaps = last_handicaps.drop(["id"], 1)
-    last_handicaps.to_sql("handicaps", con=conn, if_exists="append", flavor="mysql", index=False)
+    conn.close()
 
-    handicaps_df["oddsdate"] = datetime.now()
 
-    if "score" in handicaps_df:
-        handicaps_df = handicaps_df.drop(["score"], 1)
+def delete_previous(table, bookmaker, sport):
 
-    if "league" in handicaps_df:
-        handicaps_df = handicaps_df.drop(["league"], 1)
+    conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME, use_unicode=True, charset='utf8')
 
-    if "sport" in handicaps_df:
-        handicaps_df = handicaps_df.drop(["sport"], 1)
+    cursor = conn.cursor()
 
-    if "livedate" in handicaps_df:
-        handicaps_df = handicaps_df.drop(["livedate"], 1)
+    sql_code_del = "DELETE FROM %s WHERE bookmaker = %s AND sport = %s" % (table, bookmaker, sport)
 
-    if "gamedate" in handicaps_df:
-        handicaps_df = handicaps_df.drop(["gamedate"], 1)
+    cursor.execute(sql_code_del)
 
-    handicaps_df["actual"] = True
-    handicaps_df["bookmaker"] = bookmaker_id
+    conn.commit()
 
-    handicaps_df.to_sql("handicaps", con=conn, if_exists="append", flavor="mysql", index=False)
+    print("Предыдущие данные были удалены")
 
     conn.close()
 
-    if not handicaps_df.empty:
-        print("Были добавлены новые события")
 
 
 

@@ -1,8 +1,8 @@
 import MySQLdb as mysql
 import pandas as pd
 
-from common.distance import distance
 import db.database as db
+from distance import distance
 from settings import DB_HOST, DB_USER, DB_PASSWD, DB_NAME, LIVENSHTAIN_MIN
 
 

@@ -1,16 +1,5 @@
-from bookmakers.Sbobet import Sbobet
 import MySQLdb as mysql
 from settings import DB_HOST, DB_NAME, DB_USER, DB_PASSWD
-
-
-def get_football_test():
-    sb = Sbobet()
-    with open("football.html", encoding="utf8") as page:
-        events = sb.events(debug_page=page)
-        handicaps = events["handicap"]
-        for h in handicaps:
-            h["bookmaker"] = sb.bookmaker_id
-        return events
 
 
 def resolve_links(list_of_dicts, aim_fields, filter_field, table):
@@ -21,7 +10,7 @@ def resolve_links(list_of_dicts, aim_fields, filter_field, table):
 
     id_list = get_id_from_db(rolled_dict, table, filter_field)
     
-    return replace_attribute_value(id_list, list_of_dicts, (aim_fields, filter_field), "id_", aim_fields)
+    return replace_attribute_value(id_list, list_of_dicts, (aim_fields, filter_field), "id_")
 
 
 def get_dicts_with_unique_values_of_keys(list_of_dicts, aim_fields, filter_field):
@@ -113,17 +102,19 @@ def get_from_db(table, values, filter_field, filter_value):
     return result
 
 
-def replace_attribute_value(substitutional_objs, subsitutable_objs, match_attrs, substitutional_attr, subsitutable_atrr):
+def replace_attribute_value(substitutional_objs, subsitutable_objs, match_attrs, substitutional_attr):
 
     for substitutional_obj in substitutional_objs:
         for subsitutable_obj in subsitutable_objs:
             eq = True
+            equal_field = ""
             for attr in match_attrs:
                 if type(attr) is tuple:
-                    absent_equal = False
+                    absent_equal = True
                     for el in attr:
-                        if subsitutable_obj[el] == substitutional_obj[el]:
-                            absent_equal = True
+                        if subsitutable_obj[el] == substitutional_obj["aim_field"]:
+                            absent_equal = False
+                            equal_field = el
                             break
                     if absent_equal:
                         eq = False
@@ -133,19 +124,18 @@ def replace_attribute_value(substitutional_objs, subsitutable_objs, match_attrs,
                         eq = False
                         break
             if eq:
-                subsitutable_obj[subsitutable_atrr] = substitutional_obj[substitutional_attr]
+                subsitutable_obj[equal_field] = substitutional_obj[substitutional_attr]
+
 
     return subsitutable_objs
 
 
-data = get_football_test()["handicap"]
+def resolve_all_links(data):
 
-data = resolve_links(data, ("sport",), "bookmaker", "sports")
+    data = resolve_links(data, ("sport",), "bookmaker", "sports")
 
-data = resolve_links(data, ("league",), "sport", "leagues")
+    data = resolve_links(data, ("league",), "sport", "leagues")
 
-data = resolve_links(data, ("firstparticipant", "secondparticipant"), "league", "participants")
+    data = resolve_links(data, ("firstparticipant", "secondparticipant"), "league", "participants")
 
-
-
-debug = 1
+    return data

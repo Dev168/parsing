@@ -1,11 +1,9 @@
-import sys
 import os
 from datetime import datetime, timedelta
 from abc import abstractmethod, ABCMeta
-from settings import LOG_DIR, LOAD_WAIT_TIME
-import pandas as pd
-from parsing import resolve_participant_names
+from settings import LOG_DIR, PROJECT_PATH
 from db.database import create_handicaps
+from new_resolver import resolve_all_links
 
 
 class Bookmaker(object):
@@ -107,17 +105,25 @@ class Bookmaker(object):
 
         print(bookmaker_name + ": Начата загрузка данных с сайта")
 
-        try:
-            handicaps_df = pd.DataFrame(self.live_handicaps(scraping_url))
-        except Exception:
-            print("Произошли ошибки при парсинге данных")
-            raise
+        # try:
+        #     handicaps = self.live_handicaps(scraping_url)
+        # except Exception:
+        #     print("Произошли ошибки при парсинге данных")
+        #     raise
+
+        with open(os.path.join(PROJECT_PATH, "test1\\football.html"), encoding="utf8") as f:
+            handicaps = self._scrape_page(f.read())["handicap"]
 
         print(bookmaker_name + ": Данные успешно загружены с сайта")
 
-        handicaps_df = resolve_participant_names(handicaps_df, bookmaker_id)
+        for h in handicaps:
+            h["bookmaker"] = self.bookmaker_id
+            h["oddsdate"] = datetime.utcnow()
+            h["actual"] = True
 
-        create_handicaps(handicaps_df, bookmaker_id)
+        handicaps = resolve_all_links(handicaps)
+
+        create_handicaps(handicaps)
 
         print(bookmaker_name + ": Работа успешно завершена")
 
