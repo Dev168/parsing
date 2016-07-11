@@ -25,7 +25,9 @@ class Marathonbet(Bookmaker):
     def _scrape_page(self, page):
         doc = bs4.BeautifulSoup(page, "html.parser")
         a = doc.find("div", class_="sport-category-label")
-
+        new_list_money = []
+        new_list_hand = []
+        new_list_result2way = []
         def remove_to_win(a):
             return a[:len(a) - 7]
 
@@ -379,22 +381,45 @@ class Marathonbet(Bookmaker):
                 else:
                     return str(a[:int(str(a.index("(")))].strip())
 
-            if (a.text == "Football"):
+            def unite_dict(dict1, dict2):
+                dict1.update(dict2)
+                return dict1
+
+            if (a.text == "Football") or (a.text == "football"):
                 moneyline.append(get_list_of_moneyline()["moneyline"])
                 handicap_list.append(get_list_of_hand()["handicap"])
+
+
             else:
                 result2way.append(get_list_of_result2way()["result2way"])
                 handicap_list.append(get_list_of_hand()["handicap"])
 
         d = {}
-        if (a.text == "Football"):
-            d["handicap"] = handicap_list
-            d["moneyline"] = moneyline
+        if (a.text == "Football") or (a.text == "football"):
+            for inner_list in moneyline:
+                if (len(inner_list) > 0):
+                    new_list_money.append(inner_list[0])
+
+            for inner_list in handicap_list:
+                if (len(inner_list) > 0):
+                    new_list_hand.append(inner_list[0])
+
+            d["handicap"] = new_list_hand
+            d["moneyline"] = new_list_money
         else:
-            d["handicap"] = handicap_list
-            d["result2way"] = result2way
+            for inner_list in handicap_list:
+                if (len(inner_list) > 0):
+                    new_list_hand.append(inner_list[0])
+
+            for inner_list in result2way:
+                if (len(inner_list) > 0):
+                    new_list_result2way.append(inner_list[0])
+
+            d["handicap"] = new_list_hand
+            d["result2way"] = new_list_result2way
 
         return d
+
     def get_scraping_urls(self):
         return ["https://www.marathonplay.com/en/live/26418",
                 "https://www.marathonplay.com/en/live/45356",
