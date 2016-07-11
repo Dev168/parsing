@@ -2,13 +2,13 @@ import MySQLdb as mysql
 from settings import DB_HOST, DB_NAME, DB_USER, DB_PASSWD
 
 
-def resolve_links(list_of_dicts, aim_fields, filter_field, table):
+def resolve_links(list_of_dicts, aim_fields, filter_field, table, bk=None):
 
     unique_dicts = get_dicts_with_unique_values_of_keys(list_of_dicts, aim_fields, filter_field)
 
     rolled_dict = list_of_dicts_roll_to_dict_of_lists(unique_dicts, filter_field)
 
-    id_list = get_id_from_db(rolled_dict, table, filter_field)
+    id_list = get_id_from_db(rolled_dict, table, filter_field, bk)
     
     return replace_attribute_value(id_list, list_of_dicts, (aim_fields, filter_field), "id_")
 
@@ -39,7 +39,7 @@ def list_of_dicts_roll_to_dict_of_lists(list_of_dicts, key):
     return rolled_dict
 
 
-def get_id_from_db(dict_of_lists, table, filter_field):
+def get_id_from_db(dict_of_lists, table, filter_field, bk):
 
     result = []
 
@@ -67,7 +67,7 @@ def get_id_from_db(dict_of_lists, table, filter_field):
                 result.append({filter_field: key, "aim_field": name, "id_": id_})
 
         if len(absent_names) > 0:
-            tuples = insert_to_db(absent_names, table, filter_field, key)
+            tuples = insert_to_db(absent_names, table, filter_field, key, bk)
 
             for name in absent_names:
                 id_ = find(name, tuples)
@@ -76,10 +76,14 @@ def get_id_from_db(dict_of_lists, table, filter_field):
     return result
 
 
-def insert_to_db(absent_names, table, filter_field, filter_value):
+def insert_to_db(absent_names, table, filter_field, filter_value, bk):
     with mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME, use_unicode=True,
                        charset='utf8') as cursor:
-        sql_request = "INSERT INTO {0} (`Name`, `{1}`) VALUES (%s, {2})".format(table, filter_field, filter_value)
+        if bk is None:
+            sql_request = "INSERT INTO {0} (`Name`, `{1}`) VALUES (%s, {2})".format(table, filter_field, filter_value)
+        else:
+            sql_request = "INSERT INTO {0} (`Name`, `{1}`, `Bookmaker`) VALUES (%s, {2}, {3})"\
+                .format(table, filter_field, filter_value, bk)
         par = [(el,) for el in absent_names]
         cursor.executemany(sql_request, par)
 
@@ -134,8 +138,10 @@ def resolve_all_links(data):
 
     data = resolve_links(data, ("sport",), "bookmaker", "sports")
 
-    data = resolve_links(data, ("league",), "sport", "leagues")
+    bk = data[0]["bookmaker"]  # Величайший костыль всех времен
 
-    data = resolve_links(data, ("firstparticipant", "secondparticipant"), "league", "participants")
+    data = resolve_links(data, ("league",), "sport", "leagues", bk)
+
+    data = resolve_links(data, ("firstparticipant", "secondparticipant"), "league", "participants", bk)
 
     return data
