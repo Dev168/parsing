@@ -385,7 +385,7 @@ class Marathonbet(Bookmaker):
                 dict1.update(dict2)
                 return dict1
 
-            if (a.text == "Football") or (a.text == "football"):
+            if (a.text == "Football")or(a.text == "football"):
                 moneyline.append(get_list_of_moneyline()["moneyline"])
                 handicap_list.append(get_list_of_hand()["handicap"])
 
