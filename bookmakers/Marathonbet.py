@@ -23,7 +23,7 @@ class Marathonbet(Bookmaker):
         return requests.get(url, cookies=cookie, timeout=LOAD_WAIT_TIME, proxies=proxies).text
 
     def _scrape_page(self, page):
-        doc = bs4.BeautifulSoup(html_text, "html.parser")
+        doc = bs4.BeautifulSoup(page, "html.parser")
         a = doc.find("div", class_="sport-category-label")
 
         def remove_to_win(a):

@@ -1506,8 +1506,8 @@ def unite_dict(dict1, dict2):
 def remove_to_win(a):
     return a[:len(a)-7]
 def get_scraping_urls(self):
- return ["https://www.marafonbet.info/en/live/26418",
- "https://www.marafonsportsbook.com/en/live/45356",
- "https://www.marafonbet.info/en/live/22723",
- "https://www.marafonbet.info/en/live/120866"
- ]
+    return ["https://www.marafonbet.info/en/live/26418",
+    "https://www.marafonsportsbook.com/en/live/45356",
+    "https://www.marafonbet.info/en/live/22723",
+    "https://www.marafonbet.info/en/live/120866"
+    ]
