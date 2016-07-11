@@ -212,7 +212,7 @@ class Marathonbet(Bookmaker):
                 handicap["firstparticipant"] = get_part_string(str(n[m][index_of_hand]))
 
                 handicap["secondforward"] = get_forward_string(n[m][index_of_hand1])
-
+                handicap["league"] = get_league(ev)
                 handicap["secondparticipant"] = get_part_string(str(n[m][index_of_hand1]))
                 handicap["firstwin"] = c[m][index_of_hand]
 
