@@ -672,10 +672,12 @@ def football(url="https://www.marafonbet.info/en/live/26418"):
     return d
 def tennis(url="https://www.marafonbet.info/en/live/22723"):
 
+    path = "bookmakers/er.html"
+    h = open(path)
     url1 = "https://www.marathonplay.com/en/live/22723"
 
     cookie = {'panbet.sitestyle': 'MULTIMARKETS'}
-    html_text = requests.get(url1, cookies=cookie).text
+    html_text = h.read()
     doc = bs4.BeautifulSoup(html_text, "html.parser")
 
     def coeff(cell):
