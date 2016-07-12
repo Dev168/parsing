@@ -935,262 +935,268 @@ def baseball(url="https://www.marafonbet.info/en/live/120866"):
     url1 = "https://www.marathonplay.com/en/live/120866"
 
     cookie = {'panbet.sitestyle': 'MULTIMARKETS'}
-    html_text = requests.get(url1, cookies=cookie).text
-    doc = bs4.BeautifulSoup(html_text, "html.parser")
 
-    def coeff(cell):
-        q = []
-        q = re.split('[,]+', cell)
+    respose = requests.get(url1, cookies=cookie)
+    html_text = respose.text
+    if(respose.links['canonical']['url'].__contains__("popular") == True):
+        return {}
+    else:
 
-        for i in range(len(q)):
-            if (q[i].__contains__("epr")):
-                coeff = q[i][7:len(q[i]) - 1]
+        doc = bs4.BeautifulSoup(html_text, "html.parser")
 
-        return coeff
+        def coeff(cell):
+            q = []
+            q = re.split('[,]+', cell)
 
-    def result(cell):
-        q = []
-        q = re.split('[,]+', cell)
-        q[0] = q[0][(q[0].index(':') + 2):(len(q[0]) - 1)]
-        result_string = ''
+            for i in range(len(q)):
+                if (q[i].__contains__("epr")):
+                    coeff = q[i][7:len(q[i]) - 1]
 
-        index = 0
-        index1 = 0
+            return coeff
 
-        for i in range(len(q)):
-            if (q[i].__contains__("ewc")):
-                index = i
+        def result(cell):
+            q = []
+            q = re.split('[,]+', cell)
+            q[0] = q[0][(q[0].index(':') + 2):(len(q[0]) - 1)]
+            result_string = ''
 
-        for i in range(len(q)):
-            if (q[i].__contains__("nm")):
-                index1 = i
+            index = 0
+            index1 = 0
 
-        for i in range(index1, index):
-            result_string += q[i] + ' '
+            for i in range(len(q)):
+                if (q[i].__contains__("ewc")):
+                    index = i
 
-        result_string = result_string[(result_string.index(':') + 2):(len(result_string) - 1)]
-        result_string = result_string.strip()
-        if (result_string[len(result_string) - 1] == '"'):
-            result_string = result_string[:len(result_string) - 1]
-        return result_string
+            for i in range(len(q)):
+                if (q[i].__contains__("nm")):
+                    index1 = i
 
-    def name(cell):
-        q = []
-        q = re.split('[,]+', cell)
+            for i in range(index1, index):
+                result_string += q[i] + ' '
 
-        for i in range(len(q)):
-            if (q[i].__contains__("mn")):
-                index = i
-        for i in range(index - 1):
-            q[0] += q[i + 1] + ' '
+            result_string = result_string[(result_string.index(':') + 2):(len(result_string) - 1)]
+            result_string = result_string.strip()
+            if (result_string[len(result_string) - 1] == '"'):
+                result_string = result_string[:len(result_string) - 1]
+            return result_string
 
-        q[0] = q[0][(q[0].index(':') + 2):(len(q[0]) - 1)]
+        def name(cell):
+            q = []
+            q = re.split('[,]+', cell)
 
-        return q[0]
+            for i in range(len(q)):
+                if (q[i].__contains__("mn")):
+                    index = i
+            for i in range(index - 1):
+                q[0] += q[i + 1] + ' '
 
-    def remove_to_win(a):
-        return a[:len(a) - 7]
+            q[0] = q[0][(q[0].index(':') + 2):(len(q[0]) - 1)]
 
+            return q[0]
 
-
-    handicap_list = []
-    moneyline = []
-
-    s = doc.find_all("div", class_="category-container")
-
-    def get_league(x):
-        s1 = x.find_all("span", class_="nowrap")
-        l = []
-        for i in s1:
-            l.append(i.text)
-
-        l1 = ""
-        for league in l:
-            l1 = l1 + league
-        return l1
-
-    for ev in s:
-        spans = []
-        spans = ev.find_all("tbody", class_="")
-        events = []
-        hrefs = []
-        odds = []
-        data_sel = []
-        odds.append([])
-        data_sel.append([])
-        new_odds = []
-        new_odds.append([])
-        i = 0
-        j = 0
-        k = 0
-        c = []
-        r = []
-        n = []
-        n.append([])
-        r.append([])
-        c.append([])
+        def remove_to_win(a):
+            return a[:len(a) - 7]
 
 
-        for span in spans:
 
-            events.append(span['data-event-name'])
-            hrefs.append(span['data-event-treeid'])
+        handicap_list = []
+        moneyline = []
 
-            odds[i] = span.find_all("td",
-                                    {'class': lambda x: x
-                                                        and 'price' in x.split()
-                                     }
-                                    )
+        s = doc.find_all("div", class_="category-container")
 
-            if (i < len(spans) - 1):
-                odds.append([])
-            i += 1
+        def get_league(x):
+            s1 = x.find_all("span", class_="nowrap")
+            l = []
+            for i in s1:
+                l.append(i.text)
 
-        for odd in odds:
-            for od in odd:
-                data_sel[j].append(od['data-sel'].strip())
-                new_odds[k].append(od['data-market-type'].strip())
+            l1 = ""
+            for league in l:
+                l1 = l1 + league
+            return l1
 
-                c[j].append(coeff(od['data-sel'].strip()))
-                r[j].append(result(od['data-sel'].strip()))
-                n[j].append(name(od['data-sel'].strip()))
+        for ev in s:
+            spans = []
+            spans = ev.find_all("tbody", class_="")
+            events = []
+            hrefs = []
+            odds = []
+            data_sel = []
+            odds.append([])
+            data_sel.append([])
+            new_odds = []
+            new_odds.append([])
+            i = 0
+            j = 0
+            k = 0
+            c = []
+            r = []
+            n = []
+            n.append([])
+            r.append([])
+            c.append([])
 
-            if (j < len(spans) - 1):
-                data_sel.append([])
-                new_odds.append([])
-                c.append([])
-                r.append([])
-                n.append([])
-            j += 1
-            k += 1
 
-        def get_handicap(index_of_hand, index_of_hand1, m):
+            for span in spans:
 
-            handicap = {}
+                events.append(span['data-event-name'])
+                hrefs.append(span['data-event-treeid'])
 
-            handicap["firstforward"] = get_forward_string(str(n[m][index_of_hand]))
-            handicap["sport"] = "baseball"
-            handicap["firstparticipant"] = get_part_string(str(n[m][index_of_hand]))
+                odds[i] = span.find_all("td",
+                                        {'class': lambda x: x
+                                                            and 'price' in x.split()
+                                         }
+                                        )
 
-            handicap["secondforward"] = get_forward_string(n[m][index_of_hand1])
+                if (i < len(spans) - 1):
+                    odds.append([])
+                i += 1
 
-            handicap["secondparticipant"] = get_part_string(str(n[m][index_of_hand1]))
-            handicap["firstwin"] = c[m][index_of_hand]
+            for odd in odds:
+                for od in odd:
+                    data_sel[j].append(od['data-sel'].strip())
+                    new_odds[k].append(od['data-market-type'].strip())
 
-            handicap["secondwin"] = c[m][index_of_hand1]
-            handicap["live"] = True
-            handicap["href"] = "https://www.marafonsportsbook.com/en/live/animation/" + str(hrefs[m])
-            return handicap
+                    c[j].append(coeff(od['data-sel'].strip()))
+                    r[j].append(result(od['data-sel'].strip()))
+                    n[j].append(name(od['data-sel'].strip()))
 
-        def get_pairs_of_participants_handicap():
-            pairs = []
-            pairs.append([])
-            m = 0
+                if (j < len(spans) - 1):
+                    data_sel.append([])
+                    new_odds.append([])
+                    c.append([])
+                    r.append([])
+                    n.append([])
+                j += 1
+                k += 1
 
-            for odds_ in new_odds:
+            def get_handicap(index_of_hand, index_of_hand1, m):
+
+                handicap = {}
+
+                handicap["firstforward"] = get_forward_string(str(n[m][index_of_hand]))
+                handicap["sport"] = "baseball"
+                handicap["firstparticipant"] = get_part_string(str(n[m][index_of_hand]))
+
+                handicap["secondforward"] = get_forward_string(n[m][index_of_hand1])
+
+                handicap["secondparticipant"] = get_part_string(str(n[m][index_of_hand1]))
+                handicap["firstwin"] = c[m][index_of_hand]
+
+                handicap["secondwin"] = c[m][index_of_hand1]
+                handicap["live"] = True
+                handicap["href"] = "https://www.marafonsportsbook.com/en/live/animation/" + str(hrefs[m])
+                return handicap
+
+            def get_pairs_of_participants_handicap():
+                pairs = []
+                pairs.append([])
+                m = 0
+
+                for odds_ in new_odds:
+                    s = 0
+                    for odd_ in odds_:
+
+                        if ((str(odd_) == 'HANDICAP')):
+                            pairs[m].append(s)
+                            pairs[m].append(s + 1)
+                            break
+                        else:
+                            s += 1
+                    if (m < len(spans) - 1):
+                        pairs.append([])
+                    m += 1
+                return pairs
+
+            def get_list_of_hand():
+                d = {}
+                list = []
+                pairs = get_pairs_of_participants_handicap()
                 s = 0
-                for odd_ in odds_:
-
-                    if ((str(odd_) == 'HANDICAP')):
-                        pairs[m].append(s)
-                        pairs[m].append(s + 1)
-                        break
+                for pair in pairs:
+                    if (len(pair) > 1):
+                        list.append(get_handicap(pair[0], pair[1], s))
+                        s += 1
                     else:
                         s += 1
-                if (m < len(spans) - 1):
-                    pairs.append([])
-                m += 1
-            return pairs
 
-        def get_list_of_hand():
-            d = {}
-            list = []
-            pairs = get_pairs_of_participants_handicap()
-            s = 0
-            for pair in pairs:
-                if (len(pair) > 1):
-                    list.append(get_handicap(pair[0], pair[1], s))
-                    s += 1
-                else:
-                    s += 1
+                d["handicap"] = list
+                return d
 
-            d["handicap"] = list
-            return d
+            def get_result2way(index_of_hand, index_of_hand1, m):
 
-        def get_result2way(index_of_hand, index_of_hand1, m):
+                result2way = {}
 
-            result2way = {}
+                result2way["firstparticipant"] = remove_to_win(get_part_string(str(n[m][index_of_hand])))
+                result2way['sport'] = "baseball"
+                result2way["secondparticipant"] = remove_to_win(get_part_string(str(n[m][index_of_hand1])))
+                result2way["firstwin"] = c[m][index_of_hand]
 
-            result2way["firstparticipant"] = remove_to_win(get_part_string(str(n[m][index_of_hand])))
-            result2way['sport'] = "baseball"
-            result2way["secondparticipant"] = remove_to_win(get_part_string(str(n[m][index_of_hand1])))
-            result2way["firstwin"] = c[m][index_of_hand]
+                result2way["secondwin"] = c[m][index_of_hand1]
+                result2way["live"] = True
+                result2way["href"] = "https://www.marafonsportsbook.com/en/live/animation/" + str(hrefs[m])
+                return result2way
 
-            result2way["secondwin"] = c[m][index_of_hand1]
-            result2way["live"] = True
-            result2way["href"] = "https://www.marafonsportsbook.com/en/live/animation/" + str(hrefs[m])
-            return result2way
+            def get_pairs_of_participants_result2way():
+                pairs = []
+                pairs.append([])
+                m = 0
 
-        def get_pairs_of_participants_result2way():
-            pairs = []
-            pairs.append([])
-            m = 0
+                for odds_ in new_odds:
+                    s = 0
+                    for odd_ in odds_:
 
-            for odds_ in new_odds:
+                        if ((str(odd_) == "RESULT_2WAY")):
+                            pairs[m].append(s)
+                            pairs[m].append(s + 1)
+                            break
+                        else:
+                            s += 1
+                    if (m < len(spans) - 1):
+                        pairs.append([])
+                    m += 1
+                return pairs
+
+            def get_list_of_result2way():
+                d = {}
+                list = []
+                pairs = get_pairs_of_participants_result2way()
                 s = 0
-                for odd_ in odds_:
-
-                    if ((str(odd_) == "RESULT_2WAY")):
-                        pairs[m].append(s)
-                        pairs[m].append(s + 1)
-                        break
+                for pair in pairs:
+                    if (len(pair) > 1):
+                        list.append(get_result2way(pair[0], pair[1], s))
+                        s += 1
                     else:
                         s += 1
-                if (m < len(spans) - 1):
-                    pairs.append([])
-                m += 1
-            return pairs
 
-        def get_list_of_result2way():
-            d = {}
-            list = []
-            pairs = get_pairs_of_participants_result2way()
-            s = 0
-            for pair in pairs:
-                if (len(pair) > 1):
-                    list.append(get_result2way(pair[0], pair[1], s))
-                    s += 1
+                d["result2way"] = list
+                return d
+
+
+            def is_forward_zero(a):
+                if (str(a).find("(") == -1):
+                    return 0
                 else:
-                    s += 1
+                    return 1
 
-            d["result2way"] = list
-            return d
+            def get_forward_string(a):
+                if (is_forward_zero(a) == 0):
+                    return 0
+                else:
+                    return str(a[int(a.index("(") + 1):int(str(a.index(")")))].strip())
 
+            def get_part_string(a):
+                if (is_forward_zero(a) == 0):
+                    return a
+                else:
+                    return str(a[:int(str(a.index("(")))].strip())
+            handicap_list.append(get_list_of_hand()["handicap"])
+            moneyline.append(get_list_of_result2way()["result2way"])
 
-        def is_forward_zero(a):
-            if (str(a).find("(") == -1):
-                return 0
-            else:
-                return 1
-
-        def get_forward_string(a):
-            if (is_forward_zero(a) == 0):
-                return 0
-            else:
-                return str(a[int(a.index("(") + 1):int(str(a.index(")")))].strip())
-
-        def get_part_string(a):
-            if (is_forward_zero(a) == 0):
-                return a
-            else:
-                return str(a[:int(str(a.index("(")))].strip())
-        handicap_list.append(get_list_of_hand()["handicap"])
-        moneyline.append(get_list_of_result2way()["result2way"])
-
-    d = {}
-    d["handicap"] = handicap_list
-    d["result_2way"] = moneyline
-    return d
+        d = {}
+        d["handicap"] = handicap_list
+        d["result_2way"] = moneyline
+        return d
 def basket(url="https://www.marathonplay.com/en/live/45356"):
 
     url1 = "https://www.marathonplay.com/en/live/45356"
