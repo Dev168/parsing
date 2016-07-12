@@ -208,7 +208,7 @@ class Marathonbet(Bookmaker):
                 handicap = {}
 
                 handicap["firstforward"] = get_forward_string(str(n[m][index_of_hand]))
-                handicap["sport"] = a.text
+                handicap["sport"] = str(a.text).title()
                 handicap["firstparticipant"] = get_part_string(str(n[m][index_of_hand]))
 
                 handicap["secondforward"] = get_forward_string(n[m][index_of_hand1])
@@ -267,7 +267,7 @@ class Marathonbet(Bookmaker):
                     result2way["firstparticipant"] = remove_to_win(get_part_string(str(n[m][index_of_hand])))
                     result2way["secondparticipant"] = remove_to_win(get_part_string(str(n[m][index_of_hand1])))
                 result2way["draw"] = None
-                result2way["sport"] = a.text
+                result2way["sport"] = str(a.text).title()
                 result2way["firstwin"] = c[m][index_of_hand]
                 result2way["league"] = get_league(ev)
                 result2way["secondwin"] = c[m][index_of_hand1]
@@ -316,7 +316,7 @@ class Marathonbet(Bookmaker):
 
                 moneyline["firstparticipant"] = remove_to_win(get_part_string(str(n[m][index_of_hand])))
 
-                moneyline["sport"] = "football"
+                moneyline["sport"] = "Football"
 
                 moneyline["secondparticipant"] = remove_to_win(get_part_string(str(n[m][index_of_hand1])))
                 moneyline["firstwin"] = c[m][index_of_hand]
