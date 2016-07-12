@@ -1,16 +1,16 @@
 from bookmakers.Sbobet import Sbobet
 from bookmakers.Marathonbet import Marathonbet
 
-sbf = ["sb_football.html", "sb_tenis.html"]
-mf = ["m_tenis.html", "m_football.html"]
 sb = Sbobet()
 m = Marathonbet()
 
+sbf = sb.get_scraping_urls()
+mf = m.get_scraping_urls()
+
 for f in sbf:
-    with open(f, encoding="utf8") as fa:
-        sb.download_events(fa.read())
+
+    sb.download_events(f)
 
 for f in mf:
-    with open(f, encoding="utf8") as fa:
-        m.download_events(fa.read())
+    m.download_events(f)
 

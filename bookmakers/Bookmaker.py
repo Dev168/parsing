@@ -4,6 +4,7 @@ from abc import abstractmethod, ABCMeta
 from settings import LOG_DIR, PROJECT_PATH
 from db.database import create_handicaps
 from new_resolver import resolve_all_links
+import traceback
 
 
 class Bookmaker(object):
@@ -60,17 +61,17 @@ class Bookmaker(object):
 
             return self._scrape_page(page)
 
-        except (IndexError, AttributeError, Exception):
-            self._debug_scraping_error(page)
+        except (IndexError, AttributeError, Exception) as exc:
+            self._debug_scraping_error(page, exc)
             raise
 
     def live_handicaps(self, url=None):
         try:
             return self.events(url)["handicap"]
-        except self._timeoutexception:
+        except:
             raise
 
-    def _debug_scraping_error(self, page):
+    def _debug_scraping_error(self, page, exc):
 
         time = datetime.utcnow() + timedelta(hours=3)
 
@@ -83,7 +84,9 @@ class Bookmaker(object):
             f.write(page)
 
         with open(dpath + "/info.txt", "w+", encoding="utf8") as f:
-            f.write("Произошла ошибка парсинга")
+            f.write(traceback.format_exc())
+
+        traceback.format_exc()
 
     def _debug_timeout_exception(self):
 
@@ -97,20 +100,27 @@ class Bookmaker(object):
         with open(dpath + "/info.txt", "w+", encoding="utf8") as f:
             f.write("Превышен таймаут соединения")
 
-    def download_events(self, debug_page):
+    def download_events(self, scraping_url, debug_page=None):
+
         bookmaker_name = self.bookmaker_name
 
-        print(bookmaker_name + ": Начата загрузка данных с сайта")
+        if debug_page is not None:
+            print("Данные будут получены с отладочной страницы")
+            try:
+                handicaps = self._scrape_page(debug_page)["handicap"]
+            except Exception:
+                print("Произошли ошибки при парсинге данных")
+                raise
+            print("Данные успешно получены с отладочной страницы")
+        else:
+            print(bookmaker_name + ": Начата загрузка данных с сайта")
 
-        # try:
-        #     handicaps = self.live_handicaps(scraping_url)
-        # except Exception:
-        #     print("Произошли ошибки при парсинге данных")
-        #     raise
-
-        handicaps = self._scrape_page(debug_page)["handicap"]
-
-        print(bookmaker_name + ": Данные успешно загружены с сайта")
+            try:
+                handicaps = self.live_handicaps(scraping_url)
+            except Exception:
+                print("Произошли ошибки при парсинге данных")
+                raise
+            print(bookmaker_name + ": Данные успешно загружены с сайта")
 
         for h in handicaps:
             h["bookmaker"] = self.bookmaker_id
