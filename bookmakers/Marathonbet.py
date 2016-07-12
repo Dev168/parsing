@@ -208,12 +208,12 @@ class Marathonbet(Bookmaker):
                 handicap = {}
 
                 handicap["firstforward"] = get_forward_string(str(n[m][index_of_hand]))
-                handicap["sport"] = str(a.text).title()
-                handicap["firstparticipant"] = get_part_string(str(n[m][index_of_hand]))
+                handicap["sport"] = str(a.text).title().strip()
+                handicap["firstparticipant"] = get_part_string(str(n[m][index_of_hand])).strip()
 
                 handicap["secondforward"] = get_forward_string(n[m][index_of_hand1])
-                handicap["league"] = get_league(ev)
-                handicap["secondparticipant"] = get_part_string(str(n[m][index_of_hand1]))
+                handicap["league"] = get_league(ev).strip()
+                handicap["secondparticipant"] = get_part_string(str(n[m][index_of_hand1])).strip()
                 handicap["firstwin"] = c[m][index_of_hand]
 
                 handicap["secondwin"] = c[m][index_of_hand1]
@@ -260,16 +260,16 @@ class Marathonbet(Bookmaker):
 
                 result2way = {}
 
-                if (a.text == "Basketball"):
-                    result2way["firstparticipant"] = get_part_string(str(n[m][index_of_hand]))
-                    result2way["secondparticipant"] = get_part_string(str(n[m][index_of_hand1]))
+                if (str(a.text).title() == "Basketball"):
+                    result2way["firstparticipant"] = get_part_string(str(n[m][index_of_hand])).strip()
+                    result2way["secondparticipant"] = get_part_string(str(n[m][index_of_hand1])).strip()
                 else:
-                    result2way["firstparticipant"] = remove_to_win(get_part_string(str(n[m][index_of_hand])))
-                    result2way["secondparticipant"] = remove_to_win(get_part_string(str(n[m][index_of_hand1])))
+                    result2way["firstparticipant"] = remove_to_win(get_part_string(str(n[m][index_of_hand]))).strip()
+                    result2way["secondparticipant"] = remove_to_win(get_part_string(str(n[m][index_of_hand1]))).strip()
                 result2way["draw"] = None
-                result2way["sport"] = str(a.text).title()
+                result2way["sport"] = str(a.text).title().strip()
                 result2way["firstwin"] = c[m][index_of_hand]
-                result2way["league"] = get_league(ev)
+                result2way["league"] = get_league(ev).strip()
                 result2way["secondwin"] = c[m][index_of_hand1]
                 result2way["live"] = True
                 result2way["href"] = "https://www.marafonsportsbook.com/en/live/animation/" + str(hrefs[m])
@@ -314,13 +314,13 @@ class Marathonbet(Bookmaker):
 
                 moneyline = {}
 
-                moneyline["firstparticipant"] = remove_to_win(get_part_string(str(n[m][index_of_hand])))
+                moneyline["firstparticipant"] = remove_to_win(get_part_string(str(n[m][index_of_hand]))).strip()
 
                 moneyline["sport"] = "Football"
 
-                moneyline["secondparticipant"] = remove_to_win(get_part_string(str(n[m][index_of_hand1])))
+                moneyline["secondparticipant"] = remove_to_win(get_part_string(str(n[m][index_of_hand1]))).strip()
                 moneyline["firstwin"] = c[m][index_of_hand]
-                moneyline["league"] = get_league(ev)
+                moneyline["league"] = get_league(ev).strip()
                 moneyline["secondwin"] = c[m][index_of_hand1]
                 moneyline["draw"] = c[m][index_of_draw]
                 moneyline["live"] = True
