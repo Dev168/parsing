@@ -127,10 +127,11 @@ class Bookmaker(object):
             h["oddsdate"] = datetime.utcnow()
             h["actual"] = True
 
-        handicaps = resolve_all_links(handicaps)
-
-        create_handicaps(handicaps)
-
+        if len(handicaps) > 0:
+            handicaps = resolve_all_links(handicaps)
+            create_handicaps(handicaps)
+        else:
+            print("Данные по ссылке {0} отсутствуют".format(scraping_url))
         print(bookmaker_name + ": Работа успешно завершена")
 
 

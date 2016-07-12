@@ -136,6 +136,8 @@ def replace_attribute_value(substitutional_objs, subsitutable_objs, match_attrs,
 
 def resolve_all_links(data):
 
+
+
     data = resolve_links(data, ("sport",), "bookmaker", "sports")
 
     bk = data[0]["bookmaker"]  # Величайший костыль всех времен
