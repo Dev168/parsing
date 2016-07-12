@@ -88,7 +88,10 @@ def insert_to_db(absent_names, table, filter_field, filter_value, bk):
             sql_request = "INSERT INTO {0} (`Name`, `{1}`, `Bookmaker`) VALUES (%s, {2}, {3})"\
                 .format(table, filter_field, filter_value, bk)
         par = [(el,) for el in absent_names]
-        cursor.executemany(sql_request, par)
+        try:
+            cursor.executemany(sql_request, par)
+        except:
+            raise
 
     return get_from_db(table, absent_names, filter_field, filter_value)
 

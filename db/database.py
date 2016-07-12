@@ -124,9 +124,10 @@ def create_handicaps(handicaps):
              h["oddsdate"], h["live"], h["href"], h["firstparticipant"], h["secondparticipant"],
              h["bookmaker"], h["actual"], h["sport"], h["league"])
         )
-
-    cursor.executemany(sql_code, params)
-
+    try:
+        cursor.executemany(sql_code, params)
+    except:
+        raise
     conn.commit()
 
     logger.info("Добавлено {0} гандикапов".format(len(handicaps)))
@@ -160,7 +161,7 @@ def create_moneylines(moneylines):
     cursor = conn.cursor()
 
     sql_code = 'INSERT INTO moneylines ' \
-               '(`firstwin`, `secondwin`, `draw`' \
+               '(`firstwin`, `secondwin`, `draw`, ' \
                ' `oddsdate`, `live`, `href`, `firstparticipant`, `secondparticipant`,' \
                ' `bookmaker`, `actual`, `sport`, `league`)' \
                ' VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
