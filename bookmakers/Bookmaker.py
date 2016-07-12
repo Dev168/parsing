@@ -8,7 +8,6 @@ import traceback
 import logging
 
 
-
 class Bookmaker(object):
 
     __metaclass__ = ABCMeta
@@ -117,7 +116,7 @@ class Bookmaker(object):
         time = datetime.utcnow()
         logname = time.strftime("%d.%m.%Y.log")
         logpath = os.path.join(LOG_DIR, logname)
-        logging.basicConfig(filename=logpath, level=logging.DEBUG, format='%(asctime)s - %(threadName)s - '
+        logging.basicConfig(filename=logpath, level=logging.INFO, format='%(asctime)s - %(threadName)s - '
                                                                           '%(levelname)s - %(message)s')
         logger = logging.getLogger(__name__)
 
