@@ -1,7 +1,7 @@
 import json
 import os
 import MySQLdb as mysql
-
+import logging
 from settings import DB_HOST, DB_NAME, DB_USER, DB_PASSWD
 
 DIRNAME = os.path.dirname(os.path.abspath("__file__"))
@@ -101,7 +101,10 @@ def create_sports(sports):
 
 def create_handicaps(handicaps):
 
+    logger = logging.getLogger(__name__)
     delete_previous("handicaps", handicaps[0]["bookmaker"], handicaps[0]["sport"])
+    logger.info("Из базы данных удалены все гандикапы по конторе {0} и спорту {1}".
+                format(handicaps[0]["bookmaker"], handicaps[0]["sport"]))
 
     conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME, use_unicode=True, charset='utf8')
 
@@ -126,6 +129,8 @@ def create_handicaps(handicaps):
 
     conn.commit()
 
+    logger.info("Добавлено {0} гандикапов".format(len(handicaps)))
+
     conn.close()
 
 
@@ -141,11 +146,41 @@ def delete_previous(table, bookmaker, sport):
 
     conn.commit()
 
-    print("Предыдущие данные были удалены")
-
     conn.close()
 
 
+def create_moneylines(moneylines):
+    logger = logging.getLogger(__name__)
+    delete_previous("moneylines", moneylines[0]["bookmaker"], moneylines[0]["sport"])
+    logger.info("Из базы данных удалены все манилайны по конторе {0} и спорту {1}".
+                format(moneylines[0]["bookmaker"], moneylines[0]["sport"]))
+
+    conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME, use_unicode=True, charset='utf8')
+
+    cursor = conn.cursor()
+
+    sql_code = 'INSERT INTO moneylines ' \
+               '(`firstwin`, `secondwin`, `draw`' \
+               ' `oddsdate`, `live`, `href`, `firstparticipant`, `secondparticipant`,' \
+               ' `bookmaker`, `actual`, `sport`, `league`)' \
+               ' VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+
+    params = []
+
+    for h in moneylines:
+        params.append(
+            (h["firstwin"], h["secondwin"], h["draw"],
+             h["oddsdate"], h["live"], h["href"], h["firstparticipant"], h["secondparticipant"],
+             h["bookmaker"], h["actual"], h["sport"], h["league"])
+        )
+
+    cursor.executemany(sql_code, params)
+
+    conn.commit()
+
+    logger.info("Добавлено {0} манилайнов".format(len(moneylines)))
+
+    conn.close()
 
 
 

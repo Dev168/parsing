@@ -31,7 +31,7 @@ class Sbobet(Bookmaker):
 
     def _scrape_page(self, page):
 
-        def scrap_vs(game_tag, game):
+        def scrap_moneyline(game_tag, game):
 
             spans = game_tag.find("div", class_="DateTimeTxt").find_all("span")
             if game["live"]:
@@ -110,7 +110,7 @@ class Sbobet(Bookmaker):
 
             game["href"] = columns[4].a["href"]
 
-        def scrap_moneyline(game_tag, game):
+        def scrap_result2way(game_tag, game):
             spans = game_tag.find("div", class_="DateTimeTxt").find_all("span")
 
             if game["live"]:
@@ -139,11 +139,11 @@ class Sbobet(Bookmaker):
 
             game["href"] = columns[4].a["href"]
 
-        vs = []
+        moneyline = []
 
         handicap = []
 
-        moneyline = []
+        result2way = []
 
         doc = bs4.BeautifulSoup(page, "html.parser")
 
@@ -170,12 +170,12 @@ class Sbobet(Bookmaker):
 
                     if odds_type == "1X2":  # Если тип ставки - 1х2, то меняем функцию обработки
                         # строчки с матчем (т.к. различается)
-                        scrap_func = scrap_vs
-                        data = vs
-
-                    if odds_type == "Money Line":
                         scrap_func = scrap_moneyline
                         data = moneyline
+
+                    if odds_type == "Money Line":
+                        scrap_func = scrap_result2way
+                        data = result2way
 
                     leagues = odds_type_tag.find_all("div", class_="MarketLea")
 
@@ -199,7 +199,11 @@ class Sbobet(Bookmaker):
                             if live:
                                 data.append(game)
 
-        return {"vs": vs, "handicap": handicap, "moneyline": moneyline}
+        for game in result2way:
+            game["draw"] = None
+            moneyline.append(game)
+
+        return {"moneyline": moneyline, "handicap": handicap}
 
     def get_scraping_urls(self):
         return ["https://www.sbobet.com/euro/football",

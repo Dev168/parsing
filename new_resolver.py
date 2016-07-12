@@ -1,6 +1,6 @@
 import MySQLdb as mysql
 from settings import DB_HOST, DB_NAME, DB_USER, DB_PASSWD
-
+import logging
 
 def resolve_links(list_of_dicts, aim_fields, filter_field, table, bk=None):
 
@@ -67,6 +67,9 @@ def get_id_from_db(dict_of_lists, table, filter_field, bk):
                 result.append({filter_field: key, "aim_field": name, "id_": id_})
 
         if len(absent_names) > 0:
+            logger = logging.getLogger(__name__)
+            msg = "В базе данных отсутствуют следующие имена, которые будут созданы: \n" + "; ".join(absent_names)
+            logger.info(msg)
             tuples = insert_to_db(absent_names, table, filter_field, key, bk)
 
             for name in absent_names:
@@ -136,14 +139,18 @@ def replace_attribute_value(substitutional_objs, subsitutable_objs, match_attrs,
 
 def resolve_all_links(data):
 
-
-
-    data = resolve_links(data, ("sport",), "bookmaker", "sports")
-
     bk = data[0]["bookmaker"]  # Величайший костыль всех времен
 
+    logger = logging.getLogger(__name__)
+    logger.info("Всего к обработке: {0} событий".format(len(data)))
+
+    logger.info("Начало обработки ссылок на спорт")
+    data = resolve_links(data, ("sport",), "bookmaker", "sports")
+
+    logger.info("Начало обработки ссылок на лиги")
     data = resolve_links(data, ("league",), "sport", "leagues", bk)
 
+    logger.info("Начало обработки ссылок на участников")
     data = resolve_links(data, ("firstparticipant", "secondparticipant"), "league", "participants", bk)
 
     return data

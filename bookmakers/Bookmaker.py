@@ -1,10 +1,12 @@
 import os
 from datetime import datetime, timedelta
 from abc import abstractmethod, ABCMeta
-from settings import LOG_DIR, PROJECT_PATH
-from db.database import create_handicaps
+from settings import LOG_DIR
+from db.database import create_handicaps, create_moneylines
 from new_resolver import resolve_all_links
 import traceback
+import logging
+
 
 
 class Bookmaker(object):
@@ -46,11 +48,14 @@ class Bookmaker(object):
 
     def events(self, url=None, debug_page=None):
 
-        try:
+        logger = logging.getLogger(__name__)
 
+        try:
             if debug_page is None:
+                logger.info("{0}: Начало загрузки страницы {1} с сайта".format(self.bookmaker_name, url))
                 page = self._get_page(url)
             else:
+                logger.info("{0}: Работа будет произведена с отладочной страницей".format(self.bookmaker_name))
                 page = debug_page
 
         except self._timeoutexception:
@@ -58,20 +63,17 @@ class Bookmaker(object):
             raise
 
         try:
+            logger.info("{0}: Начало парсинга страницы".format(self.bookmaker_name))
+            result = self._scrape_page(page)
 
-            return self._scrape_page(page)
+        except (IndexError, AttributeError, Exception):
+            self._debug_scraping_error(page)
 
-        except (IndexError, AttributeError, Exception) as exc:
-            self._debug_scraping_error(page, exc)
-            raise
+        return result
 
-    def live_handicaps(self, url=None):
-        try:
-            return self.events(url)["handicap"]
-        except:
-            raise
+    def _debug_scraping_error(self, page):
 
-    def _debug_scraping_error(self, page, exc):
+        logger = logging.getLogger(__name__)
 
         time = datetime.utcnow() + timedelta(hours=3)
 
@@ -79,6 +81,10 @@ class Bookmaker(object):
         dpath = os.path.join(self.bookmaker_log_dir, dname)
 
         os.makedirs(dpath)
+
+        error_msg = "{0}: Ошибки при парсинге страницы\n".format(self.bookmaker_name)
+        error_msg += traceback.format_exc()
+        logger.error(error_msg)
 
         with open(dpath + "/page.html", "w+", encoding="utf8") as f:
             f.write(page)
@@ -90,6 +96,8 @@ class Bookmaker(object):
 
     def _debug_timeout_exception(self):
 
+        logger = logging.getLogger(__name__)
+
         time = datetime.utcnow() + timedelta(hours=3)
 
         dname = time.strftime("%Y-%m-%d_%H-%M-%S") + " load page error"
@@ -97,41 +105,61 @@ class Bookmaker(object):
 
         os.makedirs(dpath)
 
+        error_msg = "{0}: Превышен таймаут соединения\n".format(self.bookmaker_name)
+        error_msg += traceback.format_exc()
+        logger.error(error_msg)
+
         with open(dpath + "/info.txt", "w+", encoding="utf8") as f:
             f.write("Превышен таймаут соединения")
 
     def download_events(self, scraping_url, debug_page=None):
 
+        time = datetime.utcnow()
+        logname = time.strftime("%d.%m.%Y.log")
+        logpath = os.path.join(LOG_DIR, logname)
+        logging.basicConfig(filename=logpath, level=logging.DEBUG, format='%(asctime)s - %(threadName)s - '
+                                                                          '%(levelname)s - %(message)s')
+        logger = logging.getLogger(__name__)
+
         bookmaker_name = self.bookmaker_name
+        logger.info("{0}: Начало загрузки данных".format(bookmaker_name))
 
-        if debug_page is not None:
-            print("Данные будут получены с отладочной страницы")
-            try:
-                handicaps = self._scrape_page(debug_page)["handicap"]
-            except Exception:
-                print("Произошли ошибки при парсинге данных")
-                raise
-            print("Данные успешно получены с отладочной страницы")
-        else:
-            print(bookmaker_name + ": Начата загрузка данных с сайта")
+        try:
+            events = self.events(scraping_url, debug_page)
+            logger.info("{0}: События успешно получены".format(bookmaker_name))
+        except:
+            logger.error("{0}: Не удалось получить события".format(bookmaker_name))
+            raise
 
-            try:
-                handicaps = self.live_handicaps(scraping_url)
-            except Exception:
-                print("Произошли ошибки при парсинге данных")
-                raise
-            print(bookmaker_name + ": Данные успешно загружены с сайта")
+        # Костыли, TODO: убрать!!!
+        handicaps = events["handicap"]
+        moneylines = events["moneyline"]
 
         for h in handicaps:
             h["bookmaker"] = self.bookmaker_id
             h["oddsdate"] = datetime.utcnow()
             h["actual"] = True
 
+        for m in moneylines:
+            m["bookmaker"] = self.bookmaker_id
+            m["oddsdate"] = datetime.utcnow()
+            m["actual"] = True
+        # Костыли, конец
+
         if len(handicaps) > 0:
+            logger.info("{0}: Начало разрешения ссылок в гандикапах".format(bookmaker_name))
             handicaps = resolve_all_links(handicaps)
             create_handicaps(handicaps)
         else:
-            print("Данные по ссылке {0} отсутствуют".format(scraping_url))
-        print(bookmaker_name + ": Работа успешно завершена")
+            logger.info("{0}: Гандикапы на странице {1} отсутствуют".format(bookmaker_name, scraping_url))
+
+        if len(moneylines) > 0:
+            logger.info("{0}: Начало разрешения ссылок в манилайнах".format(bookmaker_name))
+            moneylines = resolve_all_links(moneylines)
+            create_moneylines(moneylines)
+        else:
+            logger.info("{0}: Манилайны на странице {1} отсутствуют".format(bookmaker_name, scraping_url))
+
+        logger.info("{0}: Загрузка со страницы {1} завершена".format(bookmaker_name, scraping_url))
 
 
