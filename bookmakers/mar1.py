@@ -4,7 +4,8 @@ import re
 import sys
 import os
 from datetime import datetime
-
+from multiprocessing import Process
+from time import sleep
 
 def events(url="https://www.marathonbet9.com/ru/live/popular"):
 
@@ -1511,3 +1512,5 @@ def get_scraping_urls(self):
     "https://www.marafonbet.info/en/live/22723",
     "https://www.marafonbet.info/en/live/120866"
     ]
+
+

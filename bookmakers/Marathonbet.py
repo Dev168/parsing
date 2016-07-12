@@ -266,7 +266,7 @@ class Marathonbet(Bookmaker):
                 else:
                     result2way["firstparticipant"] = remove_to_win(get_part_string(str(n[m][index_of_hand])))
                     result2way["secondparticipant"] = remove_to_win(get_part_string(str(n[m][index_of_hand1])))
-
+                result2way["draw"] = None
                 result2way["sport"] = a.text
                 result2way["firstwin"] = c[m][index_of_hand]
                 result2way["league"] = get_league(ev)
@@ -416,7 +416,7 @@ class Marathonbet(Bookmaker):
                     new_list_result2way.append(inner_list[0])
 
             d["handicap"] = new_list_hand
-            d["result2way"] = new_list_result2way
+            d["moneyline"] = new_list_result2way
 
         return d
 
