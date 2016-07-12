@@ -7,6 +7,7 @@ from datetime import datetime
 from multiprocessing import Process
 from time import sleep
 
+
 def events(url="https://www.marathonbet9.com/ru/live/popular"):
 
     html_text = requests.get(url).text
@@ -343,7 +344,6 @@ def events(url="https://www.marathonbet9.com/ru/live/popular"):
 
 
     return unite_dict(get_list_of_hand(),get_list_of_money(),get_list_of_result2way(),get_list_of_chance())
-
 
 
 
@@ -1198,7 +1198,6 @@ def baseball(url="https://www.marafonbet.info/en/live/120866"):
         d["result_2way"] = moneyline
         return d
 def basket(url="https://www.marathonplay.com/en/live/45356"):
-
     url1 = "https://www.marathonplay.com/en/live/45356"
 
     cookie = {'panbet.sitestyle': 'MULTIMARKETS'}
@@ -1351,9 +1350,10 @@ def basket(url="https://www.marathonplay.com/en/live/45356"):
             events.append(span['data-event-name'])
             hrefs.append(span['data-event-treeid'])
 
-            odds[i] = span.find_all("td",
+            odds[i] = span.find_all("td", {"data-market-type":True},
                                     {'class': lambda x: x
                                                         and 'price' in x.split()
+
                                      }
                                     )
 

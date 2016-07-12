@@ -182,9 +182,10 @@ class Marathonbet(Bookmaker):
                     events.append(span['data-event-name'])
                     hrefs.append(span['data-event-treeid'])
 
-                    odds[i] = span.find_all("td",
+                    odds[i] = span.find_all("td", {"data-market-type": True},
                                             {'class': lambda x: x
                                                                 and 'price' in x.split()
+
                                              }
                                             )
 
