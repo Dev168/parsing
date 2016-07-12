@@ -214,9 +214,9 @@ class Marathonbet(Bookmaker):
                 handicap["secondforward"] = get_forward_string(n[m][index_of_hand1])
                 handicap["league"] = get_league(ev).strip()
                 handicap["secondparticipant"] = get_part_string(str(n[m][index_of_hand1])).strip()
-                handicap["firstwin"] = c[m][index_of_hand]
+                handicap["firstwin"] = round(float(c[m][index_of_hand]),2)
 
-                handicap["secondwin"] = c[m][index_of_hand1]
+                handicap["secondwin"] = round(float(c[m][index_of_hand1]),2)
                 handicap["live"] = True
                 handicap["href"] = "https://www.marafonsportsbook.com/en/live/animation/" + str(hrefs[m])
                 return handicap
@@ -268,9 +268,9 @@ class Marathonbet(Bookmaker):
                     result2way["secondparticipant"] = remove_to_win(get_part_string(str(n[m][index_of_hand1]))).strip()
                 result2way["draw"] = None
                 result2way["sport"] = str(a.text).title().strip()
-                result2way["firstwin"] = c[m][index_of_hand]
+                result2way["firstwin"] = round(float(c[m][index_of_hand]),2)
                 result2way["league"] = get_league(ev).strip()
-                result2way["secondwin"] = c[m][index_of_hand1]
+                result2way["secondwin"] = round(float(c[m][index_of_hand1]),2)
                 result2way["live"] = True
                 result2way["href"] = "https://www.marafonsportsbook.com/en/live/animation/" + str(hrefs[m])
                 return result2way
@@ -319,10 +319,10 @@ class Marathonbet(Bookmaker):
                 moneyline["sport"] = "Football"
 
                 moneyline["secondparticipant"] = remove_to_win(get_part_string(str(n[m][index_of_hand1]))).strip()
-                moneyline["firstwin"] = c[m][index_of_hand]
+                moneyline["firstwin"] = round(float(c[m][index_of_hand]),2)
                 moneyline["league"] = get_league(ev).strip()
-                moneyline["secondwin"] = c[m][index_of_hand1]
-                moneyline["draw"] = c[m][index_of_draw]
+                moneyline["secondwin"] = round(float(c[m][index_of_hand1]),2)
+                moneyline["draw"] = round(float(c[m][index_of_draw]),2)
                 moneyline["live"] = True
                 moneyline["href"] = "https://www.marafonsportsbook.com/en/live/animation/" + str(hrefs[m])
                 return moneyline

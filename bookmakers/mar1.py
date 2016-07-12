@@ -815,9 +815,9 @@ def tennis(url="https://www.marafonbet.info/en/live/22723"):
             handicap["secondforward"] = get_forward_string(n[m][index_of_hand1])
             handicap["league"] = get_league(ev)
             handicap["secondparticipant"] = get_part_string(str(n[m][index_of_hand1]))
-            handicap["firstwin"] = c[m][index_of_hand]
+            handicap["firstwin"] = round(float(c[m][index_of_hand]),2)
 
-            handicap["secondwin"] = c[m][index_of_hand1]
+            handicap["secondwin"] = round(float(c[m][index_of_hand1]),2)
             handicap["live"] = True
             handicap["href"] = "https://www.marafonsportsbook.com/en/live/animation/" + str(hrefs[m])
             return handicap
