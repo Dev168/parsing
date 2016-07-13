@@ -75,6 +75,7 @@ class Bookmaker(object):
 
         except (IndexError, AttributeError, Exception):
             self._debug_scraping_error(page)
+            raise
 
         return result
 

@@ -128,6 +128,7 @@ def create_handicaps(handicaps):
         cursor.executemany(sql_code, params)
     except:
         raise
+        conn.close()
     conn.commit()
 
     logger.info("Добавлено {0} гандикапов".format(len(handicaps)))

@@ -6,6 +6,7 @@ import pandas
 import logging
 import os
 from datetime import datetime
+import db_api
 
 
 def _cartesian_product(df):
@@ -41,21 +42,11 @@ def get_best_matching(rows: list) -> list:
 
 def match_sports():
 
-    conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME, use_unicode=True, charset='utf8')
+    result = db_api.get_sports()
 
-    cursor = conn.cursor()
+    optimized_result = [(el[0], el[1], el[2]) for el in result if el[4] is None]
 
-    sql_code = 'SELECT sports.id, sports.name, sports.bookmaker ' \
-               'FROM sports ' \
-               'LEFT JOIN sportsmatch ' \
-               'ON sports.id = sportsmatch.sport ' \
-               'WHERE sportsmatch.uuid IS NULL'
-
-    cursor.execute(sql_code)
-
-    result = list(cursor.fetchall())
-
-    df = pandas.DataFrame(result, columns=["id", "name", "bookmaker"])
+    df = pandas.DataFrame(optimized_result, columns=["id", "name", "bookmaker"])
 
     df2 = _cartesian_product(df)
 
@@ -91,16 +82,7 @@ def match_sports():
 
     logger.info(msg)
 
-    sqlcode = "INSERT into sportsmatch (`sport`, `uuid`) VALUES (%s, %s)"
-
-    try:
-        cursor.executemany(sqlcode, insert_rows)
-    except:
-        conn.close()
-        raise
-    conn.commit()
-
-    conn.close()
+    db_api.update_sports(insert_rows)
 
 
 def match_leagues():
