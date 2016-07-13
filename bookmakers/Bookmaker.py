@@ -8,6 +8,11 @@ import traceback
 import logging
 
 
+class GetSportPageException(Exception):
+    def __init__(self, *args, **kwargs):
+        Exception.__init__(self, *args, **kwargs)
+
+
 class Bookmaker(object):
 
     __metaclass__ = ABCMeta
@@ -20,7 +25,6 @@ class Bookmaker(object):
 
         if not os.path.exists(LOG_DIR):
             os.makedirs(LOG_DIR)
-
 
         if not os.path.exists(bookmaker_log_dir):
             os.makedirs(bookmaker_log_dir)
@@ -59,6 +63,10 @@ class Bookmaker(object):
 
         except self._timeoutexception:
             self._debug_timeout_exception()
+            raise
+
+        except GetSportPageException:
+            logger.error("{0}: Невозможно получить страницу".format(self.bookmaker_name))
             raise
 
         try:
