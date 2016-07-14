@@ -59,14 +59,12 @@ def match_sports():
 
     df4 = df3[df3.distance < 0.35]
 
+    if df4.empty:
+        return
+
     rows = [tuple(x) for x in df4[['id_x', 'id_y', 'distance', 'name_x', 'name_y']].values]
 
     best_rows = get_best_matching(rows)
-    insert_rows = []
-    for row in best_rows:
-        uuid_ = uuid4().bytes.hex()
-        insert_rows.append((row[0], uuid_))
-        insert_rows.append((row[1], uuid_))
 
     best_rows_msg = "\n".join([
         row[3] + " = " + row[4] + ": distance = " + str(row[2]) for row in best_rows
@@ -82,7 +80,7 @@ def match_sports():
 
     logger.info(msg)
 
-    db_api.update_sports(insert_rows)
+    db_api.update_sports(best_rows)
 
 
 def match_leagues():
@@ -222,12 +220,12 @@ def match_participants():
 match_sports()
 
 
-match_leagues()
-
-
-match_participants()
-
-
+# match_leagues()
+#
+#
+# match_participants()
+#
+#
 
 
 
