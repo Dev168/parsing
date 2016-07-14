@@ -40,6 +40,23 @@ def get_best_matching(rows: list) -> list:
     return best_rows
 
 
+def log_info(best_rows):
+    best_rows_msg = "\n".join([
+                                  row[3] + " = " + row[4] + ": distance = " + str(row[2]) for row in best_rows
+                                  ])
+
+    msg = "Следующие лиги будут связаны: \n" + best_rows_msg
+
+    time = datetime.utcnow()
+    logname = time.strftime("auto_bind_%d.%m.%Y.log")
+    logpath = os.path.join(LOG_DIR, logname)
+    logging.basicConfig(filename=logpath, level=logging.INFO, format='%(asctime)s - '
+                                                                     '%(levelname)s - %(message)s')
+    logger = logging.getLogger(__name__)
+
+    logger.info(msg)
+
+
 def match_sports():
 
     result = db_api.get_sports()
@@ -66,41 +83,16 @@ def match_sports():
 
     best_rows = get_best_matching(rows)
 
-    best_rows_msg = "\n".join([
-        row[3] + " = " + row[4] + ": distance = " + str(row[2]) for row in best_rows
-    ])
-    msg = "Следующие спорты будут связаны: \n" + best_rows_msg
-
-    time = datetime.utcnow()
-    logname = time.strftime("auto_bind_%d.%m.%Y.log")
-    logpath = os.path.join(LOG_DIR, logname)
-    logging.basicConfig(filename=logpath, level=logging.INFO, format='%(asctime)s - '
-                                                                     '%(levelname)s - %(message)s')
-    logger = logging.getLogger(__name__)
-
-    logger.info(msg)
+    log_info(best_rows)
 
     db_api.update_sports(best_rows)
 
 
 def match_leagues():
 
-    conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME, use_unicode=True, charset='utf8')
+    leagues = db_api.get_leagues()
 
-    cursor = conn.cursor()
-
-    sql_code = 'SELECT leagues.id, leagues.name, leagues.bookmaker, sportsmatch.uuid as sport ' \
-               'FROM leagues ' \
-               'LEFT JOIN sportsmatch ' \
-               'ON leagues.sport = sportsmatch.sport ' \
-               'LEFT JOIN leaguesmatch ' \
-               'ON leagues.id = leaguesmatch.league ' \
-               'WHERE sportsmatch.uuid IS NOT NULL ' \
-               'AND leaguesmatch.uuid IS NULL'
-
-    cursor.execute(sql_code)
-
-    result = list(cursor.fetchall())
+    result = [(row[0], row[1], row[2], row[5]) for row in leagues if row[4] is None]
 
     df = pandas.DataFrame(result, columns=["id", "name", "bookmaker", "sport"])
 
@@ -115,59 +107,23 @@ def match_leagues():
 
     df4 = df3[df3.distance < 0.35]
 
+    if df4.empty:
+        return
+
     rows = [tuple(x) for x in df4[['id_x', 'id_y', 'distance', 'name_x', 'name_y']].values]
 
     best_rows = get_best_matching(rows)
-    insert_rows = []
-    for row in best_rows:
-        uuid_ = uuid4().bytes.hex()
-        insert_rows.append((row[0], uuid_))
-        insert_rows.append((row[1], uuid_))
 
-    best_rows_msg = "\n".join([
-                                  row[3] + " = " + row[4] + ": distance = " + str(row[2]) for row in best_rows
-                                  ])
-    msg = "Следующие лиги будут связаны: \n" + best_rows_msg
+    log_info(best_rows)
 
-    time = datetime.utcnow()
-    logname = time.strftime("auto_bind_%d.%m.%Y.log")
-    logpath = os.path.join(LOG_DIR, logname)
-    logging.basicConfig(filename=logpath, level=logging.INFO, format='%(asctime)s - '
-                                                                     '%(levelname)s - %(message)s')
-    logger = logging.getLogger(__name__)
-
-    logger.info(msg)
-
-    sqlcode = "INSERT into leaguesmatch (`league`, `uuid`) VALUES (%s, %s)"
-
-    try:
-        cursor.executemany(sqlcode, insert_rows)
-    except:
-        conn.close()
-        raise
-    conn.commit()
-
-    conn.close()
+    db_api.update_leagues(best_rows)
 
 
 def match_participants():
 
-    conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME, use_unicode=True, charset='utf8')
+    participants = db_api.get_participants()
 
-    cursor = conn.cursor()
-
-    sql_code = 'SELECT participants.id, participants.name, participants.bookmaker, leaguesmatch.uuid as league ' \
-               'FROM participants ' \
-               'LEFT JOIN leaguesmatch ' \
-               'ON participants.league = leaguesmatch.league ' \
-               'LEFT JOIN participantsmatch ' \
-               'ON participants.id = participantsmatch.participant ' \
-               'WHERE leaguesmatch.uuid IS NOT NULL ' \
-               'AND participantsmatch.uuid IS NULL'
-
-    cursor.execute(sql_code)
-
-    result = list(cursor.fetchall())
+    result = [(row[0], row[1], row[2], row[5]) for row in participants if row[4] is None]
 
     df = pandas.DataFrame(result, columns=["id", "name", "bookmaker", "league"])
 
@@ -182,50 +138,18 @@ def match_participants():
 
     df4 = df3[df3.distance < 0.35]
 
+    if df4.empty:
+        return
+
     rows = [tuple(x) for x in df4[['id_x', 'id_y', 'distance', 'name_x', 'name_y']].values]
 
     best_rows = get_best_matching(rows)
-    insert_rows = []
-    for row in best_rows:
-        uuid_ = uuid4().bytes.hex()
-        insert_rows.append((row[0], uuid_))
-        insert_rows.append((row[1], uuid_))
 
-    best_rows_msg = "\n".join([
-                                  row[3] + " = " + row[4] + ": distance = " + str(row[2]) for row in best_rows
-                                  ])
-    msg = "Следующие участники будут связаны: \n" + best_rows_msg
+    log_info(best_rows)
 
-    time = datetime.utcnow()
-    logname = time.strftime("auto_bind_%d.%m.%Y.log")
-    logpath = os.path.join(LOG_DIR, logname)
-    logging.basicConfig(filename=logpath, level=logging.INFO, format='%(asctime)s - '
-                                                                     '%(levelname)s - %(message)s')
-    logger = logging.getLogger(__name__)
-
-    logger.info(msg)
-
-    sqlcode = "INSERT into participantsmatch (`participant`, `uuid`) VALUES (%s, %s)"
-
-    try:
-        cursor.executemany(sqlcode, insert_rows)
-    except:
-        conn.close()
-        raise
-    conn.commit()
-
-    conn.close()
+    db_api.update_participants(best_rows)
 
 
-match_sports()
-
-
-# match_leagues()
-#
-#
-# match_participants()
-#
-#
 
 
 

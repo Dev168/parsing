@@ -100,7 +100,7 @@ class Bookmaker(object):
         with open(dpath + "/info.txt", "w+", encoding="utf8") as f:
             f.write(traceback.format_exc())
 
-        traceback.format_exc()
+        raise
 
     def _debug_timeout_exception(self):
 
@@ -120,7 +120,7 @@ class Bookmaker(object):
         with open(dpath + "/info.txt", "w+", encoding="utf8") as f:
             f.write("Превышен таймаут соединения")
 
-    def download_events(self, scraping_url, debug_page=None):
+    def download_events(self, scraping_url=None, debug_page=None):
 
         time = datetime.utcnow()
         logname = time.strftime("%d.%m.%Y.log")
