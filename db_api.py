@@ -40,7 +40,7 @@ def get_leagues(sport_uuid=None):
     #  TODO: Следующий код сильно подвержен SQL иньекциям! Необходимо переписать безопасно!
 
     if sport_uuid is None:
-        sportb_uuid_parameter = "WHERE sports.uuid IS NOT NULL"
+        sport_uuid_parameter = "WHERE sports.uuid IS NOT NULL"
     else:
         sport_uuid_parameter = "WHERE sports.uuid = %s" % sport_uuid
 

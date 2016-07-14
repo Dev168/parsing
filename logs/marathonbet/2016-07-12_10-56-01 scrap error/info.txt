@@ -1,8 +1,0 @@
-Traceback (most recent call last):
-  File "C:\Users\Administrator\PycharmProjects\BookmakerPlus\bookmakers\Bookmaker.py", line 62, in events
-    return self._scrape_page(page)
-  File "C:\Users\Administrator\PycharmProjects\BookmakerPlus\bookmakers\Marathonbet.py", line 191, in _scrape_page
-    new_odds[k].append(od['data-market-type'].strip())
-  File "C:\Program Files\Python35\lib\site-packages\bs4\element.py", line 958, in __getitem__
-    return self.attrs[key]
-KeyError: 'data-market-type'
