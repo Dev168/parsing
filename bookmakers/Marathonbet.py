@@ -88,6 +88,12 @@ class Marathonbet(Bookmaker):
 
             return q[0]
 
+        def is_empty(a):
+            if(len(str(a))>0):
+                return a
+            else:
+                return 1
+
         handicap_list = []
         moneyline = []
         result2way = []
@@ -107,7 +113,7 @@ class Marathonbet(Bookmaker):
 
         for ev in s:
             spans = []
-            spans = ev.find_all("tbody", class_="")
+            spans = ev.find_all("tbody",{"data-event-name":True}, class_="",)
 
             events = []
             hrefs = []
@@ -327,9 +333,9 @@ class Marathonbet(Bookmaker):
                 moneyline["sport"] = "Football"
 
                 moneyline["secondparticipant"] = remove_to_win(get_part_string(str(n[m][index_of_hand1]))).strip()
-                moneyline["firstwin"] = round(float(c[m][index_of_hand]),2)
+                moneyline["firstwin"] = is_empty(round(float(c[m][index_of_hand]),2))
                 moneyline["league"] = get_league(ev).strip()
-                moneyline["secondwin"] = round(float(c[m][index_of_hand1]),2)
+                moneyline["secondwin"] = is_empty(round(float(c[m][index_of_hand1]),2))
                 moneyline["draw"] = round(float(c[m][index_of_draw]),2)
                 moneyline["live"] = True
                 moneyline["href"] = "https://www.marafonsportsbook.com/en/live/animation/" + str(hrefs[m])
@@ -371,6 +377,7 @@ class Marathonbet(Bookmaker):
                 d["moneyline"] = list
                 return d
 
+
             def is_forward_zero(a):
                 if (str(a).find("(") == -1):
                     return 0
@@ -381,10 +388,11 @@ class Marathonbet(Bookmaker):
                 if (is_forward_zero(a) == 0):
                     return 0
                 else:
-                    return str(a[int(a.index("(") + 1):int(str(a.index(")")))].strip())
+                    return str(a[int(a.rfind("(") + 1):int(str(a.rfind(")")))].strip())
+
 
             def get_part_string(a):
-                if (is_forward_zero(a) == 0):
+                if (is_forward_zero(a) == 0)or(a.__contains__("Doubles")):
                     return a
                 else:
                     return str(a[:int(str(a.index("(")))].strip())

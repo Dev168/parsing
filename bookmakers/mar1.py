@@ -1522,3 +1522,9 @@ def get_scraping_urls(self):
     ]
 
 
+def isfloat(value):
+  try:
+    float(value)
+    return value
+  except ValueError:
+    return False
