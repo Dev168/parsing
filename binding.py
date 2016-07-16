@@ -1,7 +1,5 @@
-import MySQLdb as mysql
 from distance import distance
-from settings import DB_HOST, DB_NAME, DB_USER, DB_PASSWD, LOG_DIR
-from uuid import uuid4
+from settings import LOG_DIR
 import pandas
 import logging
 import os
@@ -149,7 +147,7 @@ def match_participants():
 
     db_api.update_participants(best_rows)
 
-
+match_participants()
 
 
 
