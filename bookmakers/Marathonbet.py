@@ -437,8 +437,8 @@ class Marathonbet(Bookmaker):
         return d
 
     def get_scraping_urls(self):
-        return ["https://www.marathonplay.com/en/live/26418",
-                "https://www.marathonplay.com/en/live/45356",
-                "https://www.marathonplay.com/en/live/22723",
-                "https://www.marathonplay.com/en/live/120866"
+        return ["https://www.marathonbet.com/en/live/26418",
+                "https://www.marathonbet.com/en/live/45356",
+                "https://www.marathonbet.com/en/live/22723",
+                "https://www.marathonbet.com/en/live/120866"
                 ]
