@@ -21,8 +21,7 @@ class Marathonbet(Bookmaker):
         proxystring = "http://{0}:{1}@{2}".format(PROXY[1], PROXY[2], PROXY[0])
         proxies = {"http": proxystring, "https": proxystring}
         response = requests.get(url, cookies=cookie, timeout=LOAD_WAIT_TIME, proxies=proxies)
-        is_red = response.links['canonical']['url'].__contains__("popular")
-
+        is_red = str(response.url).__contains__("popular")
         if is_red:
             raise GetSportPageException
 
