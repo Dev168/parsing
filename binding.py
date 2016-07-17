@@ -80,7 +80,7 @@ def match_sports():
                                   row[3] + " = " + row[4] + ": distance = " + str(row[2]) for row in best_rows
                                   ])
 
-    msg = "Следующие лиги будут связаны: \n" + best_rows_msg
+    msg = "Следующие спорты будут связаны: \n" + best_rows_msg
 
     logger.info(msg)
 
@@ -178,7 +178,7 @@ def match_participants():
                                   row[3] + " = " + row[4] + ": distance = " + str(row[2]) for row in best_rows
                                   ])
 
-    msg = "Следующие лиги будут связаны: \n" + best_rows_msg
+    msg = "Следующие участники будут связаны: \n" + best_rows_msg
 
     logger.info(msg)
 

@@ -3,6 +3,7 @@ import os
 import MySQLdb as mysql
 import logging
 from settings import DB_HOST, DB_NAME, DB_USER, DB_PASSWD
+from logs.log import get_logger
 
 DIRNAME = os.path.dirname(os.path.abspath("__file__"))
 
@@ -101,7 +102,7 @@ def create_sports(sports):
 
 def create_handicaps(handicaps):
 
-    logger = logging.getLogger(__name__)
+    logger = get_logger(__name__)
     delete_previous("handicaps", handicaps[0]["bookmaker"], handicaps[0]["sport"])
     logger.info("Из базы данных удалены все гандикапы по конторе {0} и спорту {1}".
                 format(handicaps[0]["bookmaker"], handicaps[0]["sport"]))
@@ -152,7 +153,7 @@ def delete_previous(table, bookmaker, sport):
 
 
 def create_moneylines(moneylines):
-    logger = logging.getLogger(__name__)
+    logger = get_logger(__name__)
     delete_previous("moneylines", moneylines[0]["bookmaker"], moneylines[0]["sport"])
     logger.info("Из базы данных удалены все манилайны по конторе {0} и спорту {1}".
                 format(moneylines[0]["bookmaker"], moneylines[0]["sport"]))
