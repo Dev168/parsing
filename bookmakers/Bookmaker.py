@@ -74,7 +74,7 @@ class Bookmaker(object):
             logger.info("{0}: Начало парсинга страницы".format(self.bookmaker_name))
             result = self._scrape_page(page)
 
-        except (IndexError, AttributeError, Exception):
+        except (IndexError, AttributeError, KeyError):
             self._debug_scraping_error(page)
             raise
 
@@ -131,7 +131,7 @@ class Bookmaker(object):
         try:
             events = self.events(scraping_url, debug_page)
             logger.info("{0}: События успешно получены".format(bookmaker_name))
-        except:
+        except (IndexError, AttributeError, KeyError, GetSportPageException, self._timeoutexception):
             logger.error("{0}: Не удалось получить события".format(bookmaker_name))
             raise
 

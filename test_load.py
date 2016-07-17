@@ -1,3 +1,4 @@
+from bookmakers.Bookmaker import GetSportPageException
 from bookmakers.Sbobet import Sbobet
 from bookmakers.Marathonbet import Marathonbet
 from time import sleep
@@ -12,13 +13,13 @@ mf = m.get_scraping_urls()
 for f in sbf:
     try:
         sb.download_events(f)
-    except:
+    except (IndexError, AttributeError, KeyError, GetSportPageException, sb._timeoutexception):
         pass
 
 for f in mf:
     try:
         m.download_events(f)
-    except:
+    except (IndexError, AttributeError, KeyError, GetSportPageException, sb._timeoutexception):
         pass
 
 
