@@ -8,7 +8,93 @@ class BelongException(Exception):
         Exception.__init__(self, *args, **kwargs)
 
 
+def get_sports_list():
+
+    conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME, use_unicode=True, charset='utf8')
+
+    cursor = conn.cursor()
+
+    sql_code = 'SELECT name, uuid FROM sports GROUP BY uuid'
+
+    cursor.execute(sql_code)
+
+    result = cursor.fetchall()
+
+    conn.close()
+
+    return result
+
+
+def get_leagues_list(bookmaker_id, sport_uuid, full=False):
+
+    conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME, use_unicode=True, charset='utf8')
+
+    cursor = conn.cursor()
+
+    if full:
+        cond_part = ""
+    else:
+        cond_part = "WHERE leagues.uuid IS NULL "
+
+    sql_code = "SELECT leagues.id, leagues.name, leagues.uuid " \
+               "FROM leagues " \
+               "LEFT JOIN sports " \
+               "ON leagues.sport = sports.id " \
+               "{0} " \
+               "AND leagues.bookmaker = %s " \
+               "AND sports.uuid = %s".format(cond_part)
+
+    cursor.execute(sql_code, (bookmaker_id, sport_uuid))
+
+    result = cursor.fetchall()
+
+    json_obj = [{"id": row[0], "name": row[1], "uuid": row[2]} for row in result]
+
+    conn.close()
+
+    return json_obj
+
+
+def get_leagues_matches(sport_uuid):
+    conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME, use_unicode=True, charset='utf8')
+
+    cursor = conn.cursor()
+
+    sql_code = 'SELECT leagues.id, leagues.name, leagues.uuid ' \
+               'FROM leagues ' \
+               'LEFT JOIN sports ' \
+               'ON leagues.sport = sports.id ' \
+               'WHERE leagues.uuid IS NOT NULL ' \
+               'AND sports.uuid = %s ' \
+               'ORDER BY leagues.uuid'
+
+    cursor.execute(sql_code, (sport_uuid,))
+
+    result = cursor.fetchall()
+    json_obj = []
+
+    for i in range(1, len(result), 2):
+        first = result[i]
+        second = result[i-1]
+        if first[2] == second[2]:
+            json_obj.append(
+                {"id1": first[0],
+                 "name1": first[1],
+                 "uuid": first[2],
+                 "id2": second[0],
+                 "name2": second[1]
+                 }
+            )
+        else:
+            return {"error": True}
+
+    conn.close()
+
+    return json_obj
+
+
 def get_sports():
+
     """
 Возвращает из базы данных все спорты
     :rtype: tuple of tuples
@@ -42,7 +128,7 @@ def get_leagues(sport_uuid=None):
     if sport_uuid is None:
         sport_uuid_parameter = "WHERE sports.uuid IS NOT NULL"
     else:
-        sport_uuid_parameter = "WHERE sports.uuid = %s" % sport_uuid
+        sport_uuid_parameter = "WHERE sports.uuid = '%s'" % sport_uuid
 
     sql_code = 'SELECT leagues.id, leagues.name, leagues.bookmaker, ' \
                'bookmakers.name, leagues.uuid, sports.uuid as sport, sports.name as sportname ' \
