@@ -24,6 +24,6 @@ for f in mf:
 
 print("=========================")
 print("Delay 2 sec")
-sleep(2)
 print("=========================")
+sleep(2)
 

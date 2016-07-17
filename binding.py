@@ -38,28 +38,18 @@ def get_best_matching(rows: list) -> list:
     return best_rows
 
 
-def log_info(best_rows):
-    best_rows_msg = "\n".join([
-                                  row[3] + " = " + row[4] + ": distance = " + str(row[2]) for row in best_rows
-                                  ])
+def match_sports():
 
-    msg = "Следующие лиги будут связаны: \n" + best_rows_msg
-
-    time = datetime.utcnow()
-    logname = time.strftime("auto_bind_%d.%m.%Y.log")
-    logpath = os.path.join(LOG_DIR, logname)
-    logging.basicConfig(filename=logpath, level=logging.INFO, format='%(asctime)s - '
-                                                                     '%(levelname)s - %(message)s')
     logger = logging.getLogger(__name__)
 
-    logger.info(msg)
-
-
-def match_sports():
+    logger.info("* * * * * * * * * * * * * * * * *")
+    logger.info("Начало автоматической обработки спортов")
 
     result = db_api.get_sports()
 
     optimized_result = [(el[0], el[1], el[2]) for el in result if el[4] is None]
+
+    logger.info("{0} элементов не связаны".format(len(optimized_result)))
 
     df = pandas.DataFrame(optimized_result, columns=["id", "name", "bookmaker"])
 
@@ -68,11 +58,16 @@ def match_sports():
     df3 = df2[df2.bookmaker_x != df2.bookmaker_y]
 
     if df3.empty:
+        logger.info("Нет возможных комбинаций для связи")
         return
+
+    logger.info("{0} возможных комбинаций для связи".format(len(df3)))
 
     df3["distance"] = df3.apply(_calculate_distance, axis=1, args=('name_x', 'name_y'))
 
     df4 = df3[df3.distance < 0.35]
+
+    logger.info("{0} комбинаций для связи с расстоянием меньше 0.35".format(len(df4)))
 
     if df4.empty:
         return
@@ -81,16 +76,29 @@ def match_sports():
 
     best_rows = get_best_matching(rows)
 
-    log_info(best_rows)
+    best_rows_msg = "\n".join([
+                                  row[3] + " = " + row[4] + ": distance = " + str(row[2]) for row in best_rows
+                                  ])
+
+    msg = "Следующие лиги будут связаны: \n" + best_rows_msg
+
+    logger.info(msg)
 
     db_api.update_sports(best_rows)
 
 
 def match_leagues():
 
+    logger = logging.getLogger(__name__)
+
+    logger.info("* * * * * * * * * * * * * * * * *")
+    logger.info("Начало автоматической обработки лиг")
+
     leagues = db_api.get_leagues()
 
     result = [(row[0], row[1], row[2], row[5]) for row in leagues if row[4] is None]
+
+    logger.info("{0} элементов не связаны".format(len(result)))
 
     df = pandas.DataFrame(result, columns=["id", "name", "bookmaker", "sport"])
 
@@ -99,11 +107,16 @@ def match_leagues():
     df3 = df2[(df2['bookmaker_x'] != df2['bookmaker_y']) & (df2['sport_x'] == df2['sport_y'])]
 
     if df3.empty:
+        logger.info("Нет возможных комбинаций для связи")
         return
+
+    logger.info("{0} возможных комбинаций для связи".format(len(df3)))
 
     df3["distance"] = df3.apply(_calculate_distance, axis=1, args=('name_x', 'name_y'))
 
     df4 = df3[df3.distance < 0.35]
+
+    logger.info("{0} комбинаций для связи с расстоянием меньше 0.35".format(len(df4)))
 
     if df4.empty:
         return
@@ -112,16 +125,29 @@ def match_leagues():
 
     best_rows = get_best_matching(rows)
 
-    log_info(best_rows)
+    best_rows_msg = "\n".join([
+                                  row[3] + " = " + row[4] + ": distance = " + str(row[2]) for row in best_rows
+                                  ])
+
+    msg = "Следующие лиги будут связаны: \n" + best_rows_msg
+
+    logger.info(msg)
 
     db_api.update_leagues(best_rows)
 
 
 def match_participants():
 
+    logger = logging.getLogger(__name__)
+
+    logger.info("* * * * * * * * * * * * * * * * *")
+    logger.info("Начало автоматической обработки участников")
+
     participants = db_api.get_participants()
 
     result = [(row[0], row[1], row[2], row[5]) for row in participants if row[4] is None]
+
+    logger.info("{0} элементов не связаны".format(len(result)))
 
     df = pandas.DataFrame(result, columns=["id", "name", "bookmaker", "league"])
 
@@ -130,11 +156,16 @@ def match_participants():
     df3 = df2[(df2['bookmaker_x'] != df2['bookmaker_y']) & (df2['league_x'] == df2['league_y'])]
 
     if df3.empty:
+        logger.info("Нет возможных комбинаций для связи")
         return
+
+    logger.info("{0} возможных комбинаций для связи".format(len(df3)))
 
     df3["distance"] = df3.apply(_calculate_distance, axis=1, args=('name_x', 'name_y'))
 
     df4 = df3[df3.distance < 0.35]
+
+    logger.info("{0} комбинаций для связи с расстоянием меньше 0.35".format(len(df4)))
 
     if df4.empty:
         return
@@ -143,17 +174,36 @@ def match_participants():
 
     best_rows = get_best_matching(rows)
 
-    log_info(best_rows)
+    best_rows_msg = "\n".join([
+                                  row[3] + " = " + row[4] + ": distance = " + str(row[2]) for row in best_rows
+                                  ])
+
+    msg = "Следующие лиги будут связаны: \n" + best_rows_msg
+
+    logger.info(msg)
 
     db_api.update_participants(best_rows)
 
-while True:
 
-    match_sports()
+time = datetime.utcnow()
+logname = time.strftime("auto_bind_%d.%m.%Y.log")
+logpath = os.path.join(LOG_DIR, logname)
+handler = logging.FileHandler(logpath, "a",
+                              encoding="UTF-8")
+formatter = logging.Formatter('%(asctime)s - %(threadName)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+logger.addHandler(handler)
 
-    match_leagues()
+match_sports()
 
-    match_participants()
+match_leagues()
+
+match_participants()
+
+for handler in logger.handlers:
+    handler.close()
 
 
 

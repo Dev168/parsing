@@ -6,6 +6,7 @@ from db.database import create_handicaps, create_moneylines
 from new_resolver import resolve_all_links
 import traceback
 import logging
+from logs.log import get_logger
 
 
 class GetSportPageException(Exception):
@@ -122,15 +123,7 @@ class Bookmaker(object):
 
     def download_events(self, scraping_url=None, debug_page=None):
 
-        time = datetime.utcnow()
-        logname = time.strftime("%d.%m.%Y.log")
-        logpath = os.path.join(LOG_DIR, logname)
-        logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(threadName)s - '
-                                                                          '%(levelname)s - %(message)s')
-        handler = logging.FileHandler(logpath, "w+",
-                                      encoding="UTF-8")
-        logger = logging.getLogger(__name__)
-        logger.addHandler(handler)
+        logger = get_logger(__name__)
 
         bookmaker_name = self.bookmaker_name
         logger.info("{0}: Начало загрузки данных".format(bookmaker_name))
