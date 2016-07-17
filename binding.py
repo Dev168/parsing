@@ -63,7 +63,7 @@ def match_sports():
 
     logger.info("{0} возможных комбинаций для связи".format(len(df3)))
 
-    df3["distance"] = df3.apply(_calculate_distance, axis=1, args=('name_x', 'name_y'))
+    df3.loc[:, "distance"] = df3.apply(_calculate_distance, axis=1, args=('name_x', 'name_y'))
 
     df4 = df3[df3.distance < 0.35]
 
@@ -112,7 +112,7 @@ def match_leagues():
 
     logger.info("{0} возможных комбинаций для связи".format(len(df3)))
 
-    df3["distance"] = df3.apply(_calculate_distance, axis=1, args=('name_x', 'name_y'))
+    df3.loc[:, "distance"] = df3.apply(_calculate_distance, axis=1, args=('name_x', 'name_y'))
 
     df4 = df3[df3.distance < 0.35]
 
@@ -161,7 +161,7 @@ def match_participants():
 
     logger.info("{0} возможных комбинаций для связи".format(len(df3)))
 
-    df3["distance"] = df3.apply(_calculate_distance, axis=1, args=('name_x', 'name_y'))
+    df3.loc[:, "distance"] = df3.apply(_calculate_distance, axis=1, args=('name_x', 'name_y'))
 
     df4 = df3[df3.distance < 0.35]
 
