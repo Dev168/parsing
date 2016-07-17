@@ -121,6 +121,9 @@ class Bookmaker(object):
         with open(dpath + "/info.txt", "w+", encoding="utf8") as f:
             f.write("Превышен таймаут соединения")
 
+    def download_events_by_page(self,page):
+        self.download_events(debug_page=page)
+
     def download_events(self, scraping_url=None, debug_page=None):
 
         logger = get_logger(__name__)

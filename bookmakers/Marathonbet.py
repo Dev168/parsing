@@ -441,3 +441,9 @@ class Marathonbet(Bookmaker):
                 "https://www.marathonbet.com/en/live/22723",
                 "https://www.marathonbet.com/en/live/120866"
                 ]
+    def get_scraping_urls1(self):
+        return ["https://www.marathonbet.com/en/live/26418",
+                "https://www.marathonbet.com/en/live/45356",
+                "https://www.marathonbet.com/en/live/22723",
+
+                ]
