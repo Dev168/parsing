@@ -6,6 +6,7 @@ from db.database import create_handicaps, create_moneylines
 from new_resolver import resolve_all_links
 import traceback
 import logging
+from logs.log import get_logger
 
 
 class GetSportPageException(Exception):
@@ -73,7 +74,7 @@ class Bookmaker(object):
             logger.info("{0}: Начало парсинга страницы".format(self.bookmaker_name))
             result = self._scrape_page(page)
 
-        except (IndexError, AttributeError, Exception):
+        except (IndexError, AttributeError, KeyError):
             self._debug_scraping_error(page)
             raise
 
@@ -122,12 +123,7 @@ class Bookmaker(object):
 
     def download_events(self, scraping_url=None, debug_page=None):
 
-        time = datetime.utcnow()
-        logname = time.strftime("%d.%m.%Y.log")
-        logpath = os.path.join(LOG_DIR, logname)
-        logging.basicConfig(filename=logpath, level=logging.INFO, format='%(asctime)s - %(threadName)s - '
-                                                                          '%(levelname)s - %(message)s')
-        logger = logging.getLogger(__name__)
+        logger = get_logger(__name__)
 
         bookmaker_name = self.bookmaker_name
         logger.info("{0}: Начало загрузки данных".format(bookmaker_name))
@@ -135,7 +131,7 @@ class Bookmaker(object):
         try:
             events = self.events(scraping_url, debug_page)
             logger.info("{0}: События успешно получены".format(bookmaker_name))
-        except:
+        except (IndexError, AttributeError, KeyError, GetSportPageException, self._timeoutexception):
             logger.error("{0}: Не удалось получить события".format(bookmaker_name))
             raise
 

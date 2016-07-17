@@ -79,11 +79,11 @@ def get_participants(league_uuid=None):
                'sports.uuid as sport, sports.name as sportname ' \
                'FROM participants ' \
                'LEFT JOIN bookmakers ' \
-               'ON leagues.bookmaker = bookmakers.id ' \
+               'ON participants.bookmaker = bookmakers.id ' \
                'LEFT JOIN leagues ' \
-               'ON participants.league = leagues.id' \
+               'ON participants.league = leagues.id ' \
                'LEFT JOIN sports ' \
-               'ON league.sport ON sports.id ' \
+               'ON leagues.sport = sports.id ' \
                '%s' % league_uuid_parameter
 
     cursor.execute(sql_code)
@@ -119,15 +119,15 @@ def update_uuid(table_name, uuid_list):
     new_uuid_list = []
     for row in uuid_list:
         uuid_ = uuid4().bytes.hex()
-        new_uuid_list.append((row[0], uuid_))
-        new_uuid_list.append((row[1], uuid_))
+        new_uuid_list.append((uuid_, row[0]))
+        new_uuid_list.append((uuid_, row[1]))
 
     try:
         ids_parameter = ', '.join(list(map(lambda id_: '%s', new_uuid_list)))
         sql_select = "SELECT DISTINCT uuid " \
                      "FROM %s " \
                      "WHERE id in (%s) FOR UPDATE" % (table_name, ids_parameter)
-        cursor.execute(sql_select, [el[0] for el in new_uuid_list])
+        cursor.execute(sql_select, [el[1] for el in new_uuid_list])
         reset_rows = cursor.fetchall()
 
         sql_reset = "UPDATE %s SET uuid = NULL WHERE uuid IN (%s)" % \

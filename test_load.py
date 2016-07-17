@@ -1,3 +1,4 @@
+from bookmakers.Bookmaker import GetSportPageException
 from bookmakers.Sbobet import Sbobet
 from bookmakers.Marathonbet import Marathonbet
 from time import sleep
@@ -8,15 +9,22 @@ m = Marathonbet()
 sbf = sb.get_scraping_urls()
 mf = m.get_scraping_urls()
 
-
+# while True:
 for f in sbf:
-    sb.download_events(f)
+    try:
+        sb.download_events(f)
+    except (IndexError, AttributeError, KeyError, GetSportPageException, sb._timeoutexception):
+        pass
 
 for f in mf:
-    m.download_events(f)
+    try:
+        m.download_events(f)
+    except (IndexError, AttributeError, KeyError, GetSportPageException, sb._timeoutexception):
+        pass
+
 
 print("=========================")
 print("Delay 2 sec")
-sleep(2)
 print("=========================")
+sleep(2)
 

@@ -1,5 +1,8 @@
 import MySQLdb as mysql
-from settings import DB_HOST, DB_NAME, DB_USER, DB_PASSWD
+from logs.log import get_logger
+
+
+from settings import DB_HOST, DB_NAME, DB_USER, DB_PASSWD, LOG_DIR
 import logging
 
 def resolve_links(list_of_dicts, aim_fields, filter_field, table, bk=None):
@@ -142,9 +145,10 @@ def replace_attribute_value(substitutional_objs, subsitutable_objs, match_attrs,
 
 def resolve_all_links(data):
 
-    bk = data[0]["bookmaker"]  # Величайший костыль всех времен
+    bk = data[0]["bookmaker"]
 
-    logger = logging.getLogger(__name__)
+    logger = get_logger(__name__)
+
     logger.info("Всего к обработке: {0} событий".format(len(data)))
 
     logger.info("Начало обработки ссылок на спорт")
