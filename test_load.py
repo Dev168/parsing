@@ -8,15 +8,22 @@ m = Marathonbet()
 sbf = sb.get_scraping_urls()
 mf = m.get_scraping_urls()
 
+while True:
+    for f in sbf:
+        try:
+            sb.download_events(f)
+        except:
+            pass
 
-for f in sbf:
-    sb.download_events(f)
+    for f in mf:
+        try:
+            m.download_events(f)
+        except:
+            pass
 
-for f in mf:
-    m.download_events(f)
 
-print("=========================")
-print("Delay 2 sec")
-sleep(2)
-print("=========================")
+    print("=========================")
+    print("Delay 2 sec")
+    sleep(2)
+    print("=========================")
 

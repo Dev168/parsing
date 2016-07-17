@@ -14,11 +14,17 @@ def index():
 
     t1=time.time()
     posts = get_forks()
+
     t2 = time.time()
     perf = t2- t1
     perf = str(round(perf, 3)) + " sec"
 
     return render_template("index.html", posts=posts, perf=perf)
+
+@app.route("/editor")
+def editor():
+
+    return render_template("editor.html")
 
 @app.route("/forks")
 def forks():

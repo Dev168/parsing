@@ -147,7 +147,13 @@ def match_participants():
 
     db_api.update_participants(best_rows)
 
-match_participants()
+while True:
+
+    match_sports()
+
+    match_leagues()
+
+    match_participants()
 
 
 
