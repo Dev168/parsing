@@ -125,9 +125,12 @@ class Bookmaker(object):
         time = datetime.utcnow()
         logname = time.strftime("%d.%m.%Y.log")
         logpath = os.path.join(LOG_DIR, logname)
-        logging.basicConfig(filename=logpath, level=logging.INFO, format='%(asctime)s - %(threadName)s - '
+        logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(threadName)s - '
                                                                           '%(levelname)s - %(message)s')
+        handler = logging.FileHandler(logpath, "w+",
+                                      encoding="UTF-8")
         logger = logging.getLogger(__name__)
+        logger.addHandler(handler)
 
         bookmaker_name = self.bookmaker_name
         logger.info("{0}: Начало загрузки данных".format(bookmaker_name))
