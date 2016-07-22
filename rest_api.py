@@ -2,8 +2,8 @@ import db_api
 import json
 
 
-def get_sports_list():
-    sports = db_api.get_sports_list()
+def get_sports_select_list():
+    sports = db_api.get_sport_select_list()
     list_ = []
     for row in sports:
         list_.append(
@@ -13,6 +13,34 @@ def get_sports_list():
             }
         )
     return json.dumps(list_)
+
+
+def get_leagues_select_list(sportuuid):
+
+    sports = db_api.get_leagues_select_list(sportuuid)
+    list_ = []
+    for row in sports:
+        list_.append(
+            {
+                "name": row[0],
+                "uuid": row[1]
+            }
+        )
+    return json.dumps(list_)
+
+
+def get_participants(leagueuuid):
+    fix_list = db_api.get_participants_list(1, leagueuuid)
+    select_list = db_api.get_participants_list(2, leagueuuid, full=True)
+    matches = db_api.get_participants_matches(leagueuuid)
+
+    result = {
+        "fix": fix_list,
+        "select": select_list,
+        "matches": matches
+    }
+
+    return json.dumps(result, indent=4)
 
 
 def get_leagues(sport_uuid):
@@ -26,11 +54,20 @@ def get_leagues(sport_uuid):
         "matches": matches
     }
 
-
     return json.dumps(result, indent=4)
 
 
+def get_sports():
+    fix_list = db_api.get_sports_list(1)
+    select_list = db_api.get_sports_list(2, full=True)
+    matches = db_api.get_sports_matches()
 
+    result = {
+        "fix": fix_list,
+        "select": select_list,
+        "matches": matches
+    }
 
+    return json.dumps(result, indent=4)
 
 

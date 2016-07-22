@@ -31,10 +31,27 @@ def editor():
 
 @app.route("/api/getSportsList")
 def get_sports_list():
-    return rest_api.get_sports_list()
+    return rest_api.get_sports_select_list()
+
+
+@app.route("/api/getLeaguesList")
+def get_leagues_list():
+    sportuuid = request.args.get('uuid')
+    return rest_api.get_leagues_select_list(sportuuid)
+
+
+@app.route("/api/getParticipants")
+def get_participants():
+    leagueuuid = request.args.get('uuid')
+    return rest_api.get_participants(leagueuuid)
 
 
 @app.route("/api/getLeagues")
 def get_leagues():
     sportuuid = request.args.get('uuid')
     return rest_api.get_leagues(sportuuid)
+
+
+@app.route("/api/getSports")
+def get_sports():
+    return rest_api.get_sports()

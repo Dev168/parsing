@@ -8,8 +8,15 @@ class BelongException(Exception):
         Exception.__init__(self, *args, **kwargs)
 
 
-def get_sports_list():
+# Методы используемые фронтэндом
 
+
+def get_sport_select_list():
+
+    """
+Возвращает список спортов с уникальными uuid из базы данных (имя берется произвольно из одной из контор)
+    :return:
+    """
     conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME, use_unicode=True, charset='utf8')
 
     cursor = conn.cursor()
@@ -25,6 +32,62 @@ def get_sports_list():
     return result
 
 
+def get_leagues_select_list(sportuuid):
+    """
+Возвращает список диг с уникальными uuid из базы данных (имя берется произвольно из одной из контор)
+    :return:
+    """
+    conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME, use_unicode=True, charset='utf8')
+
+    cursor = conn.cursor()
+
+    sql_code = 'SELECT leagues.name, leagues.uuid ' \
+               'FROM leagues ' \
+               'LEFT JOIN sports ' \
+               'ON leagues.sport = sports.id ' \
+               'WHERE sports.uuid = %s' \
+               'GROUP BY uuid'
+
+    cursor.execute(sql_code, (sportuuid,))
+
+    result = cursor.fetchall()
+
+    conn.close()
+
+    return result
+
+
+def get_participants_list(bookmaker_id, league_uuid, full=False):
+
+    conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME, use_unicode=True, charset='utf8')
+
+    cursor = conn.cursor()
+
+    if full:
+        cond_part = ""
+    else:
+        cond_part = "AND participants.uuid IS NULL "
+
+    sql_code = "SELECT participants.id, participants.name, participants.uuid " \
+               "FROM participants " \
+               "LEFT JOIN leagues " \
+               "ON participants.league = leagues.id " \
+               "WHERE participants.bookmaker = %s " \
+               "AND leagues.uuid = %s " \
+               "{0} " \
+               "ORDER BY participants.name".format(cond_part)
+
+    cursor.execute(sql_code, (bookmaker_id, league_uuid))
+
+    result = cursor.fetchall()
+
+    json_obj = [{"id": row[0], "name": row[1], "uuid": row[2]} for row in result]
+
+    conn.close()
+
+    return json_obj
+
+
 def get_leagues_list(bookmaker_id, sport_uuid, full=False):
 
     conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME, use_unicode=True, charset='utf8')
@@ -34,15 +97,16 @@ def get_leagues_list(bookmaker_id, sport_uuid, full=False):
     if full:
         cond_part = ""
     else:
-        cond_part = "WHERE leagues.uuid IS NULL "
+        cond_part = "AND leagues.uuid IS NULL "
 
     sql_code = "SELECT leagues.id, leagues.name, leagues.uuid " \
                "FROM leagues " \
                "LEFT JOIN sports " \
                "ON leagues.sport = sports.id " \
+               "WHERE leagues.bookmaker = %s " \
+               "AND sports.uuid = %s " \
                "{0} " \
-               "AND leagues.bookmaker = %s " \
-               "AND sports.uuid = %s".format(cond_part)
+               "ORDER BY leagues.name".format(cond_part)
 
     cursor.execute(sql_code, (bookmaker_id, sport_uuid))
 
@@ -55,20 +119,48 @@ def get_leagues_list(bookmaker_id, sport_uuid, full=False):
     return json_obj
 
 
-def get_leagues_matches(sport_uuid):
+def get_sports_list(bookmaker_id, full=False):
+
     conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME, use_unicode=True, charset='utf8')
 
     cursor = conn.cursor()
 
-    sql_code = 'SELECT leagues.id, leagues.name, leagues.uuid ' \
-               'FROM leagues ' \
-               'LEFT JOIN sports ' \
-               'ON leagues.sport = sports.id ' \
-               'WHERE leagues.uuid IS NOT NULL ' \
-               'AND sports.uuid = %s ' \
-               'ORDER BY leagues.uuid'
+    if full:
+        cond_part = ""
+    else:
+        cond_part = "AND sports.uuid IS NULL "
 
-    cursor.execute(sql_code, (sport_uuid,))
+    sql_code = "SELECT sports.id, sports.name, sports.uuid " \
+               "FROM sports " \
+               "WHERE sports.bookmaker = %s " \
+               "{0} " \
+               "ORDER BY sports.name".format(cond_part)
+
+    cursor.execute(sql_code, (bookmaker_id,))
+
+    result = cursor.fetchall()
+
+    json_obj = [{"id": row[0], "name": row[1], "uuid": row[2]} for row in result]
+
+    conn.close()
+
+    return json_obj
+
+
+def get_participants_matches(league_uuid):
+    conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME, use_unicode=True, charset='utf8')
+
+    cursor = conn.cursor()
+
+    sql_code = 'SELECT participants.id, participants.name, participants.uuid, participants.bookmaker ' \
+               'FROM participants ' \
+               'LEFT JOIN leagues ' \
+               'ON participants.league = leagues.id ' \
+               'WHERE participants.uuid IS NOT NULL ' \
+               'AND leagues.uuid = %s ' \
+               'ORDER BY participants.uuid'
+
+    cursor.execute(sql_code, (league_uuid,))
 
     result = cursor.fetchall()
     json_obj = []
@@ -76,6 +168,10 @@ def get_leagues_matches(sport_uuid):
     for i in range(1, len(result), 2):
         first = result[i]
         second = result[i-1]
+
+        if first[3] != 1:
+            first, second = second, first
+
         if first[2] == second[2]:
             json_obj.append(
                 {"id1": first[0],
@@ -91,6 +187,90 @@ def get_leagues_matches(sport_uuid):
     conn.close()
 
     return json_obj
+
+
+def get_leagues_matches(sport_uuid):
+    conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME, use_unicode=True, charset='utf8')
+
+    cursor = conn.cursor()
+
+    sql_code = 'SELECT leagues.id, leagues.name, leagues.uuid, leagues.bookmaker ' \
+               'FROM leagues ' \
+               'LEFT JOIN sports ' \
+               'ON leagues.sport = sports.id ' \
+               'WHERE leagues.uuid IS NOT NULL ' \
+               'AND sports.uuid = %s ' \
+               'ORDER BY leagues.uuid'
+
+    cursor.execute(sql_code, (sport_uuid,))
+
+    result = cursor.fetchall()
+    json_obj = []
+
+    for i in range(1, len(result), 2):
+        first = result[i]
+        second = result[i-1]
+
+        if first[3] != 1:
+            first, second = second, first
+
+        if first[2] == second[2]:
+            json_obj.append(
+                {"id1": first[0],
+                 "name1": first[1],
+                 "uuid": first[2],
+                 "id2": second[0],
+                 "name2": second[1]
+                 }
+            )
+        else:
+            return {"error": True}
+
+    conn.close()
+
+    return json_obj
+
+
+def get_sports_matches():
+    conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME, use_unicode=True, charset='utf8')
+
+    cursor = conn.cursor()
+
+    sql_code = 'SELECT sports.id, sports.name, sports.uuid, sports.bookmaker ' \
+               'FROM sports ' \
+               'WHERE sports.uuid IS NOT NULL ' \
+               'ORDER BY sports.uuid'
+
+    cursor.execute(sql_code)
+
+    result = cursor.fetchall()
+    json_obj = []
+
+    for i in range(1, len(result), 2):
+        first = result[i]
+        second = result[i-1]
+
+        if first[3] != 1:
+            first, second = second, first
+
+        if first[2] == second[2]:
+            json_obj.append(
+                {"id1": first[0],
+                 "name1": first[1],
+                 "uuid": first[2],
+                 "id2": second[0],
+                 "name2": second[1]
+                 }
+            )
+        else:
+            return {"error": True}
+
+    conn.close()
+
+    return json_obj
+
+
+# Методы применяемые автобиндингом
 
 
 def get_sports():
