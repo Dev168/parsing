@@ -49,7 +49,14 @@ def get_participants():
 @app.route("/api/getLeagues")
 def get_leagues():
     sportuuid = request.args.get('uuid')
-    return rest_api.get_leagues(sportuuid)
+    return rest_api.get_leagues(sportuuid)\
+
+
+
+@app.route("/api/events")
+def get_events():
+    bookmaker = request.args.get('bookmaker')
+    return rest_api.get_events(bookmaker)
 
 
 @app.route("/api/getSports")

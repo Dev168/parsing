@@ -270,6 +270,44 @@ def get_sports_matches():
     return json_obj
 
 
+def get_events(bookmaker_id):
+
+    conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME, use_unicode=True, charset='utf8')
+
+    cursor = conn.cursor()
+
+    sql_code = 'SELECT h.firstforward, h.secondforward, h.firstwin, h.secondwin, h.oddsdate, h.href, ' \
+               's.name as sport, p1.name as p1, p2.name as p2 ' \
+               'FROM betsdb.handicaps as h ' \
+               'LEFT JOIN sports as s ' \
+               'ON h.sport = s.id ' \
+               'LEFT JOIN participants as p1 ' \
+               'ON h.firstparticipant = p1.id ' \
+               'LEFT JOIN participants as p2 ' \
+               'ON h.secondparticipant = p2.id ' \
+               'WHERE h.bookmaker = %s'
+
+    cursor.execute(sql_code, (bookmaker_id,))
+
+    result = cursor.fetchall()
+
+    json_obj = [
+        {"firstparticipant": row[7],
+         "secondparticipant": row[8],
+         "firstforward": row[0],
+         "secondforward": row[1],
+         "firstwin": row[2],
+         "secondwin": row[3],
+         "oddsdate": row[4].strftime("%H:%M:%S %d.%m.%Y"),
+         "href": row[5],
+         "sport": row[6]
+         } for row in result
+    ]
+
+    conn.close()
+
+    return json_obj
+
 # Методы применяемые автобиндингом
 
 

@@ -1,5 +1,6 @@
 import db_api
 import json
+from MySQLdb import IntegrityError
 
 
 def get_sports_select_list():
@@ -71,3 +72,41 @@ def get_sports():
     return json.dumps(result, indent=4)
 
 
+def update_sports(sports):
+    try:
+        db_api.update_sports(sports)
+        return json.dumps(
+            {"result": True}
+        )
+    except IntegrityError:
+        return json.dumps(
+            {"result": False}
+        )
+
+
+def update_leagues(leagues):
+    try:
+        db_api.update_leagues(leagues)
+        return json.dumps(
+            {"result": True}
+        )
+    except IntegrityError:
+        return json.dumps(
+            {"result": False}
+        )
+
+
+def update_participants(participants):
+    try:
+        db_api.update_participants(participants)
+        return json.dumps(
+            {"result": True}
+        )
+    except IntegrityError:
+        return json.dumps(
+            {"result": False}
+        )
+
+
+def get_events(bookmaker_id):
+    return json.dumps(db_api.get_events(bookmaker_id))
