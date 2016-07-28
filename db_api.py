@@ -291,18 +291,24 @@ def get_events(bookmaker_id):
 
     result = cursor.fetchall()
 
-    json_obj = [
-        {"firstparticipant": row[7],
-         "secondparticipant": row[8],
-         "firstforward": row[0],
-         "secondforward": row[1],
-         "firstwin": row[2],
-         "secondwin": row[3],
-         "oddsdate": row[4].strftime("%H:%M:%S %d.%m.%Y"),
-         "href": row[5],
-         "sport": row[6]
-         } for row in result
-    ]
+    json_obj = {}
+
+    for row in result:
+        sport = row[6]
+        if sport not in json_obj:
+            json_obj[sport] = []
+
+        json_obj[sport].append(
+            {"firstparticipant": row[7],
+             "secondparticipant": row[8],
+             "firstforward": row[0],
+             "secondforward": row[1],
+             "firstwin": row[2],
+             "secondwin": row[3],
+             "oddsdate": row[4].strftime("%H:%M:%S %d.%m.%Y"),
+             "href": row[5],
+             }
+        )
 
     conn.close()
 
