@@ -2,7 +2,7 @@ import os
 
 PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
 
-PROXY = ["91.229.79.176:43395", "maxberezov@gmail.com", "I5pOQeNRl6"]
+PROXY = ["91.229.79.176:43395", "I5pOQeNRl6", "maxberezov@gmail.com"]
 
 DB_HOST = "localhost"
 
