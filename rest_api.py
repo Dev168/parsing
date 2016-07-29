@@ -109,4 +109,4 @@ def update_participants(participants):
 
 
 def get_events(bookmaker_id):
-    return json.dumps(db_api.get_events(bookmaker_id))
+    return json.dumps(db_api.get_events(bookmaker_id), indent=4)

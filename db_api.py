@@ -276,18 +276,33 @@ def get_events(bookmaker_id):
 
     cursor = conn.cursor()
 
-    sql_code = 'SELECT h.firstforward, h.secondforward, h.firstwin, h.secondwin, h.oddsdate, h.href, ' \
-               's.name as sport, p1.name as p1, p2.name as p2 ' \
+    sql_code = '(SELECT h.firstforward, h.secondforward, h.firstwin, h.secondwin, h.oddsdate, h.href, ' \
+               's.name as sport, p1.name as p1, p2.name as p2, l.name as league ' \
                'FROM betsdb.handicaps as h ' \
                'LEFT JOIN sports as s ' \
                'ON h.sport = s.id ' \
+               'LEFT JOIN leagues as l ' \
+               'ON h.league = l.id ' \
                'LEFT JOIN participants as p1 ' \
                'ON h.firstparticipant = p1.id ' \
                'LEFT JOIN participants as p2 ' \
                'ON h.secondparticipant = p2.id ' \
-               'WHERE h.bookmaker = %s'
+               'WHERE h.bookmaker = %s) ' \
+               'UNION ' \
+               '(SELECT null, h.draw, h.firstwin, h.secondwin, h.oddsdate, h.href, ' \
+               's.name as sport, p1.name as p1, p2.name as p2, l.name as league ' \
+               'FROM betsdb.moneylines as h ' \
+               'LEFT JOIN sports as s ' \
+               'ON h.sport = s.id ' \
+               'LEFT JOIN leagues as l ' \
+               'ON h.league = l.id ' \
+               'LEFT JOIN participants as p1 ' \
+               'ON h.firstparticipant = p1.id ' \
+               'LEFT JOIN participants as p2 ' \
+               'ON h.secondparticipant = p2.id ' \
+               'WHERE h.bookmaker = %s)'
 
-    cursor.execute(sql_code, (bookmaker_id,))
+    cursor.execute(sql_code, (bookmaker_id,bookmaker_id))
 
     result = cursor.fetchall()
 
@@ -295,20 +310,48 @@ def get_events(bookmaker_id):
 
     for row in result:
         sport = row[6]
-        if sport not in json_obj:
-            json_obj[sport] = []
+        league = row[9]
+        first_participant = row[7]
+        second_participant = row[8]
+        participants = ",".join((first_participant, second_participant))
 
-        json_obj[sport].append(
-            {"firstparticipant": row[7],
-             "secondparticipant": row[8],
-             "firstforward": row[0],
-             "secondforward": row[1],
-             "firstwin": row[2],
-             "secondwin": row[3],
-             "oddsdate": row[4].strftime("%H:%M:%S %d.%m.%Y"),
-             "href": row[5],
-             }
-        )
+        if sport not in json_obj:
+            json_obj[sport] = {}
+        sport_json = json_obj[sport]
+
+        if league not in sport_json:
+            sport_json[league] = {}
+        league_json = sport_json[league]
+
+        if participants not in league_json:
+            league_json[participants] = {}
+        participants_json = league_json[participants]
+
+        if row[0] is not None:
+            if "handicaps" not in participants_json:
+                participants_json["handicaps"] = []
+            handicaps = participants_json["handicaps"]
+            handicaps.append(
+                {
+                 "firstforward": row[0],
+                 "secondforward": row[1],
+                 "firstwin": row[2],
+                 "secondwin": row[3],
+                 "oddsdate": row[4].strftime("%H:%M:%S %d.%m.%Y"),
+                 "href": row[5]
+                 })
+        else:
+            if "moneylines" not in participants_json:
+                participants_json["moneylines"] = []
+            moneylines = participants_json["moneylines"]
+            moneylines.append(
+                {
+                    "draw": row[1],
+                    "firstwin": row[2],
+                    "secondwin": row[3],
+                    "oddsdate": row[4].strftime("%H:%M:%S %d.%m.%Y"),
+                    "href": row[5]
+                })
 
     conn.close()
 
