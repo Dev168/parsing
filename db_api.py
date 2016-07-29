@@ -313,7 +313,7 @@ def get_events(bookmaker_id):
         league = row[9]
         first_participant = row[7]
         second_participant = row[8]
-        participants = ",".join((first_participant, second_participant))
+        participants = " - ".join((first_participant, second_participant))
 
         if sport not in json_obj:
             json_obj[sport] = {}
