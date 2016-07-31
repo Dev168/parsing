@@ -400,9 +400,6 @@ def get_forks():
     rows = cursor.fetchall()  # Внимание, содержат дубли
 
 
-    cursor.execute(query)
-    reversed_rows = cursor.fetchall()  # Внимание, содержат дубли
-
     # Удалим временные таблицы
     cursor.execute("DROP TABLE games1")
     cursor.execute("DROP TABLE games2")
