@@ -508,7 +508,7 @@ def get_forks():
     for row in rows:
         founded = False
         for match in matches:
-            if {row[4], row[6]} == {match["p1"], match["p2"]}:
+            if {row[5], row[7]} == {match["p1"], match["p2"]}:
                 founded = True
                 break  # Дубль!
         if not founded:
