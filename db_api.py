@@ -357,6 +357,9 @@ def get_forks():
     conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME)
     cursor = conn.cursor()
 
+    # Создаем две идентичные временные таблицы. Создаем их чтобы разрешить ссылки - id шники на имена
+    # Две - потому что придется связывать таблицу саму с собой для поиска матчей, но MySQL не позволяет соединить одну
+    # временную таблицу саму с собой.
     query = "CREATE TEMPORARY TABLE IF NOT EXISTS games1 " \
             "SELECT h.firstwin, h.secondwin, h.href, p.uuid as part1, p2.uuid as part2, " \
             "p.name part1name, p2.name as part2name, h.bookmaker " \
@@ -385,33 +388,69 @@ def get_forks():
             "ON h.sport = s.id " \
             "WHERE p.uuid IS NOT NULL AND p2.uuid IS NOT NULL"
     cursor.execute(query)
-    conn.commit
+    conn.commit()
 
-    query = "SELECT g1.firstwin, g1.secondwin, g1.part1name, g1.part1, g1.part2name, g1.part2, g1.bookmaker, " \
-            "g2.firstwin, g2.secondwin, g2.part1name, g2.part1, g2.part2name, g2.part2, g2.bookmaker " \
-            "FROM games1 as g1 " \
+    # Выполняем связку - разные букмекеры, но одиниаковые участники.
+    query = "SELECT g1.firstwin, g1.secondwin, g1.part1name, g1.part1, g1.part2name, g1.part2, g1.bookmaker, g1.href, " \
+            "g2.firstwin, g2.secondwin, g2.bookmaker, g2.href " \
+            "FROM games as g1 " \
             "LEFT JOIN games2 as g2 " \
-            "ON ((g1.part1 = g2.part1 AND g1.part2 = g2.part2) " \
-            "OR (g1.part1 = g2.part2 AND g1.part2 = g2.part1)) " \
+            "ON g1.part1 = g2.part1 " \
+            "AND g1.part2 = g2.part2 " \
             "AND g1.bookmaker != g2.bookmaker"
-
     cursor.execute(query)
+    rows = cursor.fetchall()  # Внимание, содержат дубли
 
-    rows = cursor.fetchall()
+    # Выполняем связку - разные букмекеры, но одиниаковые участники, причем стоят на разных местах
+    query = "SELECT g1.firstwin, g1.secondwin, g1.part1name, g1.part1, g1.part2name, g1.part2, g1.bookmaker, g1.href, " \
+            "g2.firstwin, g2.secondwin, g2.bookmaker, g2.href " \
+            "FROM games as g1 " \
+            "LEFT JOIN games2 as g2 " \
+            "ON (g1.part1 = g2.part2 " \
+            "AND g1.part2 = g2.part1)) " \
+            "AND g1.bookmaker != g2.bookmaker"
+    cursor.execute(query)
+    reversed_rows = cursor.fetchall() # Внимание, содержат дубли
 
+    # Удалим временные таблицы
     cursor.execute("DROP TABLE games1")
     cursor.execute("DROP TABLE games2")
     conn.commit()
 
-    def handler(x, list_):
-        for el in list_:
-            if x[3] == el[3] and x[5] == el[5] and x[10] == el[10] and x[12] == el[12] \
-                    or x[3] == el[5] and x[5] == el[3] and x[10] == el[12] and x[12] == el[10]:
-                return
-        return list_.append(x)
+    # Очистим дубли и вычислим маржу. (Отдельно для обычных и реверс строк, т.к. имеют свои особенности обработки)
+    matches = []
+    for row in rows:
+        for match in matches:
+            if row[3] == match["participant1"] and row[5] == match["participant2"]:  # Участники теже, значит это дубль
+                break  # дубль! уже есть в matches такая игра!
+            else:
+                matches.append(
+                    {
+                        "event1": row[2] + " win",
+                        "event2": row[4] + " win",
+                        "coeff1": row[0],
+                        "coeff2": row[9],
+                        "href1": row[7],
+                        "href2": row[11],
+                        "bookmaker1": row[6],
+                        "bookmaker2": row[10],
+                        "marge": (row[0]*row[9] - row[0] - row[9]) / (row[0] + row[9])
+                    }
+                )
+                matches.append(
+                    {
+                        "event1": row[4] + " win",
+                        "event2": row[2] + " win",
+                        "coeff1": row[1],
+                        "coeff2": row[8],
+                        "href1": row[7],
+                        "href2": row[11],
+                        "bookmaker1": row[6],
+                        "bookmaker2": row[10],
+                        "marge": (row[1] * row[8] - row[1] - row[8]) / (row[1] + row[8])
+                    }
+                )
 
-    list_ = []
-    [handler(row, list_) for row in rows]
 
 
 # Методы применяемые автобиндингом
