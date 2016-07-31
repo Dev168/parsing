@@ -1,14 +1,17 @@
 import sys
 from flask import Flask
 from flask import render_template, request
-sys.path.append("C:\\Users\\Vlad\\PycharmProjects\\BookmakerPlus")
+
+from settings import PROJECT_PATH
+
+sys.path.append(PROJECT_PATH)
 from forks_searching.search import get_forks
 import time
 import rest_api
 
 
-app = Flask(__name__)
 
+app = Flask(__name__)
 
 @app.route("/")
 def index():
@@ -27,6 +30,12 @@ def index():
 def editor():
 
     return render_template("editor.html")
+
+
+@app.route("/eventsList")
+def events():
+
+    return render_template("events.html")
 
 
 @app.route("/api/getSportsList")
@@ -62,3 +71,7 @@ def get_events():
 @app.route("/api/getSports")
 def get_sports():
     return rest_api.get_sports()
+
+
+if __name__ == "__main__":
+    app.run(debug=True, port=80)

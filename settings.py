@@ -17,4 +17,3 @@ LIVENSHTAIN_MIN = 0.35
 LOAD_WAIT_TIME = 30
 
 LOG_DIR = os.path.join(PROJECT_PATH, "logs")
-

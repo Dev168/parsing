@@ -1,0 +1,30 @@
+body {
+    padding-top: 70px;
+    /* Required padding for .navbar-fixed-top. Remove if using .navbar-static-top. Change if height of navigation changes. */
+}
+
+.table {
+    width:100%;
+    text-align: center;
+    margin-bottom: 0px;
+}
+
+.table-bordered>tbody>tr>td {
+    border: 1px solid #ddd;
+    border-bottom: 0;
+}
+
+tr{
+    font-size: 12px;
+}
+
+.moneylines td{
+    width: 333px;
+}
+
+.handicaps td{
+    width: 250px;
+}
+
+div.row{
+    margin-bottom:20px}

@@ -12,7 +12,6 @@ class BelongException(Exception):
 
 
 def get_sport_select_list():
-
     """
 Возвращает список спортов с уникальными uuid из базы данных (имя берется произвольно из одной из контор)
     :return:
@@ -58,7 +57,6 @@ def get_leagues_select_list(sportuuid):
 
 
 def get_participants_list(bookmaker_id, league_uuid, full=False):
-
     conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME, use_unicode=True, charset='utf8')
 
     cursor = conn.cursor()
@@ -89,7 +87,6 @@ def get_participants_list(bookmaker_id, league_uuid, full=False):
 
 
 def get_leagues_list(bookmaker_id, sport_uuid, full=False):
-
     conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME, use_unicode=True, charset='utf8')
 
     cursor = conn.cursor()
@@ -120,7 +117,6 @@ def get_leagues_list(bookmaker_id, sport_uuid, full=False):
 
 
 def get_sports_list(bookmaker_id, full=False):
-
     conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME, use_unicode=True, charset='utf8')
 
     cursor = conn.cursor()
@@ -167,7 +163,7 @@ def get_participants_matches(league_uuid):
 
     for i in range(1, len(result), 2):
         first = result[i]
-        second = result[i-1]
+        second = result[i - 1]
 
         if first[3] != 1:
             first, second = second, first
@@ -209,7 +205,7 @@ def get_leagues_matches(sport_uuid):
 
     for i in range(1, len(result), 2):
         first = result[i]
-        second = result[i-1]
+        second = result[i - 1]
 
         if first[3] != 1:
             first, second = second, first
@@ -248,7 +244,7 @@ def get_sports_matches():
 
     for i in range(1, len(result), 2):
         first = result[i]
-        second = result[i-1]
+        second = result[i - 1]
 
         if first[3] != 1:
             first, second = second, first
@@ -271,7 +267,6 @@ def get_sports_matches():
 
 
 def get_events(bookmaker_id):
-
     conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME, use_unicode=True, charset='utf8')
 
     cursor = conn.cursor()
@@ -302,7 +297,7 @@ def get_events(bookmaker_id):
                'ON h.secondparticipant = p2.id ' \
                'WHERE h.bookmaker = %s)'
 
-    cursor.execute(sql_code, (bookmaker_id,bookmaker_id))
+    cursor.execute(sql_code, (bookmaker_id, bookmaker_id))
 
     result = cursor.fetchall()
 
@@ -333,13 +328,13 @@ def get_events(bookmaker_id):
             handicaps = participants_json["handicaps"]
             handicaps.append(
                 {
-                 "firstforward": row[0],
-                 "secondforward": row[1],
-                 "firstwin": row[2],
-                 "secondwin": row[3],
-                 "oddsdate": row[4].strftime("%H:%M:%S %d.%m.%Y"),
-                 "href": row[5]
-                 })
+                    "firstforward": row[0],
+                    "secondforward": row[1],
+                    "firstwin": row[2],
+                    "secondwin": row[3],
+                    "oddsdate": row[4].strftime("%H:%M:%S %d.%m.%Y"),
+                    "href": row[5]
+                })
         else:
             if "moneylines" not in participants_json:
                 participants_json["moneylines"] = []
@@ -357,11 +352,71 @@ def get_events(bookmaker_id):
 
     return json_obj
 
+
+def get_forks():
+    conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME)
+    cursor = conn.cursor()
+
+    query = "CREATE TEMPORARY TABLE IF NOT EXISTS games1 " \
+            "SELECT h.firstwin, h.secondwin, h.href, p.uuid as part1, p2.uuid as part2, " \
+            "p.name part1name, p2.name as part2name, h.bookmaker " \
+            "FROM moneylines as h " \
+            "LEFT JOIN participants as p " \
+            "ON h.firstparticipant = p.id " \
+            "LEFT JOIN participants as p2 " \
+            "ON h.secondparticipant = p2.id " \
+            "LEFT JOIN leagues as l " \
+            "ON h.league = l.id " \
+            "LEFT JOIN sports as s " \
+            "ON h.sport = s.id " \
+            "WHERE p.uuid IS NOT NULL AND p2.uuid IS NOT NULL"
+    cursor.execute(query)
+    query = "CREATE TEMPORARY TABLE IF NOT EXISTS games2 " \
+            "SELECT h.firstwin, h.secondwin, h.href, p.uuid as part1, p2.uuid as part2, " \
+            "p.name part1name, p2.name as part2name, h.bookmaker " \
+            "FROM moneylines as h " \
+            "LEFT JOIN participants as p " \
+            "ON h.firstparticipant = p.id " \
+            "LEFT JOIN participants as p2 " \
+            "ON h.secondparticipant = p2.id " \
+            "LEFT JOIN leagues as l " \
+            "ON h.league = l.id " \
+            "LEFT JOIN sports as s " \
+            "ON h.sport = s.id " \
+            "WHERE p.uuid IS NOT NULL AND p2.uuid IS NOT NULL"
+    cursor.execute(query)
+    conn.commit
+
+    query = "SELECT g1.firstwin, g1.secondwin, g1.part1name, g1.part1, g1.part2name, g1.part2, g1.bookmaker, " \
+            "g2.firstwin, g2.secondwin, g2.part1name, g2.part1, g2.part2name, g2.part2, g2.bookmaker " \
+            "FROM games1 as g1 " \
+            "LEFT JOIN games2 as g2 " \
+            "ON ((g1.part1 = g2.part1 AND g1.part2 = g2.part2) " \
+            "OR (g1.part1 = g2.part2 AND g1.part2 = g2.part1)) " \
+            "AND g1.bookmaker != g2.bookmaker"
+
+    cursor.execute(query)
+
+    rows = cursor.fetchall()
+
+    cursor.execute("DROP TABLE games1")
+    cursor.execute("DROP TABLE games2")
+    conn.commit()
+
+    def handler(x, list_):
+        for el in list_:
+            if x[3] == el[3] and x[5] == el[5] and x[10] == el[10] and x[12] == el[12] \
+                    or x[3] == el[5] and x[5] == el[3] and x[10] == el[12] and x[12] == el[10]:
+                return
+        return list_.append(x)
+
+    list_ = []
+    [handler(row, list_) for row in rows]
+
+
 # Методы применяемые автобиндингом
 
-
 def get_sports():
-
     """
 Возвращает из базы данных все спорты
     :rtype: tuple of tuples
@@ -385,7 +440,6 @@ def get_sports():
 
 
 def get_leagues(sport_uuid=None):
-
     conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME, use_unicode=True, charset='utf8')
 
     cursor = conn.cursor()
@@ -449,22 +503,18 @@ def get_participants(league_uuid=None):
 
 
 def update_sports(sports):
-
     update_uuid("sports", sports)
 
 
 def update_leagues(leagues):
-
     update_uuid("leagues", leagues)
 
 
 def update_participants(participants):
-
     update_uuid("participants", participants)
 
 
 def update_uuid(table_name, uuid_list):
-
     conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME, use_unicode=True, charset='utf8')
 
     cursor = conn.cursor()
@@ -495,7 +545,3 @@ def update_uuid(table_name, uuid_list):
     conn.commit()
 
     conn.close()
-
-
-
-
