@@ -68,12 +68,12 @@
         <div class="row">
             <div class="col-lg-4 text-center">
                 <p class="lead">Последнее время загрузки</p>
-                <p class="lead">12:39:14</p>
+                <p class="lead">Не установлено</p>
             </div>
 
             <div class="col-lg-4 text-center">
                 <p class="lead">Всего событий</p>
-                <p class="lead">6</p>
+                <p class="lead">{{posts|length}}</p>
             </div>
              <div class="col-lg-4 text-center">
                 <p class="lead">Производительность</p>
@@ -94,10 +94,10 @@
             <tbody>
             {% for post in posts %}
             <tr>
-                <td>{{post.participant_names}}</td>
-                <td> <a href="{{ post.href_1 }}">{{post.event_1}} ({{post.bookmaker1}})</a><br><a href="{{ post.href_2 }}">{{post.event_2}} ({{post.bookmaker2}})</a></td>
-                <td>{{post.coeff_1}}<br>{{post.coeff_2}}</td>
-                <td> {{post.marge_percent}}</td>
+                <td>{{post.game}}</td>
+                <td> <a href="{{ post.href1 }}">{{post.event1}} ({{post.bookmaker1}})</a><br><a href="{{ post.href2 }}">{{post.event2}} ({{post.bookmaker2}})</a></td>
+                <td>{{post.coeff1}}<br>{{post.coeff2}}</td>
+                <td> {{post.marge}}</td>
             </tr>
             {% endfor %}
             </tbody>

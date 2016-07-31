@@ -357,12 +357,12 @@ def get_forks():
     conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME)
     cursor = conn.cursor()
 
-    # Создаем две идентичные временные таблицы. Создаем их чтобы разрешить ссылки - id шники на имена
-    # Две - потому что придется связывать таблицу саму с собой для поиска матчей, но MySQL не позволяет соединить одну
+    # Создаем четыре идентичные временные таблицы. Создаем их чтобы разрешить ссылки - id шники на имена
+    # Четыре - потому что придется связывать таблицу саму с собой для поиска матчей, но MySQL не позволяет соединить одну
     # временную таблицу саму с собой.
-    query = "CREATE TEMPORARY TABLE IF NOT EXISTS games1 " \
-            "SELECT h.firstwin, h.secondwin, h.href, p.uuid as part1, p2.uuid as part2, " \
-            "p.name part1name, p2.name as part2name, h.bookmaker " \
+    query = "CREATE TEMPORARY TABLE IF NOT EXISTS {0} " \
+            "SELECT h.firstwin, h.secondwin, CONCAT(b.hostname, h.href) as href, p.uuid as part1, p2.uuid as part2, " \
+            "p.name part1name, p2.name as part2name, b.name as bookmaker " \
             "FROM moneylines as h " \
             "LEFT JOIN participants as p " \
             "ON h.firstparticipant = p.id " \
@@ -372,84 +372,88 @@ def get_forks():
             "ON h.league = l.id " \
             "LEFT JOIN sports as s " \
             "ON h.sport = s.id " \
+            "LEFT JOIN bookmakers as b " \
+            "ON h.bookmaker = b.id " \
             "WHERE p.uuid IS NOT NULL AND p2.uuid IS NOT NULL"
-    cursor.execute(query)
-    query = "CREATE TEMPORARY TABLE IF NOT EXISTS games2 " \
-            "SELECT h.firstwin, h.secondwin, h.href, p.uuid as part1, p2.uuid as part2, " \
-            "p.name part1name, p2.name as part2name, h.bookmaker " \
-            "FROM moneylines as h " \
-            "LEFT JOIN participants as p " \
-            "ON h.firstparticipant = p.id " \
-            "LEFT JOIN participants as p2 " \
-            "ON h.secondparticipant = p2.id " \
-            "LEFT JOIN leagues as l " \
-            "ON h.league = l.id " \
-            "LEFT JOIN sports as s " \
-            "ON h.sport = s.id " \
-            "WHERE p.uuid IS NOT NULL AND p2.uuid IS NOT NULL"
-    cursor.execute(query)
+
+    for temp_table in ["games1", "games2", "games3", "games4"]:
+        cursor.execute(query.format(temp_table))
     conn.commit()
 
     # Выполняем связку - разные букмекеры, но одиниаковые участники.
     query = "SELECT g1.firstwin, g1.secondwin, g1.part1name, g1.part1, g1.part2name, g1.part2, g1.bookmaker, g1.href, " \
-            "g2.firstwin, g2.secondwin, g2.bookmaker, g2.href " \
-            "FROM games as g1 " \
-            "LEFT JOIN games2 as g2 " \
+            "g2.firstwin, g2.secondwin, g2.bookmaker, g2.href, false as reverse " \
+            "FROM games1 as g1 " \
+            "INNER JOIN games2 as g2 " \
             "ON g1.part1 = g2.part1 " \
             "AND g1.part2 = g2.part2 " \
+            "AND g1.bookmaker != g2.bookmaker " \
+            "UNION " \
+            "SELECT g1.firstwin, g1.secondwin, g1.part1name, g1.part1, g1.part2name, g1.part2, g1.bookmaker, g1.href, " \
+            "g2.secondwin, g2.firstwin, g2.bookmaker, g2.href, true " \
+            "FROM games3 as g1 " \
+            "INNER JOIN games4 as g2 " \
+            "ON g1.part1 = g2.part2 " \
+            "AND g1.part2 = g2.part1 " \
             "AND g1.bookmaker != g2.bookmaker"
     cursor.execute(query)
     rows = cursor.fetchall()  # Внимание, содержат дубли
 
-    # Выполняем связку - разные букмекеры, но одиниаковые участники, причем стоят на разных местах
-    query = "SELECT g1.firstwin, g1.secondwin, g1.part1name, g1.part1, g1.part2name, g1.part2, g1.bookmaker, g1.href, " \
-            "g2.firstwin, g2.secondwin, g2.bookmaker, g2.href " \
-            "FROM games as g1 " \
-            "LEFT JOIN games2 as g2 " \
-            "ON (g1.part1 = g2.part2 " \
-            "AND g1.part2 = g2.part1)) " \
-            "AND g1.bookmaker != g2.bookmaker"
+
     cursor.execute(query)
-    reversed_rows = cursor.fetchall() # Внимание, содержат дубли
+    reversed_rows = cursor.fetchall()  # Внимание, содержат дубли
 
     # Удалим временные таблицы
     cursor.execute("DROP TABLE games1")
     cursor.execute("DROP TABLE games2")
+    cursor.execute("DROP TABLE games3")
+    cursor.execute("DROP TABLE games4")
     conn.commit()
 
     # Очистим дубли и вычислим маржу. (Отдельно для обычных и реверс строк, т.к. имеют свои особенности обработки)
     matches = []
+
     for row in rows:
+        founded = False
         for match in matches:
-            if row[3] == match["participant1"] and row[5] == match["participant2"]:  # Участники теже, значит это дубль
-                break  # дубль! уже есть в matches такая игра!
-            else:
-                matches.append(
-                    {
-                        "event1": row[2] + " win",
-                        "event2": row[4] + " win",
-                        "coeff1": row[0],
-                        "coeff2": row[9],
-                        "href1": row[7],
-                        "href2": row[11],
-                        "bookmaker1": row[6],
-                        "bookmaker2": row[10],
-                        "marge": (row[0]*row[9] - row[0] - row[9]) / (row[0] + row[9])
-                    }
-                )
-                matches.append(
-                    {
-                        "event1": row[4] + " win",
-                        "event2": row[2] + " win",
-                        "coeff1": row[1],
-                        "coeff2": row[8],
-                        "href1": row[7],
-                        "href2": row[11],
-                        "bookmaker1": row[6],
-                        "bookmaker2": row[10],
-                        "marge": (row[1] * row[8] - row[1] - row[8]) / (row[1] + row[8])
-                    }
-                )
+            if {row[3], row[5]} == {match["p1"], match["p2"]}:
+                founded = True
+                break  #  Дубль!
+        if not founded:
+            matches.append(
+                {
+                    "event1": row[2] + " win",
+                    "event2": row[4] + " win",
+                    "coeff1": row[0],
+                    "coeff2": row[9],
+                    "href1": row[7],
+                    "href2": row[11],
+                    "bookmaker1": row[6],
+                    "bookmaker2": row[10],
+                    "marge": round((row[0]*row[9] - row[0] - row[9]) / (row[0] + row[9]), 2),
+                    "p1": row[3],
+                    "p2": row[5],
+                    "game": row[2] + " - " + row[4]
+                }
+            )
+            matches.append(
+                {
+                    "event1": row[4] + " win",
+                    "event2": row[2] + " win",
+                    "coeff1": row[1],
+                    "coeff2": row[8],
+                    "href1": row[7],
+                    "href2": row[11],
+                    "bookmaker1": row[6],
+                    "bookmaker2": row[10],
+                    "marge": round((row[1] * row[8] - row[1] - row[8]) / (row[1] + row[8]), 2),
+                    "p1": row[5],
+                    "p2": row[3],
+                    "game": row[2] + " - " + row[4]
+                }
+            )
+
+    return matches
 
 
 

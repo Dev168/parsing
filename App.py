@@ -5,7 +5,7 @@ from flask import render_template, request
 from settings import PROJECT_PATH
 
 sys.path.append(PROJECT_PATH)
-from forks_searching.search import get_forks
+from db_api import get_forks
 import time
 import rest_api
 
