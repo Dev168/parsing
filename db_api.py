@@ -419,8 +419,8 @@ def get_handicap_forks():
         if not founded:
             matches_hand.append(
                 {
-                    "event1": "handicap "+ row[5] + " " + row[2],
-                    "event2": "handicap "+ row[7] + " " + row[13],
+                    "event1": "handicap "+ row[4] + " " + str(row[2]),
+                    "event2": "handicap "+ row[6] + " " + str(row[13]),
                     "coeff1": row[0],
                     "coeff2": row[11],
                     "href1": row[9],
@@ -435,8 +435,8 @@ def get_handicap_forks():
             )
             matches_hand.append(
                 {
-                    "event1": "handicap "+ row[7] + " " + row[3],
-                    "event2": "handicap "+ row[5] + " " + row[12],
+                    "event1": "handicap "+ row[6] + " " + str(row[3]),
+                    "event2": "handicap "+ row[4] + " " + str(row[12]),
                     "coeff1": row[1],
                     "coeff2": row[10],
                     "href1": row[9],
@@ -446,7 +446,7 @@ def get_handicap_forks():
                     "marge": round((row[1] * row[10] - row[1] - row[10]) / (row[1] + row[10]), 2),
                     "p1": row[7],
                     "p2": row[5],
-                    "game": row[6] + " - " + row[4]
+                    "game": row[4] + " - " + row[6]
                 }
             )
 
