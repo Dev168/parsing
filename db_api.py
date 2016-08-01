@@ -20,7 +20,7 @@ def get_sport_select_list():
 
     cursor = conn.cursor()
 
-    sql_code = 'SELECT name, uuid FROM sports WHERE sports.uuid IS NOT NULL GROUP BY uuid'
+    sql_code = 'SELECT MAX(name), uuid FROM sports WHERE sports.uuid IS NOT NULL GROUP BY uuid'
 
     cursor.execute(sql_code)
 
@@ -40,7 +40,7 @@ def get_leagues_select_list(sportuuid):
 
     cursor = conn.cursor()
 
-    sql_code = 'SELECT leagues.name, leagues.uuid ' \
+    sql_code = 'SELECT MAX(leagues.name), leagues.uuid ' \
                'FROM leagues ' \
                'LEFT JOIN sports ' \
                'ON leagues.sport = sports.id ' \

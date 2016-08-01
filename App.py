@@ -81,4 +81,4 @@ def update_uuid():
     return rest_api.update_uuid(table_name, uuid_list)
 
 if __name__ == "__main__":
-    app.run(debug=True, port=80)
+    app.run(debug=True, port=1024)
