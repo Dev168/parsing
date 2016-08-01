@@ -237,7 +237,7 @@ function typeSelectHandler(selectedType) {
     if (typeSelect.val() == "sports") {
         tableLoading = true;
         updateVisibility();
-        $.get("http://localhost/api/getSports", function (data) {
+        $.get("/api/getSports", function (data) {
             fillTable(data)
         })
     }
@@ -269,7 +269,7 @@ function matchSelectHandler(selectedId){
     id2 = $(selectedId).parent().parent().find("td:nth-child(3)").html();
     tableName = typeSelect.val();
     $("select").prop("disabled", true);
-    $.post("http://localhost/api/updateUuid", {"id1": id1, "id2": id2, "tableName": tableName}, function(data){
+    $.post("/api/updateUuid", {"id1": id1, "id2": id2, "tableName": tableName}, function(data){
         showResult(data);
     })
 }
