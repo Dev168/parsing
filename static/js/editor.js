@@ -234,7 +234,7 @@ function typeSelectHandler(selectedType) {
 
     dataTable.find("tr").remove();
 
-    if (selectedType.value == "sports") {
+    if (typeSelect.val() == "sports") {
         tableLoading = true;
         updateVisibility();
         $.get("http://localhost/api/getSports", function (data) {
@@ -242,7 +242,7 @@ function typeSelectHandler(selectedType) {
         })
     }
 
-    else if (selectedType.value == "leagues"){
+    else if (typeSelect.val() == "leagues"){
         sportsListLoading = true;
         updateVisibility();
         sportChoice
@@ -275,29 +275,29 @@ function matchSelectHandler(selectedId){
 }
 
 function showResult(resp){
-    tablee = typeSelect.val()
-    reload = null;
-    if(tablee =="sports"){
-    reload = sportSelectHandler;
-    }
-    else if(tablee =="leagues"){
-    reload = leagueSelectHandler
-    }
-    else{
-    }
-
 
     obj = JSON.parse(resp);
-    if (obj[result] == True){
-        leagueSelectHandler();
+    if (obj["result"] == true){
+        reload();
     }
     else{
         alert("Произошла ошибка на сервере");
-        leagueSelectHandler();
+        reload();
     }
 }
 
-
+function reload(){
+    tablee = typeSelect.val()
+    if(tablee =="sports"){
+        typeSelectHandler();
+    }
+    else if(tablee =="leagues"){
+        sportSelectHandler();
+    }
+    else{
+        leagueSelectHandler()
+    }
+}
 
 
 // Регистрация обработчиков событий
