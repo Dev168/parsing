@@ -19,7 +19,7 @@ while True:
     for f in mf:
         try:
             m.download_events(f)
-        except (IndexError, AttributeError, KeyError, GetSportPageException, sb._timeoutexception):
+        except (IndexError, AttributeError, KeyError, GetSportPageException, m._timeoutexception):
             pass
 
     print("=========================")
