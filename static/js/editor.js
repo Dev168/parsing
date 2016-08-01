@@ -59,6 +59,9 @@ function fillTable(data){
     )
 
     tableLoading = false;
+    $("table select").change(function() {
+    matchSelectHandler(this);
+    });
     updateVisibility();
 
 
@@ -133,13 +136,13 @@ function updateVisibility(){
         sportChoice.prop("disabled", false);
     }
 
-    if (typeSelectValue == "sport"){
+    if (typeSelectValue == "sports"){
         sportChoice.hide();
         leagueChoice.hide();
         leagueChoiceLoad.hide();
         sportChoiceLoad.hide();
     }
-    else if(typeSelectValue == "league"){
+    else if(typeSelectValue == "leagues"){
         if(sportsListLoading){
             leagueChoice.hide();
             leagueChoiceLoad.hide();
@@ -197,7 +200,7 @@ function updateVisibility(){
 function sportSelectHandler(){
     dataTable.find("tr").remove();
 
-    if (typeSelect.val() == "league"){
+    if (typeSelect.val() == "leagues"){
         tableLoading = true;
         updateVisibility();
         var el = sportChoice.val();
@@ -231,7 +234,7 @@ function typeSelectHandler(selectedType) {
 
     dataTable.find("tr").remove();
 
-    if (selectedType.value == "sport") {
+    if (selectedType.value == "sports") {
         tableLoading = true;
         updateVisibility();
         $.get("http://localhost/api/getSports", function (data) {
@@ -239,7 +242,7 @@ function typeSelectHandler(selectedType) {
         })
     }
 
-    else if (selectedType.value == "league"){
+    else if (selectedType.value == "leagues"){
         sportsListLoading = true;
         updateVisibility();
         sportChoice
@@ -261,6 +264,38 @@ function typeSelectHandler(selectedType) {
     }
 }
 
+function matchSelectHandler(selectedId){
+    id1 = $(selectedId).val();
+    id2 = $(selectedId).parent().parent().find("td:nth-child(3)").html();
+    tableName = typeSelect.val();
+    $("select").prop("disabled", true);
+    $.post("http://localhost/api/updateUuid", {"id1": id1, "id2": id2, "tableName": tableName}, function(data){
+        showResult(data);
+    })
+}
+
+function showResult(resp){
+    tablee = typeSelect.val()
+    reload = null;
+    if(tablee =="sports"){
+    reload = sportSelectHandler;
+    }
+    else if(tablee =="leagues"){
+    reload = leagueSelectHandler
+    }
+    else{
+    }
+
+
+    obj = JSON.parse(resp);
+    if (obj[result] == True){
+        leagueSelectHandler();
+    }
+    else{
+        alert("Произошла ошибка на сервере");
+        leagueSelectHandler();
+    }
+}
 
 
 
@@ -294,7 +329,7 @@ leagueChoice.change(function () {
 });
 
 $( document ).ready(function() {
-    typeSelect.val("sport");
+    typeSelect.val("sports");
 
     typeSelectHandler(typeSelect.get(0));
 });

@@ -20,7 +20,7 @@ def index():
     posts = get_forks()
 
     t2 = time.time()
-    perf = t2- t1
+    perf = t2 - t1
     perf = str(round(perf, 3)) + " sec"
 
     return render_template("index.html", posts=posts, perf=perf)
@@ -58,8 +58,7 @@ def get_participants():
 @app.route("/api/getLeagues")
 def get_leagues():
     sportuuid = request.args.get('uuid')
-    return rest_api.get_leagues(sportuuid)\
-
+    return rest_api.get_leagues(sportuuid)
 
 
 @app.route("/api/events")
@@ -72,6 +71,14 @@ def get_events():
 def get_sports():
     return rest_api.get_sports()
 
+
+@app.route("/api/updateUuid", methods=["POST"])
+def update_uuid():
+    id1 = request.form['id1']
+    id2 = request.form['id2']
+    table_name = request.form['tableName']
+    uuid_list = [id1, id2]
+    return rest_api.update_uuid(table_name, uuid_list)
 
 if __name__ == "__main__":
     app.run(debug=True, port=80)

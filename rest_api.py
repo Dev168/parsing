@@ -72,33 +72,12 @@ def get_sports():
     return json.dumps(result, indent=4)
 
 
-def update_sports(sports):
+def update_uuid(table_name, uuid_list):
+    return json.dumps(
+        {"result": True}
+    )
     try:
-        db_api.update_sports(sports)
-        return json.dumps(
-            {"result": True}
-        )
-    except IntegrityError:
-        return json.dumps(
-            {"result": False}
-        )
-
-
-def update_leagues(leagues):
-    try:
-        db_api.update_leagues(leagues)
-        return json.dumps(
-            {"result": True}
-        )
-    except IntegrityError:
-        return json.dumps(
-            {"result": False}
-        )
-
-
-def update_participants(participants):
-    try:
-        db_api.update_participants(participants)
+        db_api.update_uuid(table_name, uuid_list)
         return json.dumps(
             {"result": True}
         )
