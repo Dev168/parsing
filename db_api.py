@@ -477,7 +477,8 @@ def get_forks():
             "ON h.sport = s.id " \
             "LEFT JOIN bookmakers as b " \
             "ON h.bookmaker = b.id " \
-            "WHERE p.uuid IS NOT NULL AND p2.uuid IS NOT NULL"
+            "WHERE p.uuid IS NOT NULL AND p2.uuid IS NOT NULL " \
+            "AND h.draw IS NULL"
 
     for temp_table in ["games1", "games2", "games3", "games4"]:
         cursor.execute(query.format(temp_table))
