@@ -15,6 +15,7 @@ function getIconPath(sport) {
         return "static/img/tennis24.png";
     }
 }
+
 function fillTables(data) {
 
     var iconpath;
