@@ -91,7 +91,7 @@ function bookmakerSelectHandler(selectedBookmaker){
     var value = selectedBookmaker.value;
     $("#data table").remove();
     $("#time").empty();
-    $.get( "http://localhost/api/events", {"bookmaker": value}, function(data){
+    $.get( "/api/events", {"bookmaker": value}, function(data){
         fillTables(data);
     })
 }
