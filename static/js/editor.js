@@ -70,7 +70,7 @@ function fillTable(data){
 
 // Заполняет select лист спортов
 function fillSports() {
-    $.get( "http://localhost/api/getSportsList", function(data){
+    $.get( "/api/getSportsList", function(data){
 
         var selectValues = JSON.parse(data);
 
@@ -92,7 +92,7 @@ function fillSports() {
 function fillLeagues() {
     var el = sportChoice.val();
 
-    $.get( "http://localhost/api/getLeaguesList", {"uuid": el}, function(data){
+    $.get( "/api/getLeaguesList", {"uuid": el}, function(data){
 
         var selectValues = JSON.parse(data);
 
@@ -204,7 +204,7 @@ function sportSelectHandler(){
         tableLoading = true;
         updateVisibility();
         var el = sportChoice.val();
-        $.get( "http://localhost/api/getLeagues", {"uuid": el}, function(data){
+        $.get( "/api/getLeagues", {"uuid": el}, function(data){
             fillTable(data)
         })
     }
@@ -225,7 +225,7 @@ function leagueSelectHandler() {
     tableLoading = true;
     updateVisibility();
     var el = leagueChoice.val();
-    $.get( "http://localhost/api/getParticipants", {"uuid": el}, function(data){
+    $.get( "/api/getParticipants", {"uuid": el}, function(data){
         fillTable(data)
     })
 }
