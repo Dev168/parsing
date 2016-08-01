@@ -672,17 +672,24 @@ def update_uuid(table_name, uuid_list):
         ids_parameter = ', '.join(list(map(lambda id_: '%s', new_uuid_list)))
         sql_select = "SELECT DISTINCT uuid " \
                      "FROM %s " \
-                     "WHERE id in (%s) FOR UPDATE" % (table_name, ids_parameter)
-        cursor.execute(sql_select, [el[1] for el in new_uuid_list])
+                     "WHERE id in (%s) " \
+                     "AND uuid IS NOT NULL " \
+                     "FOR UPDATE" % (table_name, ids_parameter)
+        print(sql_select)
+        cursor.execute(sql_select, [(row[1],) for row in new_uuid_list])
         reset_rows = cursor.fetchall()
+        print(reset_rows)
 
-        sql_reset = "UPDATE %s SET uuid = NULL WHERE uuid IN (%s)" % \
-                    (table_name, ', '.join(list(map(lambda id_: '%s', reset_rows))))
-        cursor.execute(sql_reset, reset_rows)
+        if len(reset_rows) > 0:
+            sql_reset = "UPDATE %s SET uuid = NULL WHERE uuid IN (%s)" % \
+                        (table_name, ', '.join(list(map(lambda id_: '%s', reset_rows))))
+            cursor.execute(sql_reset, reset_rows)
 
+        print(table_name, new_uuid_list)
         cursor.executemany("UPDATE {0} SET uuid = %s WHERE id = %s".format(table_name), new_uuid_list)
 
     except:
+        print("Исключение")
         conn.close()
         raise
     conn.commit()

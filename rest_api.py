@@ -73,9 +73,8 @@ def get_sports():
 
 
 def update_uuid(table_name, uuid_list):
-    return json.dumps(
-        {"result": True}
-    )
+
+
     try:
         db_api.update_uuid(table_name, uuid_list)
         return json.dumps(

@@ -77,7 +77,7 @@ def update_uuid():
     id1 = request.form['id1']
     id2 = request.form['id2']
     table_name = request.form['tableName']
-    uuid_list = [id1, id2]
+    uuid_list = [[id1, id2]]
     return rest_api.update_uuid(table_name, uuid_list)
 
 if __name__ == "__main__":
