@@ -47,6 +47,10 @@ class Bookmaker(object):
         pass
 
     @abstractmethod
+    def _get_log_suff(self):
+        return ""
+
+    @abstractmethod
     def get_scraping_urls(self):
         pass
 
@@ -126,7 +130,7 @@ class Bookmaker(object):
 
     def download_events(self, scraping_url=None, debug_page=None):
 
-        logger = get_logger(__name__)
+        logger = get_logger(__name__, self._get_log_suff())
 
         bookmaker_name = self.bookmaker_name
         logger.info("{0}: Начало загрузки данных".format(bookmaker_name))
@@ -155,15 +159,15 @@ class Bookmaker(object):
 
         if len(handicaps) > 0:
             logger.info("{0}: Начало разрешения ссылок в гандикапах".format(bookmaker_name))
-            handicaps = resolve_all_links(handicaps)
-            create_handicaps(handicaps)
+            handicaps = resolve_all_links(handicaps, self._get_log_suff)
+            create_handicaps(handicaps, self._get_log_suff())
         else:
             logger.info("{0}: Гандикапы на странице {1} отсутствуют".format(bookmaker_name, scraping_url))
 
         if len(moneylines) > 0:
             logger.info("{0}: Начало разрешения ссылок в манилайнах".format(bookmaker_name))
-            moneylines = resolve_all_links(moneylines)
-            create_moneylines(moneylines)
+            moneylines = resolve_all_links(moneylines, self._get_log_suff)
+            create_moneylines(moneylines, self._get_log_suff())
         else:
             logger.info("{0}: Манилайны на странице {1} отсутствуют".format(bookmaker_name, scraping_url))
 

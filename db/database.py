@@ -100,9 +100,9 @@ def create_sports(sports):
     print("Добавлены новые виды спорта")
 
 
-def create_handicaps(handicaps):
+def create_handicaps(handicaps, suff):
 
-    logger = get_logger(__name__)
+    logger = get_logger(__name__, suff)
     delete_previous("handicaps", handicaps[0]["bookmaker"], handicaps[0]["sport"])
     logger.info("Из базы данных удалены все гандикапы по конторе {0} и спорту {1}".
                 format(handicaps[0]["bookmaker"], handicaps[0]["sport"]))
@@ -152,8 +152,8 @@ def delete_previous(table, bookmaker, sport):
     conn.close()
 
 
-def create_moneylines(moneylines):
-    logger = get_logger(__name__)
+def create_moneylines(moneylines, suff):
+    logger = get_logger(__name__, suff)
     delete_previous("moneylines", moneylines[0]["bookmaker"], moneylines[0]["sport"])
     logger.info("Из базы данных удалены все манилайны по конторе {0} и спорту {1}".
                 format(moneylines[0]["bookmaker"], moneylines[0]["sport"]))

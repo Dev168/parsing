@@ -1,19 +1,19 @@
 import logging
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from settings import LOG_DIR
 
 logger = None
 
-def get_logger(name):
+def get_logger(name, suff):
 
     global logger
 
     if logger is not None:
         return logger
 
-    time = datetime.utcnow()
-    logname = time.strftime("%d.%m.%Y.log")
+    time = datetime.utcnow() + timedelta(hours=3)
+    logname = time.strftime("{0}%d.%m.%Y.log".format(suff))
     logpath = os.path.join(LOG_DIR, logname)
 
     handler = logging.FileHandler(logpath, "a",

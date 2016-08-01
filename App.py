@@ -10,7 +10,6 @@ import time
 import rest_api
 
 
-
 app = Flask(__name__)
 
 @app.route("/")

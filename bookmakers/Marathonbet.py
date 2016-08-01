@@ -16,6 +16,9 @@ class Marathonbet(Bookmaker):
 
     _default_url = "https://www.marathonplay.com/en/live/26418"
 
+    def _get_log_suff(self):
+        return "m-"
+
     def _get_page(self, url):
         cookie = {'panbet.sitestyle': 'MULTIMARKETS'}
         proxystring = "http://{0}:{1}@{2}".format(PROXY[1], PROXY[2], PROXY[0])

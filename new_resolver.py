@@ -143,11 +143,11 @@ def replace_attribute_value(substitutional_objs, subsitutable_objs, match_attrs,
     return subsitutable_objs
 
 
-def resolve_all_links(data):
+def resolve_all_links(data, suff):
 
     bk = data[0]["bookmaker"]
 
-    logger = get_logger(__name__)
+    logger = get_logger(__name__, suff)
 
     logger.info("Всего к обработке: {0} событий".format(len(data)))
 
