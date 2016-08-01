@@ -231,7 +231,7 @@ class Marathonbet(Bookmaker):
 
                     handicap["secondwin"] = round(float(c[m][index_of_hand1]),2)
                     handicap["live"] = True
-                    handicap["href"] = "https://www.marathonbet.com/en/live/" + str(hrefs[m])
+                    handicap["href"] = "/en/live/" + str(hrefs[m])
                     return handicap
 
                 def get_pairs_of_participants_handicap():
@@ -285,7 +285,7 @@ class Marathonbet(Bookmaker):
                     result2way["league"] = get_league(ev).strip()
                     result2way["secondwin"] = round(float(c[m][index_of_hand1]),2)
                     result2way["live"] = True
-                    result2way["href"] = "https://www.marathonbet.com/en/live/" + str(hrefs[m])
+                    result2way["href"] = "/en/live/" + str(hrefs[m])
                     return result2way
 
                 def get_pairs_of_participants_result2way():
@@ -337,7 +337,7 @@ class Marathonbet(Bookmaker):
                     moneyline["secondwin"] = is_empty(round(float(c[m][index_of_hand1]),2))
                     moneyline["draw"] = round(float(c[m][index_of_draw]),2)
                     moneyline["live"] = True
-                    moneyline["href"] = "https://www.marathonbet.com/en/live/" + str(hrefs[m])
+                    moneyline["href"] = "/en/live/" + str(hrefs[m])
                     return moneyline
 
                 def get_pairs_of_participants_moneyline():
