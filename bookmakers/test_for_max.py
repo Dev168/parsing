@@ -1,6 +1,8 @@
 import requests
 from multiprocessing.dummy import Pool as ThreadPool
 import time
+
+from bookmakers.Bookmaker import GetSportPageException
 from bookmakers.Marathonbet import Marathonbet
 from bookmakers.Sbobet import Sbobet
 from subprocess import Popen, PIPE
@@ -26,13 +28,16 @@ def get_pages(bookmaker):
         s = Sbobet()
         for p in s.get_scraping_urls():
             s_pages.append(s._get_page(p))
+
         del s
         return s_pages
     else:
 
         pool = ThreadPool(5)
         m = Marathonbet()
-        m_pages = pool.map(m._get_page, [])
+        m_pages = pool.map(m._get_page, m.get_scraping_urls())
+
+
         pool.close()
         pool.join()
         del m
@@ -66,5 +71,5 @@ def save():
 
 t1 = time.time()
 save()
-t2 = time.time()
+t2=time.time()
 

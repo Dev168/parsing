@@ -352,6 +352,106 @@ def get_events(bookmaker_id):
 
     return json_obj
 
+def get_handicap_forks():
+    conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME)
+    cursor = conn.cursor()
+
+    # Создаем четыре идентичные временные таблицы. Создаем их чтобы разрешить ссылки - id шники на имена
+    # Четыре - потому что придется связывать таблицу саму с собой для поиска матчей, но MySQL не позволяет соединить одну
+    # временную таблицу саму с собой.
+    query = "CREATE TEMPORARY TABLE IF NOT EXISTS {0} " \
+            "SELECT h.firstwin, h.secondwin, h.firstforward, h.secondforward, CONCAT(b.hostname, h.href) as href, p.uuid as part1, p2.uuid as part2, " \
+            "p.name part1name, p2.name as part2name, b.name as bookmaker " \
+            "FROM handicaps as h " \
+            "LEFT JOIN participants as p " \
+            "ON h.firstparticipant = p.id " \
+            "LEFT JOIN participants as p2 " \
+            "ON h.secondparticipant = p2.id " \
+            "LEFT JOIN leagues as l " \
+            "ON h.league = l.id " \
+            "LEFT JOIN sports as s " \
+            "ON h.sport = s.id " \
+            "LEFT JOIN bookmakers as b " \
+            "ON h.bookmaker = b.id " \
+            "WHERE p.uuid IS NOT NULL AND p2.uuid IS NOT NULL"
+
+    for temp_table in ["games1", "games2", "games3", "games4"]:
+        cursor.execute(query.format(temp_table))
+    conn.commit()
+
+    # Выполняем связку - разные букмекеры, но одиниаковые участники.
+    query = "SELECT g1.firstwin, g1.secondwin, g1.firstforward, g1.secondforward, g1.part1name, g1.part1, g1.part2name, g1.part2, g1.bookmaker, g1.href, " \
+            "g2.firstwin, g2.secondwin, g2.firstforward, g2.secondforward, g2.bookmaker, g2.href, false as reverse " \
+            "FROM games1 as g1 " \
+            "INNER JOIN games2 as g2 " \
+            "ON g1.part1 = g2.part1 " \
+            "AND g1.part2 = g2.part2 " \
+            "AND (( g1.firstforward + g2.secondforward ) >= 0)" \
+            "AND g1.bookmaker != g2.bookmaker " \
+            "UNION " \
+            "SELECT g1.firstwin, g1.secondwin, g1.firstforward, g1.secondforward,  g1.part1name, g1.part1, g1.part2name, g1.part2, g1.bookmaker, g1.href, " \
+            "g2.firstwin, g2.secondwin, g2.firstforward, g2.secondforward, g2.bookmaker, g2.href, true " \
+            "FROM games3 as g1 " \
+            "INNER JOIN games4 as g2 " \
+            "ON g1.part1 = g2.part2 " \
+            "AND g1.part2 = g2.part1 " \
+            "AND (( g1.firstforward + g2.secondforward ) >= 0)" \
+            "AND g1.bookmaker != g2.bookmaker"
+    cursor.execute(query)
+    rows = cursor.fetchall()  # Внимание, содержат дубли
+
+    # Удалим временные таблицы
+    cursor.execute("DROP TABLE games1")
+    cursor.execute("DROP TABLE games2")
+    cursor.execute("DROP TABLE games3")
+    cursor.execute("DROP TABLE games4")
+    conn.commit()
+
+    # Очистим дубли и вычислим маржу. (Отдельно для обычных и реверс строк, т.к. имеют свои особенности обработки)
+    matches_hand = []
+
+    for row in rows:
+        founded = False
+        for match in matches_hand:
+            if {row[5], row[7]} == {match["p1"], match["p2"]}:
+                founded = True
+                break  # Дубль!
+        if not founded:
+            matches_hand.append(
+                {
+                    "event1": row[5] + " " + row[2],
+                    "event2": row[7] + " " + row[13],
+                    "coeff1": row[0],
+                    "coeff2": row[11],
+                    "href1": row[9],
+                    "href2": row[15],
+                    "bookmaker1": row[8],
+                    "bookmaker2": row[14],
+                    "marge": round((row[0] * row[11] - row[0] - row[11]) / (row[0] + row[11]), 2),
+                    "p1": row[5],
+                    "p2": row[7],
+                    "game": row[4] + " - " + row[6]
+                }
+            )
+            matches_hand.append(
+                {
+                    "event1": row[7] + " " + row[3],
+                    "event2": row[5] + " " + row[12],
+                    "coeff1": row[1],
+                    "coeff2": row[10],
+                    "href1": row[9],
+                    "href2": row[15],
+                    "bookmaker1": row[8],
+                    "bookmaker2": row[14],
+                    "marge": round((row[1] * row[10] - row[1] - row[10]) / (row[1] + row[10]), 2),
+                    "p1": row[7],
+                    "p2": row[5],
+                    "game": row[6] + " - " + row[4]
+                }
+            )
+
+
+    return matches_hand
 
 def get_forks():
     conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME)
@@ -450,7 +550,7 @@ def get_forks():
                 }
             )
 
-    return matches
+    return matches + get_handicap_forks()
 
 
 
