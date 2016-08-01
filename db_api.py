@@ -511,16 +511,16 @@ def get_forks():
     conn.commit()
 
     # Очистим дубли и вычислим маржу. (Отдельно для обычных и реверс строк, т.к. имеют свои особенности обработки)
-    matches = []
+    matches_m = []
 
     for row in rows:
         founded = False
-        for match in matches:
+        for match in matches_m:
             if {row[3], row[5]} == {match["p1"], match["p2"]}:
                 founded = True
                 break  #  Дубль!
         if not founded:
-            matches.append(
+            matches_m.append(
                 {
                     "event1": row[2] + " win",
                     "event2": row[4] + " win",
@@ -536,7 +536,7 @@ def get_forks():
                     "game": row[2] + " - " + row[4]
                 }
             )
-            matches.append(
+            matches_m.append(
                 {
                     "event1": row[4] + " win",
                     "event2": row[2] + " win",
@@ -553,7 +553,13 @@ def get_forks():
                 }
             )
 
-    return matches + get_handicap_forks()
+    matches_handicaps = get_handicap_forks()
+
+    matches = matches_m + matches_handicaps
+
+    matches = sorted(matches, key=lambda match: match['marge'], reverse=True)
+
+    return matches
 
 
 
@@ -675,21 +681,17 @@ def update_uuid(table_name, uuid_list):
                      "WHERE id in (%s) " \
                      "AND uuid IS NOT NULL " \
                      "FOR UPDATE" % (table_name, ids_parameter)
-        print(sql_select)
         cursor.execute(sql_select, [(row[1],) for row in new_uuid_list])
         reset_rows = cursor.fetchall()
-        print(reset_rows)
 
         if len(reset_rows) > 0:
             sql_reset = "UPDATE %s SET uuid = NULL WHERE uuid IN (%s)" % \
                         (table_name, ', '.join(list(map(lambda id_: '%s', reset_rows))))
             cursor.execute(sql_reset, reset_rows)
 
-        print(table_name, new_uuid_list)
         cursor.executemany("UPDATE {0} SET uuid = %s WHERE id = %s".format(table_name), new_uuid_list)
 
     except:
-        print("Исключение")
         conn.close()
         raise
     conn.commit()
