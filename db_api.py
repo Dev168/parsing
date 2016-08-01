@@ -397,7 +397,7 @@ def get_handicap_forks():
             "INNER JOIN games4 as g2 " \
             "ON g1.part1 = g2.part2 " \
             "AND g1.part2 = g2.part1 " \
-            "AND (( g1.firstforward + g2.secondforward ) >= 0)" \
+            "AND (( g1.secondforward + g2.firstforward ) >= 0)" \
             "AND g1.bookmaker != g2.bookmaker"
     cursor.execute(query)
     rows = cursor.fetchall()  # Внимание, содержат дубли
