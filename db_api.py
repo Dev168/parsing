@@ -20,7 +20,7 @@ def get_sport_select_list():
 
     cursor = conn.cursor()
 
-    sql_code = 'SELECT name, uuid FROM sports GROUP BY uuid'
+    sql_code = 'SELECT name, uuid FROM sports WHERE sports.uuid IS NOT NULL GROUP BY uuid'
 
     cursor.execute(sql_code)
 
@@ -33,7 +33,7 @@ def get_sport_select_list():
 
 def get_leagues_select_list(sportuuid):
     """
-Возвращает список диг с уникальными uuid из базы данных (имя берется произвольно из одной из контор)
+Возвращает список лиг с уникальными uuid из базы данных (имя берется произвольно из одной из контор)
     :return:
     """
     conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME, use_unicode=True, charset='utf8')
@@ -44,7 +44,8 @@ def get_leagues_select_list(sportuuid):
                'FROM leagues ' \
                'LEFT JOIN sports ' \
                'ON leagues.sport = sports.id ' \
-               'WHERE sports.uuid = %s' \
+               'WHERE sports.uuid = %s ' \
+               'AND leagues.uuid IS NOT NULL ' \
                'GROUP BY uuid'
 
     cursor.execute(sql_code, (sportuuid,))
@@ -352,6 +353,7 @@ def get_events(bookmaker_id):
 
     return json_obj
 
+
 def get_handicap_forks():
     conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME)
     cursor = conn.cursor()
@@ -452,6 +454,7 @@ def get_handicap_forks():
 
 
     return matches_hand
+
 
 def get_forks():
     conn = mysql.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASSWD, db=DB_NAME)

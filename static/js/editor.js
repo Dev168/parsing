@@ -287,6 +287,7 @@ function showResult(resp){
 }
 
 function reload(){
+    $("select").prop("disabled", false);
     tablee = typeSelect.val()
     if(tablee =="sports"){
         typeSelectHandler();
