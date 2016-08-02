@@ -2,7 +2,7 @@ import requests
 import bs4
 import re
 from bookmakers.Bookmaker import Bookmaker, GetSportPageException
-from requests.exceptions import ConnectTimeout
+from requests.exceptions import ConnectTimeout, ProxyError
 from settings import LOAD_WAIT_TIME, PROXY
 
 
@@ -12,7 +12,7 @@ class Marathonbet(Bookmaker):
 
     bookmaker_name = "marathonbet"
 
-    _timeoutexception = ConnectTimeout
+    _timeoutexception = ProxyError
 
     _default_url = "https://www.marathonplay.com/en/live/26418"
 

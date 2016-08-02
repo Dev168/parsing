@@ -1,7 +1,8 @@
 from bookmakers.Bookmaker import GetSportPageException
-from bookmakers.Sbobet import Sbobet
 from bookmakers.Marathonbet import Marathonbet
 from time import sleep
+import random
+from datetime import datetime, timedelta
 
 m = Marathonbet()
 mf = m.get_scraping_urls()
@@ -11,11 +12,16 @@ while True:
     for f in mf:
         try:
             m.download_events(f)
-        except (IndexError, AttributeError, KeyError, GetSportPageException, m._timeoutexception):
+        except GetSportPageException:
             pass
+        except (IndexError, AttributeError, KeyError, m._timeoutexception):
+            timelapse = random.randint(30, 180)
+            timez = (datetime.utcnow() + timedelta(hours=3)).strftime("%H:%M:%S: ")
+            print(timez + "Сервер забанил нас. Сделаем паузу {0} секунд".format(timelapse))
+            sleep(timelapse)
 
-    print("=========================")
-    print("Delay 1 sec")
-    print("=========================")
-    sleep(1)
+    timelapse = random.randint(1, 3)
+    timez = (datetime.utcnow() + timedelta(hours=3)).strftime("%H:%M:%S: ")
+    print(timez + "Delay {0} sec".format(timelapse))
+    sleep(timelapse)
 
