@@ -1,6 +1,7 @@
 import MySQLdb as mysql
 from settings import DB_HOST, DB_NAME, DB_USER, DB_PASSWD
 from uuid import uuid4
+from datetime import timedelta
 
 
 class BelongException(Exception):
@@ -333,7 +334,7 @@ def get_events(bookmaker_id):
                     "secondforward": row[1],
                     "firstwin": row[2],
                     "secondwin": row[3],
-                    "oddsdate": row[4].strftime("%H:%M:%S %d.%m.%Y"),
+                    "oddsdate": (row[4]+timedelta(hours=3)).strftime("%H:%M:%S %d.%m.%Y"),
                     "href": row[5]
                 })
         else:
@@ -345,7 +346,7 @@ def get_events(bookmaker_id):
                     "draw": row[1],
                     "firstwin": row[2],
                     "secondwin": row[3],
-                    "oddsdate": row[4].strftime("%H:%M:%S %d.%m.%Y"),
+                    "oddsdate": (row[4]+timedelta(hours=3)).strftime("%H:%M:%S %d.%m.%Y"),
                     "href": row[5]
                 })
 
